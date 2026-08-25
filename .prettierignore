@@ -1,0 +1,7 @@
+node_modules
+.next
+out
+build
+
+# 다른 프로젝트에서 그대로 복사해 온 원본 문서
+docs
