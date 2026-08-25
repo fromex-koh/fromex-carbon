@@ -1,0 +1,27 @@
+<svg width="1276" height="628" viewBox="0 0 1276 628" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_397_11809)" filter="url(#filter0_n_397_11809)">
+<path d="M186.63 127.55L167.96 140.75C165.47 142.51 162.49 143.46 159.44 143.46H0V100.69L27.46 97.98L81.81 89.8201C84.97 89.3501 88.19 89.7801 91.11 91.0701L128.68 107.63L264.43 110.32C266.34 110.36 267.29 112.64 265.98 114.03L255.7 119.92L186.61 127.56L186.63 127.55Z" fill="#194E8E"/>
+<path d="M323.53 205.32H113C111.68 205.32 110.96 203.79 111.79 202.77L115.48 198.22H137.65L139.13 192.95C140.1 189.49 143.2 187.05 146.79 186.93L201.8 185.05C204.18 184.97 206.52 185.72 208.41 187.17L216.13 193.09C217.86 194.42 219.96 195.17 222.14 195.24L309.24 198.23L323.9 202.83C325.29 203.27 324.98 205.32 323.52 205.32H323.53Z" fill="#194E8E"/>
+</g>
+<defs>
+<filter id="filter0_n_397_11809" x="0" y="0" width="1276" height="628" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feTurbulence type="fractalNoise" baseFrequency="0.90909087657928467 0.90909087657928467" stitchTiles="stitch" numOctaves="3" result="noise" seed="1398" />
+<feColorMatrix in="noise" type="luminanceToAlpha" result="alphaNoise" />
+<feComponentTransfer in="alphaNoise" result="coloredNoise1">
+<feFuncA type="discrete" tableValues="1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+</feComponentTransfer>
+<feComposite operator="in" in2="shape" in="coloredNoise1" result="noise1Clipped" />
+<feFlood flood-color="rgba(17, 17, 17, 0.15)" result="color1Flood" />
+<feComposite operator="in" in2="noise1Clipped" in="color1Flood" result="color1" />
+<feMerge result="effect1_noise_397_11809">
+<feMergeNode in="shape" />
+<feMergeNode in="color1" />
+</feMerge>
+</filter>
+<clipPath id="clip0_397_11809">
+<rect width="1276" height="628" fill="white"/>
+</clipPath>
+</defs>
+</svg>

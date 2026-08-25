@@ -1,0 +1,74 @@
+[
+  {
+    "path": "app",
+    "kind": "폴더",
+    "role": "라우트·루트 레이아웃·전역 스타일·폰트",
+    "copy": true
+  },
+  {
+    "path": "components",
+    "kind": "폴더",
+    "role": "헤더·푸터 등 도메인 컴포넌트",
+    "copy": true
+  },
+  {
+    "path": "components/ui",
+    "kind": "폴더",
+    "role": "shadcn 기반 공통 UI",
+    "copy": false
+  },
+  {
+    "path": "lib",
+    "kind": "폴더",
+    "role": "공용 유틸과 GNB 상수",
+    "copy": true
+  },
+  {
+    "path": "lib/publishing",
+    "kind": "폴더",
+    "role": "퍼블리싱 인덱스 전용 데이터 — 화면 원본 소스가 아님",
+    "copy": false
+  },
+  {
+    "path": "public",
+    "kind": "폴더",
+    "role": "로고·SNS·스텝 아이콘 에셋",
+    "copy": true
+  },
+  {
+    "path": "components.json",
+    "kind": "파일",
+    "role": "shadcn 컴포넌트 추가 설정",
+    "copy": true
+  },
+  {
+    "path": "package.json",
+    "kind": "파일",
+    "role": "의존성 정의 (main 최초 상태로 고정)",
+    "copy": false
+  },
+  {
+    "path": "postcss.config.mjs",
+    "kind": "파일",
+    "role": "Tailwind v4 PostCSS 설정",
+    "copy": true
+  },
+  {
+    "path": "tsconfig.json",
+    "kind": "파일",
+    "role": "TypeScript 설정과 @/ 경로 alias",
+    "copy": true
+  },
+  {
+    "path": "yarn.lock",
+    "kind": "파일",
+    "role": "의존성 버전 잠금",
+    "copy": true
+  },
+  {
+    "path": ".gitignore",
+    "kind": "파일",
+    "role": "git 추적 제외 목록",
+    "copy": true
+  }
+]
