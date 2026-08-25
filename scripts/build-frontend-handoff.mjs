@@ -1,4 +1,11 @@
-import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs"
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs"
 import { basename, resolve } from "node:path"
 import process from "node:process"
 
@@ -39,20 +46,18 @@ const copyRequiredHandoffAsset = (source, destination) => {
 rmSync(outputDirectory, { recursive: true, force: true })
 mkdirSync(outputDirectory, { recursive: true })
 
-// 전달본에 포함할 경로만 명시한다.
+// 전달 범위는 lib/publishing/handoff-assets.json 한 곳에서 관리한다.
+// 퍼블리싱 인덱스의 "프론트엔드 인계 자산" 표도 같은 파일을 읽으므로 둘이 어긋나지 않는다.
 // 여기에 없는 것(.github, .claude, CLAUDE.md, docs, scripts 등)은 전달되지 않는다.
-for (const path of [
-  ".gitignore",
-  "app",
-  "components",
-  "components.json",
-  "lib",
-  "postcss.config.mjs",
-  "public",
-  "tsconfig.json",
-  "yarn.lock",
-]) {
-  copy(path)
+const handoffAssets = JSON.parse(
+  readFileSync(
+    resolve(repositoryRoot, "lib/publishing/handoff-assets.json"),
+    "utf8",
+  ),
+)
+
+for (const asset of handoffAssets.filter((item) => item.copy)) {
+  copy(asset.path)
 }
 
 for (const path of [".DS_Store", "app/.DS_Store", "components/.DS_Store"]) {

@@ -13,8 +13,11 @@ if (!releasedAt) {
   throw new Error("RELEASE_TIME 환경변수가 필요합니다.")
 }
 
-const target = resolve(process.cwd(), "lib/release-info.json")
+const repositoryRoot = process.cwd()
 
-writeFileSync(target, `${JSON.stringify({ version, releasedAt }, null, 2)}\n`)
+writeFileSync(
+  resolve(repositoryRoot, "lib/publishing/release-info.json"),
+  `${JSON.stringify({ version, releasedAt }, null, 2)}\n`,
+)
 
 console.log(`릴리스 정보 기록: ${version} / ${releasedAt}`)
