@@ -1,0 +1,144 @@
+name: Release main
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-main
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Verify and tag release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check whether HEAD is already released
+        id: released
+        shell: bash
+        run: |
+          if git tag --points-at HEAD --list 'v[0-9]*.[0-9]*.[0-9]*' | grep -q .; then
+              echo 'value=true' >> "$GITHUB_OUTPUT"
+          else
+              echo 'value=false' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Node.js
+        if: steps.released.outputs.value == 'false'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install dependencies
+        if: steps.released.outputs.value == 'false'
+        run: yarn install --frozen-lockfile
+
+      - name: Verify release source
+        if: steps.released.outputs.value == 'false'
+        run: yarn build
+
+      - name: Resolve next release version
+        if: steps.released.outputs.value == 'false'
+        id: version
+        shell: bash
+        run: |
+          latest=$(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | head -n 1)
+          latest=${latest:-v0.0.0}
+          next=$(node scripts/resolve-release-version.mjs "$latest")
+          echo "value=$next" >> "$GITHUB_OUTPUT"
+
+      - name: Create release tag
+        if: steps.released.outputs.value == 'false'
+        id: release_commit
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.value }}
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git tag -a "$RELEASE_VERSION" -m "$RELEASE_VERSION"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "time=$(git show -s --format=%cI HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare frontend handoff history
+        if: steps.released.outputs.value == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          publish_dir="$RUNNER_TEMP/frontend-handoff-publish"
+          target_branch="frontend-handoff"
+          repository="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+
+          if git ls-remote --exit-code --heads "$repository" "$target_branch" > /dev/null; then
+              git clone --branch "$target_branch" --single-branch "$repository" "$publish_dir"
+          else
+              mkdir -p "$publish_dir"
+              git -C "$publish_dir" init
+              git -C "$publish_dir" switch --orphan "$target_branch"
+              git -C "$publish_dir" remote add origin "$repository"
+          fi
+
+      - name: Generate frontend handoff
+        if: steps.released.outputs.value == 'false'
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.value }}
+          HANDOFF_SOURCE_COMMIT: ${{ steps.release_commit.outputs.sha }}
+          HANDOFF_GENERATED_AT: ${{ steps.release_commit.outputs.time }}
+        run: node scripts/build-frontend-handoff.mjs "$RUNNER_TEMP/frontend-handoff"
+
+      - name: Install handoff dependencies
+        if: steps.released.outputs.value == 'false'
+        working-directory: ${{ runner.temp }}/frontend-handoff
+        run: yarn install --frozen-lockfile
+
+      - name: Build handoff
+        if: steps.released.outputs.value == 'false'
+        working-directory: ${{ runner.temp }}/frontend-handoff
+        run: yarn build
+
+      - name: Publish release tag
+        if: steps.released.outputs.value == 'false'
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.value }}
+        run: git push origin "refs/tags/${RELEASE_VERSION}"
+
+      - name: Publish frontend handoff with history
+        if: steps.released.outputs.value == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_VERSION: ${{ steps.version.outputs.value }}
+          SOURCE_COMMIT: ${{ steps.release_commit.outputs.sha }}
+        shell: bash
+        run: |
+          source_dir="$RUNNER_TEMP/frontend-handoff"
+          publish_dir="$RUNNER_TEMP/frontend-handoff-publish"
+          target_branch="frontend-handoff"
+
+          rsync -a --delete \
+              --exclude='.git/' \
+              --exclude='.next/' \
+              --exclude='node_modules/' \
+              "$source_dir/" "$publish_dir/"
+
+          git -C "$publish_dir" config user.name 'github-actions[bot]'
+          git -C "$publish_dir" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C "$publish_dir" add --all
+
+          if git -C "$publish_dir" diff --cached --quiet; then
+              echo '변경된 frontend handoff 파일이 없습니다.'
+              exit 0
+          fi
+
+          git -C "$publish_dir" commit -m "chore: sync frontend handoff ${RELEASE_VERSION} from ${SOURCE_COMMIT}"
+          git -C "$publish_dir" push origin "HEAD:${target_branch}"
