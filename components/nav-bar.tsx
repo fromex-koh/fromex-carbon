@@ -17,7 +17,7 @@ import { ModeToggle } from "@/components/ui/mode-toggle"
 import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
 import { menuList, navBarHeight } from "@/lib/const"
-import { logout } from "@/actions/logout"
+// import { logout } from "@/actions/logout"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useSession } from "@/components/auth-provider"
 import LogoTaxonomy from "@/components/ui/logo-taxonomy"
@@ -259,7 +259,7 @@ const NavBar = () => {
                     isDark && "bg-white text-black",
                   )}
                   variant={"login"}
-                  onClick={() => logout(isTaxonomy())}
+                  onClick={() => {/* logout(isTaxonomy()) */}}
                 >
                   로그아웃
                 </Button>
@@ -337,7 +337,7 @@ const NavBar = () => {
                   현황조회
                 </Button>
               </Link>
-              <Button variant={"ghost"} onClick={() => logout(isTaxonomy())}>
+              <Button variant={"ghost"} onClick={() => {/* logout(isTaxonomy()) */}}>
                 <LogOut />
                 로그아웃
               </Button>
