@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import {
   Table,
   TableBody,
@@ -8,6 +9,7 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+import releaseInfo from "@/lib/release-info.json"
 
 const DEPTH_HEADS = ["1뎁스", "2뎁스", "3뎁스", "4뎁스", "5뎁스"]
 
@@ -679,14 +681,44 @@ type UiuxKey = keyof typeof UIUX_VARIANT
 const getUiuxVariant = (uiux: string) =>
   uiux in UIUX_VARIANT ? UIUX_VARIANT[uiux as UiuxKey] : "outline"
 
+export const metadata: Metadata = {
+  title: "퍼블리싱 인덱스",
+}
+
+const formatReleasedAt = (isoDate: string) => {
+  if (!isoDate) return ""
+
+  return new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    weekday: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(new Date(isoDate))
+}
+
 const PublishingIndexPage = () => {
+  const releasedAt = formatReleasedAt(releaseInfo.releasedAt)
+
   return (
     <div className="flex w-full flex-col items-center px-4 py-10">
       <div className="flex w-full max-w-[1276px] flex-col gap-6">
         <div className="flex flex-col gap-2">
-          <h1 className="text-xl font-bold sm:text-2xl">퍼블리싱 인덱스</h1>
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-xl font-bold sm:text-2xl">퍼블리싱 인덱스</h1>
+            <Badge variant="forest" className="text-sm">
+              탄소중립 플랫폼 FO · IA V1.21_260818
+            </Badge>
+          </div>
           <p className="text-muted-foreground text-sm">
-            탄소중립 플랫폼 FO · IA V1.21_260818
+            현재 버전:{" "}
+            <span className="text-foreground font-medium">
+              {releaseInfo.version}
+            </span>
+            {releasedAt && ` / ${releasedAt}`}
           </p>
           <p className="text-muted-foreground text-xs">
             메뉴 자체가 화면인 행의 미사용 하위 뎁스는 병합된 &apos;-&apos;로
