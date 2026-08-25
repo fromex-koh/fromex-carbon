@@ -8,10 +8,45 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  ExternalLink,
+  FileText,
+  Folder,
+  GitBranch,
+  History,
+  Info,
+  PackageCheck,
+  TriangleAlert,
+} from "lucide-react"
 import { cn } from "@/lib/utils"
-import releaseInfo from "@/lib/release-info.json"
+import releaseInfo from "@/lib/publishing/release-info.json"
+import { RELEASE_NOTES, findAssetVersion } from "@/lib/publishing/release-note"
+import type {
+  ReleaseNoteChange,
+  ReleaseNoteHandoff,
+  ReleaseNoteHandoffMode,
+} from "@/lib/publishing/release-note"
+import handoffAssets from "@/lib/publishing/handoff-assets.json"
 
 const DEPTH_HEADS = ["1뎁스", "2뎁스", "3뎁스", "4뎁스", "5뎁스"]
+
+const REPOSITORY_URL = "https://github.com/fromex-koh/fromex-carbon"
+const REPOSITORY_LABEL = "github.com/fromex-koh/fromex-carbon"
+const AUTHOR = "이윤화 (웹 퍼블리싱)"
+
+const REPOSITORY_LINKS = [
+  {
+    term: "저장소",
+    href: REPOSITORY_URL,
+    branch: "(main 브랜치)",
+  },
+  {
+    term: "FE 전달용",
+    href: `${REPOSITORY_URL}/tree/frontend-handoff`,
+    branch: "(frontend-handoff 브랜치)",
+  },
+]
 
 const IA_ROWS = [
   {
@@ -685,6 +720,124 @@ export const metadata: Metadata = {
   title: "퍼블리싱 인덱스",
 }
 
+// 전달 카드 구분별 배지. kibo-ktop 의 Diff 확인·신규 추가·덮어쓰기 표기를 따른다.
+const HANDOFF_PRESENTATION: Record<
+  ReleaseNoteHandoffMode,
+  { label: string; variant: "blue" | "success" | "violet" }
+> = {
+  diff: { label: "Diff 확인", variant: "blue" },
+  new: { label: "신규 추가", variant: "success" },
+  overwrite: { label: "덮어쓰기", variant: "violet" },
+}
+
+// 방금 배포한 것만 강조한다. 두 표가 같은 배경색을 쓴다.
+// 표에 이미 회색 계열(bg-muted)이 쓰여 대비가 서도록 앰버를 골랐다.
+// TableRow 원본의 hover:bg-muted/50 이 강조를 덮으므로 hover 도 앰버로 지정한다.
+// cn 이 tailwind-merge 라 나중에 들어오는 className 쪽이 이긴다.
+const LATEST_HIGHLIGHT = "bg-amber-500/20 hover:bg-amber-500/30"
+
+const COMMIT_LINK_LABELS = ["커밋", "GitHub Diff", "Diff 링크"]
+const MARKDOWN_LINK_PATTERN = /\[([^\]]+)\]\(([^)]+)\)/g
+
+// 커밋 계열 라벨의 값은 "[변경사항 보기](URL)" 형태로 적는다. 링크로 바꿔 준다.
+const parseCommitLinks = (label: string, value: string) => {
+  if (!COMMIT_LINK_LABELS.includes(label)) return []
+  return [...value.matchAll(MARKDOWN_LINK_PATTERN)].map((match) => ({
+    text: match[1],
+    href: match[2],
+  }))
+}
+
+const ReleaseNoteDetailValue = ({
+  label,
+  value,
+}: {
+  label: string
+  value: string
+}) => {
+  const commitLinks = parseCommitLinks(label, value)
+
+  if (commitLinks.length > 0) {
+    return (
+      <span className="flex flex-col gap-1">
+        {commitLinks.map((link) => (
+          <a
+            key={link.href}
+            href={link.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary inline-flex w-fit items-center gap-1.5 rounded font-medium hover:underline"
+          >
+            <ExternalLink aria-hidden="true" className="size-4 shrink-0" />
+            {link.text} (새 창)
+          </a>
+        ))}
+      </span>
+    )
+  }
+
+  // 대상은 줄바꿈으로 여러 경로를 적을 수 있다.
+  if (label === "대상") {
+    return (
+      <span className="flex flex-wrap gap-1.5">
+        {value.split("\n").map((target) => (
+          <code
+            key={target}
+            className="bg-muted rounded px-1.5 py-0.5 font-mono text-xs break-all"
+          >
+            {target}
+          </code>
+        ))}
+      </span>
+    )
+  }
+
+  return <span className="break-keep">{value}</span>
+}
+
+const ReleaseNoteHandoffCard = ({ change }: { change: ReleaseNoteHandoff }) => {
+  const { label, variant } = HANDOFF_PRESENTATION[change.mode]
+
+  return (
+    <div className="border-border flex flex-col gap-3 rounded-md border p-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <Badge variant={variant}>{label}</Badge>
+        <p className="text-sm font-medium break-keep">{change.title}</p>
+      </div>
+      <dl className="flex flex-col gap-1.5 text-sm">
+        {change.details.map((detail) => (
+          <div
+            key={`${detail.label}-${detail.value}`}
+            className="flex flex-wrap gap-2"
+          >
+            <dt className="text-muted-foreground w-10 shrink-0">
+              {detail.label}
+            </dt>
+            <dd className="flex-1">
+              <ReleaseNoteDetailValue
+                label={detail.label}
+                value={detail.value}
+              />
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  )
+}
+
+const isHandoffChange = (
+  change: ReleaseNoteChange,
+): change is ReleaseNoteHandoff => typeof change !== "string"
+
+const formatReleaseDate = (isoDate: string) => {
+  if (!isoDate) return "-"
+
+  return new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Seoul" }).format(
+    new Date(isoDate),
+  )
+}
+
 const formatReleasedAt = (isoDate: string) => {
   if (!isoDate) return ""
 
@@ -702,6 +855,12 @@ const formatReleasedAt = (isoDate: string) => {
 
 const PublishingIndexPage = () => {
   const releasedAt = formatReleasedAt(releaseInfo.releasedAt)
+  const releaseNotes = RELEASE_NOTES
+  const latestVersion = releaseNotes[0]?.version
+
+  // IA 행은 자기 버전이 최신 릴리스와 같을 때 강조한다.
+  const isLatestScreen = (version: string) =>
+    latestVersion !== undefined && version === latestVersion
 
   return (
     <div className="flex w-full flex-col items-center px-4 py-10">
@@ -725,6 +884,198 @@ const PublishingIndexPage = () => {
             표시합니다.
           </p>
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Info
+                aria-hidden="true"
+                className="text-primary size-5 shrink-0"
+              />
+              프로젝트 정보
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <dl className="flex flex-col gap-3 text-sm">
+              {REPOSITORY_LINKS.map((link) => (
+                <div
+                  key={link.term}
+                  className="flex flex-wrap items-center gap-3"
+                >
+                  <dt className="text-muted-foreground w-20 shrink-0">
+                    {link.term}
+                  </dt>
+                  <dd>
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary inline-flex items-center gap-1.5 rounded font-medium break-all hover:underline"
+                    >
+                      <GitBranch
+                        aria-hidden="true"
+                        className="size-4 shrink-0"
+                      />
+                      {REPOSITORY_LABEL}
+                      <span className="text-muted-foreground whitespace-nowrap">
+                        {link.branch}
+                      </span>
+                      <span className="sr-only"> (새 창에서 열림)</span>
+                    </a>
+                  </dd>
+                </div>
+              ))}
+              <div className="flex flex-wrap items-center gap-3">
+                <dt className="text-muted-foreground w-20 shrink-0">작업자</dt>
+                <dd>{AUTHOR}</dd>
+              </div>
+            </dl>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <History
+                aria-hidden="true"
+                className="text-primary size-5 shrink-0"
+              />
+              버전 업데이트
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {releaseNotes.length === 0 ? (
+              <p className="text-muted-foreground text-sm">
+                아직 릴리스가 없습니다. RELEASE_NOTES_DRAFT.md 에 작성하면 main
+                릴리스 때 여기에 쌓입니다.
+              </p>
+            ) : (
+              <div className="max-h-100 overflow-auto overscroll-contain">
+                <div className="flex flex-col gap-6">
+                  {releaseNotes.map((note, noteIndex) => (
+                    <section
+                      key={note.version}
+                      className={cn(
+                        "flex flex-col gap-3 rounded-md",
+                        noteIndex === 0 && `${LATEST_HIGHLIGHT} p-3`,
+                      )}
+                    >
+                      <div className="bg-card sticky top-0 flex flex-wrap items-center gap-2 py-1">
+                        <Badge variant="outline">{note.version}</Badge>
+                        <span className="text-muted-foreground text-sm">
+                          {formatReleaseDate(note.releasedAt)}
+                        </span>
+                      </div>
+                      {note.changes.some(
+                        (change) => !isHandoffChange(change),
+                      ) && (
+                        <ul className="flex flex-col gap-1 text-sm">
+                          {note.changes
+                            .filter((change) => !isHandoffChange(change))
+                            .map((change) => (
+                              <li key={String(change)} className="break-keep">
+                                {String(change)}
+                              </li>
+                            ))}
+                        </ul>
+                      )}
+                      {note.changes.some(isHandoffChange) && (
+                        <div className="flex flex-col gap-3">
+                          {note.changes
+                            .filter(isHandoffChange)
+                            .map((change) => (
+                              <ReleaseNoteHandoffCard
+                                key={`${change.mode}-${change.title}`}
+                                change={change}
+                              />
+                            ))}
+                        </div>
+                      )}
+                    </section>
+                  ))}
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <PackageCheck
+                aria-hidden="true"
+                className="text-primary size-5 shrink-0"
+              />
+              프론트엔드 인계 자산
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3">
+            <p className="text-muted-foreground text-sm break-keep">
+              frontend-handoff 브랜치로 전달되는 범위입니다. CI 설정과 작업
+              문서는 전달하지 않습니다.
+            </p>
+            <div className="border-border overflow-hidden rounded-md border">
+              <div className="max-h-100 overflow-auto overscroll-contain [&>div]:overflow-visible">
+                <Table>
+                  <TableHeader className="[&_th]:bg-muted [&_th]:sticky [&_th]:top-0">
+                    <TableRow>
+                      <TableHead className="min-w-[5rem]">구분</TableHead>
+                      <TableHead className="min-w-[11rem]">원본 경로</TableHead>
+                      <TableHead className="min-w-[16rem]">역할</TableHead>
+                      <TableHead className="min-w-[7rem]">반영 버전</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {handoffAssets.map((asset) => {
+                      const assetVersion = findAssetVersion(asset.path)
+
+                      return (
+                        <TableRow
+                          key={asset.path}
+                          className={cn(
+                            assetVersion.isCurrent && LATEST_HIGHLIGHT,
+                          )}
+                        >
+                          <TableCell className="text-muted-foreground align-top text-sm">
+                            <span className="flex items-center gap-1.5">
+                              {asset.kind === "폴더" ? (
+                                <Folder
+                                  aria-hidden="true"
+                                  className="text-primary size-4 shrink-0"
+                                />
+                              ) : (
+                                <FileText
+                                  aria-hidden="true"
+                                  className="size-4 shrink-0"
+                                />
+                              )}
+                              {asset.kind}
+                            </span>
+                          </TableCell>
+                          <TableCell className="align-top font-mono text-sm">
+                            {asset.path}
+                          </TableCell>
+                          <TableCell className="align-top text-sm break-keep">
+                            {asset.role}
+                          </TableCell>
+                          <TableCell className="align-top">
+                            <Badge
+                              variant={
+                                assetVersion.isCurrent ? "default" : "outline"
+                              }
+                            >
+                              {assetVersion.version}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         <p className="text-muted-foreground text-sm">
           총{" "}
@@ -759,7 +1110,10 @@ const PublishingIndexPage = () => {
               return (
                 <TableRow
                   key={row.no}
-                  className={cn(isTopLevel && "bg-muted/40")}
+                  className={cn(
+                    isTopLevel && "bg-muted/40",
+                    isLatestScreen(row.version) && LATEST_HIGHLIGHT,
+                  )}
                 >
                   {row.cells.map((cell, index) =>
                     cell.level === 0 ? (
