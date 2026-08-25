@@ -1010,10 +1010,21 @@ const PublishingIndexPage = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
-            <p className="text-muted-foreground text-sm break-keep">
-              frontend-handoff 브랜치로 전달되는 범위입니다. CI 설정과 작업
-              문서는 전달하지 않습니다.
-            </p>
+            <ul className="text-muted-foreground flex list-disc flex-col gap-1 pl-5 text-sm break-keep">
+              <li>
+                <code className="text-foreground font-mono">main</code> 은
+                퍼블리싱 제작·검수용 브랜치입니다. 프론트엔드 개발은 검증된
+                결과만 제공하는{" "}
+                <code className="text-foreground font-mono">
+                  frontend-handoff
+                </code>{" "}
+                브랜치를 내려받아 시작합니다.
+              </li>
+              <li>
+                아래 표는 전달 자산의 원본 경로와 마지막 반영 버전이며, 이번
+                버전에 반영된 항목은 강조해 표시합니다.
+              </li>
+            </ul>
             <div className="border-border overflow-hidden rounded-md border">
               <div className="max-h-100 overflow-auto overscroll-contain [&>div]:overflow-visible">
                 <Table>
