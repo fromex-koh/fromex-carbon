@@ -66,6 +66,19 @@ jobs:
           RELEASE_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
             node scripts/write-release-info.mjs
 
+      - name: Compute asset versions and release notes
+        if: steps.released.outputs.value == 'false'
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.value }}
+        run: node scripts/compute-asset-versions.mjs
+
+      - name: Check generated file formatting
+        if: steps.released.outputs.value == 'false'
+        run: |
+          npx prettier --check RELEASE_NOTES_DRAFT.md \
+            lib/publishing/asset-versions.generated.json \
+            lib/publishing/release-notes.generated.json
+
       - name: Create tagged release commit
         if: steps.released.outputs.value == 'false'
         id: release_commit
@@ -75,7 +88,8 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add lib/release-info.json
+          git add lib/publishing/release-info.json RELEASE_NOTES_DRAFT.md \
+            lib/publishing/asset-versions.generated.json lib/publishing/release-notes.generated.json
           git commit -m "chore(release): ${RELEASE_VERSION}"
           git tag -a "$RELEASE_VERSION" -m "$RELEASE_VERSION"
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
