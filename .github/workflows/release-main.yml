@@ -36,7 +36,7 @@ jobs:
         if: steps.released.outputs.value == 'false'
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: yarn
 
       - name: Install dependencies
@@ -57,7 +57,16 @@ jobs:
           next=$(node scripts/resolve-release-version.mjs "$latest")
           echo "value=$next" >> "$GITHUB_OUTPUT"
 
-      - name: Create release tag
+      - name: Write release info
+        if: steps.released.outputs.value == 'false'
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.value }}
+        shell: bash
+        run: |
+          RELEASE_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            node scripts/write-release-info.mjs
+
+      - name: Create tagged release commit
         if: steps.released.outputs.value == 'false'
         id: release_commit
         env:
@@ -66,6 +75,8 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add lib/release-info.json
+          git commit -m "chore(release): ${RELEASE_VERSION}"
           git tag -a "$RELEASE_VERSION" -m "$RELEASE_VERSION"
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           echo "time=$(git show -s --format=%cI HEAD)" >> "$GITHUB_OUTPUT"
@@ -107,11 +118,11 @@ jobs:
         working-directory: ${{ runner.temp }}/frontend-handoff
         run: yarn build
 
-      - name: Publish release tag
+      - name: Publish release
         if: steps.released.outputs.value == 'false'
         env:
           RELEASE_VERSION: ${{ steps.version.outputs.value }}
-        run: git push origin "refs/tags/${RELEASE_VERSION}"
+        run: git push origin HEAD:main "refs/tags/${RELEASE_VERSION}"
 
       - name: Publish frontend handoff with history
         if: steps.released.outputs.value == 'false'
