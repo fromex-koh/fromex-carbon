@@ -1,0 +1,351 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  /* Define the marquee animations */
+  --animate-marquee-horizontal: marquee-horizontal var(--duration) infinite
+    linear;
+  --animate-marquee-vertical: marquee-vertical var(--duration) infinite linear;
+
+  @keyframes marquee-horizontal {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(calc(-100% - var(--gap)));
+    }
+  }
+  @keyframes marquee-vertical {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(calc(-100% - var(--gap)));
+    }
+  }
+}
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-footer: hsl(var(--footer));
+  --color-footer-foreground: hsl(var(--footer-foreground));
+
+  --color-bottom-bar: hsl(var(--bottom-bar));
+
+  --color-card: hsl(var(--card));
+  --color-card-info: hsl(var(--card-info));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsla(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-border: hsl(var(--border));
+  --color-border-foreground: hsl(var(--border-foreground));
+
+  --color-active: hsl(var(--active));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-section: hsl(var(--section));
+  --color-hover: hsl(var(--hover));
+
+  --color-primary-light: hsl(var(--primary-light));
+  --color-primary-dark: hsl(var(--primary-dark));
+  --color-forest-light: hsl(var(--forest-light));
+  --color-forest: hsl(var(--forest));
+  --color-forest-dark: hsl(var(--forest-dark));
+  --color-sky-blue-light: hsl(var(--sky-blue-light));
+  --color-sky-blue: hsl(var(--sky-blue));
+  --color-reverse: hsl(var(--reverse));
+
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+  --color-chart-6: hsl(var(--chart-6));
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --color-ash-100: hsla(var(--ash-100));
+  --color-ash-200: hsla(var(--ash-200));
+  --color-ash-300: hsla(var(--ash-300));
+  --color-ash-400: hsla(var(--ash-400));
+  --color-ash-500: hsla(var(--ash-500));
+  --color-ash-600: hsla(var(--ash-600));
+  --color-ash-700: hsla(var(--ash-700));
+  --color-ash-800: hsla(var(--ash-800));
+
+  --color-aqua-blue: hsl(var(--aqua-blue));
+  --color-lagoon-blue: hsl(var(--lagoon-blue));
+  --color-neon-violet: hsl(var(--neon-violet));
+  --color-candy-pink: hsl(var(--candy-pink));
+  --color-ocean-blue: hsl(var(--ocean-blue));
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+@layer utilities {
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+  }
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 11%;
+    --footer: 0 0% 97.25%;
+    --footer-foreground: 0, 0%, 82.35%;
+    --bottom-bar: 0 0% 7%;
+    --card: 0 0% 100%;
+    --card-info: 0 0% 96.47%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 220 48% 48%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 0, 0%, 53%, 1;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --active: 210 40% 98%;
+    --border: 0, 0%, 93%, 1;
+    --border-foreground: 222.2 15.4% 15%;
+    --input: 0, 0%, 82%, 1;
+    --ring: 221.2 83.2% 53.3%;
+    --section: 0 0% 95%;
+    --hover: 0 0% 53%;
+    --primary-light: 220 58% 69%;
+    --primary-dark: 220 48% 38%;
+    --forest-light: 122 33% 59%;
+    --forest: 122 35% 49%;
+    --forest-dark: 122 35% 39%;
+    --sky-blue-light: 220 46% 95%;
+    --sky-blue: 221 54% 90%;
+    --reverse: 0 0% 0%;
+    --radius: 0.5rem;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --chart-6: 217 91% 60%;
+    --ash-100: 0, 0%, 97%, 1;
+    --ash-200: 0, 0%, 95%, 1;
+    --ash-300: 0, 0%, 93%, 1;
+    --ash-400: 0, 0%, 82%, 1;
+    --ash-500: 0, 0%, 60%, 1;
+    --ash-600: 0, 0%, 53%, 1;
+    --ash-700: 0, 0%, 40%, 1;
+    --ash-800: 0, 0%, 20%, 1;
+    --aqua-blue: 212, 100%, 61%;
+    --lagoon-blue: 184, 65%, 44%;
+    --neon-violet: 255, 77%, 62%;
+    --candy-pink: 338, 83%, 73%;
+    --ocean-blue: 234, 54%, 42%;
+  }
+
+  :root .light {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 11%;
+    --footer: 0 0% 97.25%;
+    --footer-foreground: 0 0% 50%;
+    --bottom-bar: 0 0% 7%;
+    --card: 0 0% 100%;
+    --card-info: 0 0% 96.47%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 220 48% 48%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 0, 0%, 53%, 1;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --active: 210 40% 98%;
+    --border: 0, 0%, 93%, 1;
+    --border-foreground: 222.2 15.4% 15%;
+    --input: 0, 0%, 82%, 1;
+    --ring: 221.2 83.2% 53.3%;
+    --section: 0 0% 95%;
+    --hover: 0 0% 53%;
+    --primary-light: 220 44% 58%;
+    --primary-dark: 220 48% 38%;
+    --forest-light: 122 33% 59%;
+    --forest: 122 35% 49%;
+    --forest-dark: 122 35% 39%;
+    --sky-blue-light: 220 46% 95%;
+    --sky-blue: 221 54% 90%;
+    --reverse: 0 0% 0%;
+    --radius: 0.5rem;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --chart-6: 217 91% 60%;
+    --ash-100: 0, 0%, 97%, 1;
+    --ash-200: 0, 0%, 95%, 1;
+    --ash-300: 0, 0%, 93%, 1;
+    --ash-400: 0, 0%, 82%, 1;
+    --ash-500: 0, 0%, 60%, 1;
+    --ash-600: 0, 0%, 53%, 1;
+    --ash-700: 0, 0%, 40%, 1;
+    --ash-800: 0, 0%, 20%, 1;
+    --aqua-blue: 212, 100%, 61%;
+    --lagoon-blue: 184, 65%, 44%;
+    --neon-violet: 255, 77%, 62%;
+    --candy-pink: 338, 83%, 73%;
+    --ocean-blue: 234, 54%, 42%;
+  }
+
+  .dark {
+    --background: 0 0% 7%;
+    --foreground: 210 40% 98%;
+    --footer: 0 0% 13.33%;
+    --footer-foreground: 0 0% 50%;
+    --bottom-bar: 0 0% 20%;
+    --card: 222.2 15.4% 11%;
+    --card-info: 0 0% 20%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 15.4% 11%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 220 75% 54%;
+    --primary-foreground: 355.7 100% 97.3%;
+    --secondary: 207 12% 19%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 14.6% 17.5%;
+    --muted-foreground: 0, 0%, 82%, 1;
+    --accent: 217.2 14.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --active: 222.2 15.4% 11%;
+    --border: 0, 0%, 92%, 0.1;
+    --border-foreground: 222.2 15.4% 15%;
+    --input: 0, 0%, 40%, 1;
+    --ring: 224.3 76.3% 48%;
+    --section: 0 0% 13%;
+    --hover: 0 0% 82%;
+    --primary-light: 220 44% 58%;
+    --primary-dark: 220 48% 38%;
+    --forest-light: 122 33% 59%;
+    --forest: 122 35% 49%;
+    --forest-dark: 122 35% 39%;
+    --sky-blue-light: 219 17% 16%;
+    --sky-blue: 217 100% 10%;
+    --reverse: 0 0% 100%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    --chart-6: 10 81% 69%;
+    --ash-100: 0, 0%, 20%, 0.25;
+    --ash-200: 0, 0%, 13%, 1;
+    --ash-300: 0, 0%, 92%, 0.1;
+    --ash-400: 0, 0%, 40%, 1;
+    --ash-500: 0, 0%, 60%, 1;
+    --ash-600: 0, 0%, 82%, 1;
+    --ash-700: 0, 0%, 82%, 1;
+    --ash-800: 0, 0%, 93%, 1;
+    --aqua-blue: 212, 100%, 61%;
+    --lagoon-blue: 184, 65%, 44%;
+    --neon-violet: 255, 77%, 62%;
+    --candy-pink: 338, 83%, 73%;
+    --ocean-blue: 234, 54%, 42%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  .light {
+    @apply bg-background text-foreground;
+  }
+  html {
+    font-size: 17px;
+  }
+}
+
+@layer base {
+  /* Collapsible 애니메이션 설정 */
+  .CollapsibleContent {
+    overflow: hidden;
+  }
+
+  .CollapsibleContent[data-state="open"] {
+    animation: slideDown 300ms ease-out forwards;
+  }
+
+  .CollapsibleContent[data-state="closed"] {
+    animation: slideUp 300ms ease-out forwards;
+  }
+
+  @keyframes slideDown {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-collapsible-content-height);
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      height: var(--radix-collapsible-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+}
