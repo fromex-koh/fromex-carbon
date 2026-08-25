@@ -1,3 +1,6 @@
+// @ts-nocheck -- 원본에서 넘어오지 않은 모듈(@/hooks/remote-store 등) 때문에
+// 발생하는 타입 에러를 억제한다. 퍼블리싱 단계 임시 조치이며,
+// 빠진 모듈이 들어오면 이 주석 3줄만 지우면 된다.
 "use client"
 
 import * as React from "react"
