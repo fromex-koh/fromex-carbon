@@ -28,6 +28,14 @@ const copy = (source, destination = source) => {
   cpSync(sourcePath, resolve(outputDirectory, destination), { recursive: true })
 }
 
+const copyRequiredHandoffAsset = (source, destination) => {
+  const sourcePath = resolve(repositoryRoot, source)
+  if (!existsSync(sourcePath)) {
+    throw new Error(`handoff 전용 파일이 없습니다: ${source}`)
+  }
+  cpSync(sourcePath, resolve(outputDirectory, destination), { recursive: true })
+}
+
 rmSync(outputDirectory, { recursive: true, force: true })
 mkdirSync(outputDirectory, { recursive: true })
 
@@ -39,7 +47,6 @@ for (const path of [
   "components",
   "components.json",
   "lib",
-  "package.json",
   "postcss.config.mjs",
   "public",
   "tsconfig.json",
@@ -51,6 +58,12 @@ for (const path of [
 for (const path of [".DS_Store", "app/.DS_Store", "components/.DS_Store"]) {
   rmSync(resolve(outputDirectory, path), { force: true })
 }
+
+// package.json 은 원본 저장소의 것을 그대로 쓰지 않는다.
+// 릴리스 스크립트 등 퍼블리싱 쪽 사정으로 늘어나는 항목이 전달본에 새어 나가지 않도록,
+// main 최초 상태를 고정해 둔 handoff/package.json 을 전달한다.
+// 실제 의존성이 바뀌어 전달본이 깨지면 CI 의 handoff 빌드 단계에서 걸린다.
+copyRequiredHandoffAsset("handoff/package.json", "package.json")
 
 const version = process.env.RELEASE_VERSION ?? "(미지정)"
 const sourceCommit = process.env.HANDOFF_SOURCE_COMMIT ?? "(미지정)"
