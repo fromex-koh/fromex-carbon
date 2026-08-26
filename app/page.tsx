@@ -28,6 +28,7 @@ import type {
   ReleaseNoteHandoffMode,
 } from "@/lib/publishing/release-note"
 import handoffAssets from "@/lib/publishing/handoff-assets.json"
+import ScreenKeyBadge from "@/components/publishing/screen-key-badge"
 
 const DEPTH_HEADS = ["1뎁스", "2뎁스", "3뎁스", "4뎁스", "5뎁스"]
 
@@ -51,6 +52,7 @@ const REPOSITORY_LINKS = [
 const IA_ROWS = [
   {
     no: 1,
+    key: "home",
     user: "비회원·회원",
     type: "Page",
     status: "유지",
@@ -64,6 +66,7 @@ const IA_ROWS = [
   },
   {
     no: 2,
+    key: "carbon-leader",
     user: "비회원·회원",
     type: "Page",
     status: "변경",
@@ -77,6 +80,7 @@ const IA_ROWS = [
   },
   {
     no: 3,
+    key: "carbon-leader-self-check-company-info",
     user: "비회원·회원",
     type: "Page",
     status: "변경",
@@ -90,6 +94,7 @@ const IA_ROWS = [
   },
   {
     no: 4,
+    key: "carbon-leader-self-check-inventory-emission",
     user: "비회원·회원",
     type: "Page",
     status: "변경",
@@ -103,6 +108,7 @@ const IA_ROWS = [
   },
   {
     no: 5,
+    key: "carbon-leader-self-check-inventory-emission-item-select",
     user: "비회원·회원",
     type: "Modal Popup",
     status: "신규",
@@ -113,6 +119,7 @@ const IA_ROWS = [
   },
   {
     no: 6,
+    key: "carbon-leader-self-check-inventory-emission-scope-guide",
     user: "비회원·회원",
     type: "Dialog",
     status: "신규",
@@ -123,6 +130,7 @@ const IA_ROWS = [
   },
   {
     no: 7,
+    key: "carbon-leader-self-check-reduction-potential",
     user: "비회원·회원",
     type: "Page",
     status: "신규",
@@ -136,6 +144,7 @@ const IA_ROWS = [
   },
   {
     no: 8,
+    key: "carbon-leader-self-check-reduction-potential-delete-confirm",
     user: "비회원·회원",
     type: "Dialog",
     status: "신규",
@@ -146,6 +155,7 @@ const IA_ROWS = [
   },
   {
     no: 9,
+    key: "carbon-leader-self-check-reduction-target",
     user: "비회원·회원",
     type: "Page",
     status: "신규",
@@ -156,6 +166,7 @@ const IA_ROWS = [
   },
   {
     no: 10,
+    key: "carbon-leader-self-check-evaluation-index",
     user: "비회원·회원",
     type: "Page",
     status: "신규",
@@ -169,6 +180,7 @@ const IA_ROWS = [
   },
   {
     no: 11,
+    key: "carbon-leader-self-check-evaluation-index-mandatory-training",
     user: "비회원·회원",
     type: "Dialog",
     status: "신규",
@@ -186,6 +198,7 @@ const IA_ROWS = [
   },
   {
     no: 12,
+    key: "carbon-leader-self-check-evaluation-index-emission-source-example",
     user: "비회원·회원",
     type: "Dialog",
     status: "신규",
@@ -203,6 +216,7 @@ const IA_ROWS = [
   },
   {
     no: 13,
+    key: "carbon-leader-self-check-evaluation-index-certification-type",
     user: "비회원·회원",
     type: "Dialog",
     status: "신규",
@@ -220,6 +234,7 @@ const IA_ROWS = [
   },
   {
     no: 14,
+    key: "carbon-leader-self-check-result",
     user: "비회원·회원",
     type: "Page",
     status: "신규",
@@ -233,6 +248,7 @@ const IA_ROWS = [
   },
   {
     no: 15,
+    key: "carbon-leader-self-check-result-result-certificate",
     user: "",
     type: "Link",
     status: "신규",
@@ -243,6 +259,7 @@ const IA_ROWS = [
   },
   {
     no: 16,
+    key: "carbon-leader-application-1-application-form",
     user: "회원",
     type: "Page",
     status: "신규",
@@ -256,6 +273,7 @@ const IA_ROWS = [
   },
   {
     no: 17,
+    key: "carbon-leader-application-1-document-submit",
     user: "회원",
     type: "Page",
     status: "신규",
@@ -266,6 +284,7 @@ const IA_ROWS = [
   },
   {
     no: 18,
+    key: "carbon-leader-application-1-final-confirm",
     user: "회원",
     type: "Page",
     status: "신규",
@@ -279,6 +298,7 @@ const IA_ROWS = [
   },
   {
     no: 19,
+    key: "carbon-leader-application-1-final-confirm-submit-confirm",
     user: "회원",
     type: "Modal Popup",
     status: "신규",
@@ -289,6 +309,7 @@ const IA_ROWS = [
   },
   {
     no: 20,
+    key: "carbon-leader-application-1-final-confirm-result",
     user: "회원",
     type: "Page",
     status: "신규",
@@ -299,6 +320,7 @@ const IA_ROWS = [
   },
   {
     no: 21,
+    key: "carbon-leader-application-1-final-confirm-application-download",
     user: "",
     type: "Link",
     status: "신규",
@@ -309,6 +331,7 @@ const IA_ROWS = [
   },
   {
     no: 22,
+    key: "carbon-leader-application-1-final-confirm-result-certificate",
     user: "",
     type: "Link",
     status: "신규",
@@ -319,6 +342,7 @@ const IA_ROWS = [
   },
   {
     no: 23,
+    key: "carbon-leader-application-2-application-form",
     user: "회원",
     type: "Page",
     status: "신규",
@@ -332,6 +356,7 @@ const IA_ROWS = [
   },
   {
     no: 24,
+    key: "carbon-leader-application-2-document-submit",
     user: "회원",
     type: "Page",
     status: "신규",
@@ -342,6 +367,7 @@ const IA_ROWS = [
   },
   {
     no: 25,
+    key: "carbon-leader-application-2-final-confirm",
     user: "회원",
     type: "Page",
     status: "신규",
@@ -355,6 +381,7 @@ const IA_ROWS = [
   },
   {
     no: 26,
+    key: "carbon-leader-application-2-final-confirm-submit-confirm",
     user: "회원",
     type: "Modal Popup",
     status: "신규",
@@ -365,6 +392,7 @@ const IA_ROWS = [
   },
   {
     no: 27,
+    key: "carbon-leader-application-2-result",
     user: "회원",
     type: "Page",
     status: "신규",
@@ -378,6 +406,7 @@ const IA_ROWS = [
   },
   {
     no: 28,
+    key: "carbon-leader-application-2-result-application-download",
     user: "",
     type: "Link",
     status: "신규",
@@ -388,6 +417,7 @@ const IA_ROWS = [
   },
   {
     no: 29,
+    key: "carbon-leader-application-2-result-result-certificate",
     user: "",
     type: "Link",
     status: "신규",
@@ -398,6 +428,7 @@ const IA_ROWS = [
   },
   {
     no: 30,
+    key: "carbon-leader-application-3-application-form",
     user: "회원",
     type: "Page",
     status: "신규",
@@ -411,6 +442,7 @@ const IA_ROWS = [
   },
   {
     no: 31,
+    key: "carbon-leader-application-3-inventory-emission",
     user: "회원",
     type: "Page",
     status: "변경",
@@ -424,6 +456,7 @@ const IA_ROWS = [
   },
   {
     no: 32,
+    key: "carbon-leader-application-3-inventory-emission-item-select",
     user: "회원",
     type: "Modal Popup",
     status: "신규",
@@ -434,6 +467,7 @@ const IA_ROWS = [
   },
   {
     no: 33,
+    key: "carbon-leader-application-3-inventory-emission-scope-guide",
     user: "회원",
     type: "Dialog",
     status: "신규",
@@ -444,6 +478,7 @@ const IA_ROWS = [
   },
   {
     no: 34,
+    key: "carbon-leader-application-3-target-achievement",
     user: "회원",
     type: "Page",
     status: "신규",
@@ -454,6 +489,7 @@ const IA_ROWS = [
   },
   {
     no: 35,
+    key: "carbon-leader-application-3-document-submit",
     user: "회원",
     type: "Page",
     status: "신규",
@@ -464,6 +500,7 @@ const IA_ROWS = [
   },
   {
     no: 36,
+    key: "carbon-leader-application-3-final-confirm",
     user: "회원",
     type: "Page",
     status: "신규",
@@ -477,6 +514,7 @@ const IA_ROWS = [
   },
   {
     no: 37,
+    key: "carbon-leader-application-3-final-confirm-submit-confirm",
     user: "회원",
     type: "Modal Popup",
     status: "신규",
@@ -487,6 +525,7 @@ const IA_ROWS = [
   },
   {
     no: 38,
+    key: "carbon-leader-application-3-result",
     user: "회원",
     type: "Page",
     status: "신규",
@@ -500,6 +539,7 @@ const IA_ROWS = [
   },
   {
     no: 39,
+    key: "carbon-leader-application-3-result-application-download",
     user: "",
     type: "Link",
     status: "신규",
@@ -510,6 +550,7 @@ const IA_ROWS = [
   },
   {
     no: 40,
+    key: "carbon-leader-application-3-result-result-certificate",
     user: "",
     type: "Link",
     status: "신규",
@@ -520,6 +561,7 @@ const IA_ROWS = [
   },
   {
     no: 41,
+    key: "carbon-leader-application-history",
     user: "회원",
     type: "Link",
     status: "신규",
@@ -537,6 +579,7 @@ const IA_ROWS = [
   },
   {
     no: 42,
+    key: "k-taxonomy-assessment",
     user: "비회원·회원",
     type: "Page",
     status: "변경",
@@ -550,6 +593,7 @@ const IA_ROWS = [
   },
   {
     no: 43,
+    key: "k-taxonomy-assessment-search",
     user: "비회원·회원",
     type: "Page",
     status: "변경",
@@ -563,6 +607,7 @@ const IA_ROWS = [
   },
   {
     no: 44,
+    key: "k-taxonomy-assessment-search-result",
     user: "비회원·회원",
     type: "Page",
     status: "변경",
@@ -573,6 +618,7 @@ const IA_ROWS = [
   },
   {
     no: 45,
+    key: "k-taxonomy-assessment-search-classification-result",
     user: "비회원·회원",
     type: "Dialog",
     status: "변경",
@@ -583,6 +629,7 @@ const IA_ROWS = [
   },
   {
     no: 46,
+    key: "k-taxonomy-assessment-self-check",
     user: "비회원·회원",
     type: "Page",
     status: "변경",
@@ -596,6 +643,7 @@ const IA_ROWS = [
   },
   {
     no: 47,
+    key: "k-taxonomy-assessment-self-check-detail-question",
     user: "비회원·회원",
     type: "Page",
     status: "변경",
@@ -606,6 +654,7 @@ const IA_ROWS = [
   },
   {
     no: 48,
+    key: "k-taxonomy-assessment-self-check-result",
     user: "비회원·회원",
     type: "Page",
     status: "변경",
@@ -616,6 +665,7 @@ const IA_ROWS = [
   },
   {
     no: 49,
+    key: "k-taxonomy-assessment-self-check-classification-result",
     user: "비회원·회원",
     type: "Dialog",
     status: "변경",
@@ -626,6 +676,7 @@ const IA_ROWS = [
   },
   {
     no: 50,
+    key: "k-taxonomy-assessment-expert-assessment",
     user: "기관 회원",
     type: "Page",
     status: "신규",
@@ -639,6 +690,7 @@ const IA_ROWS = [
   },
   {
     no: 51,
+    key: "k-taxonomy-assessment-expert-assessment-pre-info",
     user: "기관 회원",
     type: "Page",
     status: "신규",
@@ -649,6 +701,7 @@ const IA_ROWS = [
   },
   {
     no: 52,
+    key: "k-taxonomy-assessment-expert-assessment-eligibility-assessment",
     user: "기관 회원",
     type: "Page",
     status: "신규",
@@ -659,6 +712,7 @@ const IA_ROWS = [
   },
   {
     no: 53,
+    key: "status",
     user: "회원",
     type: "Page",
     status: "유지",
@@ -669,6 +723,7 @@ const IA_ROWS = [
   },
   {
     no: 54,
+    key: "login",
     user: "비회원",
     type: "Page",
     status: "유지",
@@ -682,6 +737,7 @@ const IA_ROWS = [
   },
   {
     no: 55,
+    key: "signup",
     user: "비회원",
     type: "Page",
     status: "유지",
@@ -692,6 +748,7 @@ const IA_ROWS = [
   },
   {
     no: 56,
+    key: "footer",
     user: "비회원·회원",
     type: "-",
     status: "유지",
@@ -1117,6 +1174,12 @@ const PublishingIndexPage = () => {
           <TableBody>
             {IA_ROWS.map((row) => {
               const isTopLevel = row.cells[0]?.level === 1
+              // level 0 은 병합된 빈 칸이다. 그 행이 가리키는 실제 화면은
+              // 마지막 이름 있는 뎁스이며, 그 배지에만 키 복사를 붙인다.
+              const screenCellIndex = row.cells.reduce(
+                (last, cell, index) => (cell.level === 0 ? last : index),
+                -1,
+              )
 
               return (
                 <TableRow
@@ -1144,9 +1207,16 @@ const PublishingIndexPage = () => {
                         className="border-border border-r border-b p-2 text-left align-top font-normal"
                       >
                         <span className="flex flex-col gap-1">
-                          <Badge variant="outline" className="w-fit">
-                            {cell.level}
-                          </Badge>
+                          {index === screenCellIndex ? (
+                            <ScreenKeyBadge
+                              depth={cell.level}
+                              screenKey={row.key}
+                            />
+                          ) : (
+                            <Badge variant="outline" className="w-fit">
+                              {cell.level}
+                            </Badge>
+                          )}
                           <span className="text-sm font-medium break-keep">
                             {cell.name}
                           </span>

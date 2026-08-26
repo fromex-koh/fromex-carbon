@@ -18,6 +18,12 @@
     "copy": false
   },
   {
+    "path": "components/publishing",
+    "kind": "폴더",
+    "role": "퍼블리싱 인덱스 전용 — 화면 원본 소스가 아님",
+    "copy": false
+  },
+  {
     "path": "lib",
     "kind": "폴더",
     "role": "공용 유틸과 GNB 상수",
