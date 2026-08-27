@@ -29,6 +29,9 @@ import type {
 } from "@/lib/publishing/release-note"
 import handoffAssets from "@/lib/publishing/handoff-assets.json"
 import ScreenKeyBadge from "@/components/publishing/screen-key-badge"
+import Link from "next/link"
+import { existsSync } from "node:fs"
+import { join } from "node:path"
 
 const DEPTH_HEADS = ["1뎁스", "2뎁스", "3뎁스", "4뎁스", "5뎁스"]
 
@@ -52,7 +55,7 @@ const REPOSITORY_LINKS = [
 const IA_ROWS = [
   {
     no: 1,
-    key: "home",
+    path: "/home",
     user: "비회원·회원",
     type: "Page",
     status: "유지",
@@ -60,45 +63,129 @@ const IA_ROWS = [
     version: "미배포",
     desc: "메인 홈 화면",
     cells: [
-      { level: 1, name: "메인 홈", rowSpan: 53, colSpan: 1 },
+      { level: 1, name: "메인 홈", rowSpan: 66, colSpan: 1 },
       { level: 2, name: "메인 화면", rowSpan: 1, colSpan: 4 },
     ],
   },
   {
     no: 2,
-    key: "carbon-leader",
+    path: "/carbon-leader/application/initial",
     user: "비회원·회원",
     type: "Page",
     status: "변경",
-    uiux: "대기중",
+    uiux: "진행중",
     version: "미배포",
-    desc: "탄소중립 선도기업 제도 설명 화면 / 자가진단으로 이동하는 버튼 포함 - 자가진단, 선도기업 1차, 중간점검, 최종점검",
+    desc: "탄소중립 선도기업 제도 설명 화면 / 자가진단으로 이동하는 버튼 포함 - 자가진단, 선도기업 1차, 중간점검, 최종점검. 선행 이력이 없어 자가진단만 신청가능",
     cells: [
-      { level: 2, name: "탄소중립 선도기업", rowSpan: 40, colSpan: 1 },
-      { level: 0, name: "", rowSpan: 1, colSpan: 3 },
+      { level: 2, name: "탄소중립 선도기업", rowSpan: 49, colSpan: 1 },
+      { level: 3, name: "선도기업 신청", rowSpan: 6, colSpan: 1 },
+      { level: 4, name: "최초 진입", rowSpan: 1, colSpan: 1 },
+      { level: 0, name: "", rowSpan: 1, colSpan: 1 },
     ],
   },
   {
     no: 3,
-    key: "carbon-leader-self-check-company-info",
+    path: "/carbon-leader/application/self-check-done",
     user: "비회원·회원",
     type: "Page",
     status: "변경",
-    uiux: "대기중",
+    uiux: "진행중",
     version: "미배포",
-    desc: "Step 1, 정보 입력",
+    desc: "자가진단 신청완료(현황조회 노출) / 선도기업 1차 신청가능",
     cells: [
-      { level: 3, name: "자가진단", rowSpan: 13, colSpan: 1 },
-      { level: 4, name: "기업 정보 입력", rowSpan: 1, colSpan: 2 },
+      { level: 4, name: "자가진단 완료", rowSpan: 1, colSpan: 1 },
+      { level: 0, name: "", rowSpan: 1, colSpan: 1 },
     ],
   },
   {
     no: 4,
-    key: "carbon-leader-self-check-inventory-emission",
+    path: "/carbon-leader/application/first-done",
     user: "비회원·회원",
     type: "Page",
     status: "변경",
-    uiux: "대기중",
+    uiux: "진행중",
+    version: "미배포",
+    desc: "자가진단·1차 신청 완료 / 중간점검 신청가능",
+    cells: [
+      { level: 4, name: "1차 신청 완료", rowSpan: 1, colSpan: 1 },
+      { level: 0, name: "", rowSpan: 1, colSpan: 1 },
+    ],
+  },
+  {
+    no: 5,
+    path: "/carbon-leader/application/middle-review",
+    user: "비회원·회원",
+    type: "Page",
+    status: "변경",
+    uiux: "진행중",
+    version: "미배포",
+    desc: "중간점검 담당자 점검 진행중 / 신청 버튼 비활성",
+    cells: [
+      { level: 4, name: "중간점검 접수", rowSpan: 1, colSpan: 1 },
+      { level: 0, name: "", rowSpan: 1, colSpan: 1 },
+    ],
+  },
+  {
+    no: 6,
+    path: "/carbon-leader/application/middle-done",
+    user: "비회원·회원",
+    type: "Page",
+    status: "변경",
+    uiux: "진행중",
+    version: "미배포",
+    desc: "중간점검 점검완료(현황조회 노출) / 최종점검 신청가능",
+    cells: [
+      { level: 4, name: "중간점검 완료", rowSpan: 1, colSpan: 1 },
+      { level: 0, name: "", rowSpan: 1, colSpan: 1 },
+    ],
+  },
+  {
+    no: 7,
+    path: "/carbon-leader/application/final-done",
+    user: "비회원·회원",
+    type: "Page",
+    status: "변경",
+    uiux: "진행중",
+    version: "미배포",
+    desc: "4단계 모두 완료 / 전 단계 현황조회만 가능",
+    cells: [
+      { level: 4, name: "최종점검 완료", rowSpan: 1, colSpan: 1 },
+      { level: 0, name: "", rowSpan: 1, colSpan: 1 },
+    ],
+  },
+  {
+    no: 8,
+    path: "/carbon-leader/self-check/company-info",
+    user: "비회원·회원",
+    type: "Page",
+    status: "변경",
+    uiux: "진행중",
+    version: "미배포",
+    desc: "Step 1, 정보 입력",
+    cells: [
+      { level: 3, name: "자가진단", rowSpan: 14, colSpan: 1 },
+      { level: 4, name: "기업 정보 입력", rowSpan: 2, colSpan: 1 },
+      { level: 0, name: "", rowSpan: 1, colSpan: 1 },
+    ],
+  },
+  {
+    no: 9,
+    path: "/carbon-leader/self-check/company-info/industry-code-search",
+    user: "비회원·회원",
+    type: "Modal Popup",
+    status: "유지",
+    uiux: "진행중",
+    version: "미배포",
+    desc: "업종코드 조회 팝업 (기존 팝업 사용)",
+    cells: [{ level: 5, name: "업종코드 조회", rowSpan: 1, colSpan: 1 }],
+  },
+  {
+    no: 10,
+    path: "/carbon-leader/self-check/inventory-emission",
+    user: "비회원·회원",
+    type: "Page",
+    status: "변경",
+    uiux: "진행중",
     version: "미배포",
     desc: "Step 2, 정보 입력 / 계산결과 도출",
     cells: [
@@ -107,30 +194,30 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 5,
-    key: "carbon-leader-self-check-inventory-emission-item-select",
+    no: 11,
+    path: "/carbon-leader/self-check/inventory-emission/item-select",
     user: "비회원·회원",
     type: "Modal Popup",
     status: "신규",
-    uiux: "대기중",
+    uiux: "진행중",
     version: "미배포",
     desc: "인벤토리 항목 선택 팝업",
     cells: [{ level: 5, name: "항목 선택", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 6,
-    key: "carbon-leader-self-check-inventory-emission-scope-guide",
+    no: 12,
+    path: "/carbon-leader/self-check/inventory-emission/scope-guide",
     user: "비회원·회원",
     type: "Dialog",
     status: "신규",
-    uiux: "대기중",
+    uiux: "진행중",
     version: "미배포",
     desc: "Scope 설명 팝업",
     cells: [{ level: 5, name: "Scope설명", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 7,
-    key: "carbon-leader-self-check-reduction-potential",
+    no: 13,
+    path: "/carbon-leader/self-check/reduction-potential",
     user: "비회원·회원",
     type: "Page",
     status: "신규",
@@ -143,8 +230,8 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 8,
-    key: "carbon-leader-self-check-reduction-potential-delete-confirm",
+    no: 14,
+    path: "/carbon-leader/self-check/reduction-potential/delete-confirm",
     user: "비회원·회원",
     type: "Dialog",
     status: "신규",
@@ -154,8 +241,8 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "삭제 확인 팝업", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 9,
-    key: "carbon-leader-self-check-reduction-target",
+    no: 15,
+    path: "/carbon-leader/self-check/reduction-target",
     user: "비회원·회원",
     type: "Page",
     status: "신규",
@@ -165,8 +252,8 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "감축목표 설정", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 10,
-    key: "carbon-leader-self-check-evaluation-index",
+    no: 16,
+    path: "/carbon-leader/self-check/evaluation-index",
     user: "비회원·회원",
     type: "Page",
     status: "신규",
@@ -179,14 +266,14 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 11,
-    key: "carbon-leader-self-check-evaluation-index-mandatory-training",
+    no: 17,
+    path: "/carbon-leader/self-check/evaluation-index/mandatory-training",
     user: "비회원·회원",
     type: "Dialog",
     status: "신규",
     uiux: "대기중",
     version: "미배포",
-    desc: '설명 팝업 1.2.2 탄소중립 전문역량 향상 노력 [4번째 체크항목 "탄소중립 관련 의무 교육을 수 료하고 있는 경우" 옆 ?] 선택 시 노출되는 팝업',
+    desc: '설명 팝업 1.2.2 탄소중립 전문역량 향상 노력 [4번째 체크항목 "탄소중립 관련 의무 교육을 수 료하고 있는 경우" 옆 ?] 선택 시 노출되는 팝업',
     cells: [
       {
         level: 5,
@@ -197,14 +284,14 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 12,
-    key: "carbon-leader-self-check-evaluation-index-emission-source-example",
+    no: 18,
+    path: "/carbon-leader/self-check/evaluation-index/emission-source-example",
     user: "비회원·회원",
     type: "Dialog",
     status: "신규",
     uiux: "대기중",
     version: "미배포",
-    desc: '설명 팝업 2.1.1 탄소배출량 산정 [3번째 항목 "(Scope 3) …" 의 * (예시) 중소기업 온실가스 배출원(Scope 1,2,3) 옆 ?] 선택 시 노출되는 팝업',
+    desc: '설명 팝업 2.1.1 탄소배출량 산정 [3번째 항목 "(Scope 3) …" 의 * (예시) 중소기업 온실가스 배출원(Scope 1,2,3) 옆 ?] 선택 시 노출되는 팝업',
     cells: [
       {
         level: 5,
@@ -215,14 +302,14 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 13,
-    key: "carbon-leader-self-check-evaluation-index-certification-type",
+    no: 19,
+    path: "/carbon-leader/self-check/evaluation-index/certification-type",
     user: "비회원·회원",
     type: "Dialog",
     status: "신규",
     uiux: "대기중",
     version: "미배포",
-    desc: '설명 팝업 2.2.5 탄소감축 자발적 행동 [4번째 항목 "(제품·기술에 대한 환경분야 국가인증 취득) …" 옆 ?] 선택 시 노출되는 팝업.',
+    desc: '설명 팝업 2.2.5 탄소감축 자발적 행동 [4번째 항목 "(제품·기술에 대한 환경분야 국가인증 취득) …" 옆 ?] 선택 시 노출되는 팝업.',
     cells: [
       {
         level: 5,
@@ -233,8 +320,8 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 14,
-    key: "carbon-leader-self-check-result",
+    no: 20,
+    path: "/carbon-leader/self-check/result",
     user: "비회원·회원",
     type: "Page",
     status: "신규",
@@ -247,8 +334,8 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 15,
-    key: "carbon-leader-self-check-result-result-certificate",
+    no: 21,
+    path: "/carbon-leader/self-check/result/result-certificate",
     user: "",
     type: "Link",
     status: "신규",
@@ -258,8 +345,8 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "결과 확인서", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 16,
-    key: "carbon-leader-application-1-application-form",
+    no: 22,
+    path: "/carbon-leader/application-1/application-form",
     user: "회원",
     type: "Page",
     status: "신규",
@@ -267,24 +354,36 @@ const IA_ROWS = [
     version: "미배포",
     desc: "Step 1, 정보 입력(회원정보 및 자가진단 정보 일부 연동) - 탄소중립 기준연도 현황 (자가진단 데이터 불러오기)",
     cells: [
-      { level: 3, name: "선도기업 신청 1차", rowSpan: 7, colSpan: 1 },
-      { level: 4, name: "신청서 작성", rowSpan: 1, colSpan: 2 },
+      { level: 3, name: "선도기업 신청 1차", rowSpan: 8, colSpan: 1 },
+      { level: 4, name: "신청서 작성", rowSpan: 2, colSpan: 1 },
+      { level: 0, name: "", rowSpan: 1, colSpan: 1 },
     ],
   },
   {
-    no: 17,
-    key: "carbon-leader-application-1-document-submit",
+    no: 23,
+    path: "/carbon-leader/application-1/application-form/address-search",
+    user: "회원",
+    type: "Modal Popup",
+    status: "신규",
+    uiux: "대기중",
+    version: "미배포",
+    desc: "카카오 주소 검색 API  사용",
+    cells: [{ level: 5, name: "주소 검색", rowSpan: 1, colSpan: 1 }],
+  },
+  {
+    no: 24,
+    path: "/carbon-leader/application-1/document-submit",
     user: "회원",
     type: "Page",
     status: "신규",
     uiux: "대기중",
     version: "미배포",
-    desc: "Step 2, 서류 제출 (파일 업로드 기능) , 이전, 다음 버튼",
+    desc: "Step 2,  서류 제출 (파일 업로드 기능)  , 이전, 다음 버튼",
     cells: [{ level: 4, name: "서류 제출", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 18,
-    key: "carbon-leader-application-1-final-confirm",
+    no: 25,
+    path: "/carbon-leader/application-1/final-confirm",
     user: "회원",
     type: "Page",
     status: "신규",
@@ -297,8 +396,8 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 19,
-    key: "carbon-leader-application-1-final-confirm-submit-confirm",
+    no: 26,
+    path: "/carbon-leader/application-1/final-confirm/submit-confirm",
     user: "회원",
     type: "Modal Popup",
     status: "신규",
@@ -308,8 +407,8 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "제출 확인 팝업", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 20,
-    key: "carbon-leader-application-1-final-confirm-result",
+    no: 27,
+    path: "/carbon-leader/application-1/final-confirm/result",
     user: "회원",
     type: "Page",
     status: "신규",
@@ -319,8 +418,8 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "결과 확인", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 21,
-    key: "carbon-leader-application-1-final-confirm-application-download",
+    no: 28,
+    path: "/carbon-leader/application-1/final-confirm/application-download",
     user: "",
     type: "Link",
     status: "신규",
@@ -330,19 +429,19 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "신청서", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 22,
-    key: "carbon-leader-application-1-final-confirm-result-certificate",
+    no: 29,
+    path: "/carbon-leader/application-1/final-confirm/result-certificate",
     user: "",
     type: "Link",
     status: "신규",
     uiux: "대기중",
     version: "미배포",
-    desc: "결과 보고서 다운로드 (콘텐츠 미수급), 제공 미정",
+    desc: "결과 보고서 다운로드  (콘텐츠 미수급), 제공 미정/  * 공식 인증을 받는 절차 인하여 현재개발에 제외될 수 있음",
     cells: [{ level: 5, name: "결과 확인서", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 23,
-    key: "carbon-leader-application-2-application-form",
+    no: 30,
+    path: "/carbon-leader/application-2/application-form",
     user: "회원",
     type: "Page",
     status: "신규",
@@ -350,24 +449,36 @@ const IA_ROWS = [
     version: "미배포",
     desc: "Step 1, 정보 입력(회원정보 및 자가진단 정보 일부 연동) - 탄소중립 기준연도 현황 (자가진단 데이터 불러오기)",
     cells: [
-      { level: 3, name: "선도기업 신청 2차", rowSpan: 7, colSpan: 1 },
-      { level: 4, name: "신청서 작성", rowSpan: 1, colSpan: 2 },
+      { level: 3, name: "선도기업 신청 2차", rowSpan: 8, colSpan: 1 },
+      { level: 4, name: "신청서 작성", rowSpan: 2, colSpan: 1 },
+      { level: 0, name: "", rowSpan: 1, colSpan: 1 },
     ],
   },
   {
-    no: 24,
-    key: "carbon-leader-application-2-document-submit",
+    no: 31,
+    path: "/carbon-leader/application-2/application-form/address-search",
+    user: "회원",
+    type: "Modal Popup",
+    status: "신규",
+    uiux: "대기중",
+    version: "미배포",
+    desc: "카카오 주소 검색 API  사용",
+    cells: [{ level: 5, name: "주소 검색", rowSpan: 1, colSpan: 1 }],
+  },
+  {
+    no: 32,
+    path: "/carbon-leader/application-2/document-submit",
     user: "회원",
     type: "Page",
     status: "신규",
     uiux: "대기중",
     version: "미배포",
-    desc: "Step 2, 서류 제출 (파일 업로드 기능), 이전, 다음 버튼",
+    desc: "Step 2,  서류 제출 (파일 업로드 기능), 이전, 다음 버튼",
     cells: [{ level: 4, name: "서류 제출", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 25,
-    key: "carbon-leader-application-2-final-confirm",
+    no: 33,
+    path: "/carbon-leader/application-2/final-confirm",
     user: "회원",
     type: "Page",
     status: "신규",
@@ -380,8 +491,8 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 26,
-    key: "carbon-leader-application-2-final-confirm-submit-confirm",
+    no: 34,
+    path: "/carbon-leader/application-2/final-confirm/submit-confirm",
     user: "회원",
     type: "Modal Popup",
     status: "신규",
@@ -391,8 +502,8 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "제출 확인 팝업", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 27,
-    key: "carbon-leader-application-2-result",
+    no: 35,
+    path: "/carbon-leader/application-2/result",
     user: "회원",
     type: "Page",
     status: "신규",
@@ -405,8 +516,8 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 28,
-    key: "carbon-leader-application-2-result-application-download",
+    no: 36,
+    path: "/carbon-leader/application-2/result/application-download",
     user: "",
     type: "Link",
     status: "신규",
@@ -416,19 +527,19 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "신청서", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 29,
-    key: "carbon-leader-application-2-result-result-certificate",
+    no: 37,
+    path: "/carbon-leader/application-2/result/result-certificate",
     user: "",
     type: "Link",
     status: "신규",
     uiux: "대기중",
     version: "미배포",
-    desc: "결과 보고서 다운로드 (콘텐츠 미수급), 제공 미정",
+    desc: "결과 보고서 다운로드  (콘텐츠 미수급), 제공 미정 * 공식 인증을 받는 절차 인하여 현재개발에 제외될 수 있음",
     cells: [{ level: 5, name: "결과 확인서", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 30,
-    key: "carbon-leader-application-3-application-form",
+    no: 38,
+    path: "/carbon-leader/application-3/application-form",
     user: "회원",
     type: "Page",
     status: "신규",
@@ -436,16 +547,28 @@ const IA_ROWS = [
     version: "미배포",
     desc: "Step 1, 정보 입력, 기업정보 - 내정보 불러오기, 탄소중립 기준연도현황 - 기존데이터 불러오기 기능",
     cells: [
-      { level: 3, name: "선도기업 신청 3차", rowSpan: 11, colSpan: 1 },
-      { level: 4, name: "신청서 작성", rowSpan: 1, colSpan: 2 },
+      { level: 3, name: "선도기업 신청 3차", rowSpan: 12, colSpan: 1 },
+      { level: 4, name: "신청서 작성", rowSpan: 2, colSpan: 1 },
+      { level: 0, name: "", rowSpan: 1, colSpan: 1 },
     ],
   },
   {
-    no: 31,
-    key: "carbon-leader-application-3-inventory-emission",
+    no: 39,
+    path: "/carbon-leader/application-3/application-form/address-search",
+    user: "회원",
+    type: "Modal Popup",
+    status: "신규",
+    uiux: "대기중",
+    version: "미배포",
+    desc: "카카오 주소 검색 API  사용",
+    cells: [{ level: 5, name: "주소 검색", rowSpan: 1, colSpan: 1 }],
+  },
+  {
+    no: 40,
+    path: "/carbon-leader/application-3/inventory-emission",
     user: "회원",
     type: "Page",
-    status: "변경",
+    status: "변경·신규",
     uiux: "대기중",
     version: "미배포",
     desc: "Step 2, 정보 입력 / 계산결과 도출",
@@ -455,8 +578,8 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 32,
-    key: "carbon-leader-application-3-inventory-emission-item-select",
+    no: 41,
+    path: "/carbon-leader/application-3/inventory-emission/item-select",
     user: "회원",
     type: "Modal Popup",
     status: "신규",
@@ -466,8 +589,8 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "항목 선택", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 33,
-    key: "carbon-leader-application-3-inventory-emission-scope-guide",
+    no: 42,
+    path: "/carbon-leader/application-3/inventory-emission/scope-guide",
     user: "회원",
     type: "Dialog",
     status: "신규",
@@ -477,8 +600,8 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "Scope설명", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 34,
-    key: "carbon-leader-application-3-target-achievement",
+    no: 43,
+    path: "/carbon-leader/application-3/target-achievement",
     user: "회원",
     type: "Page",
     status: "신규",
@@ -488,8 +611,8 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "목표달성 평가", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 35,
-    key: "carbon-leader-application-3-document-submit",
+    no: 44,
+    path: "/carbon-leader/application-3/document-submit",
     user: "회원",
     type: "Page",
     status: "신규",
@@ -499,8 +622,8 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "서류 제출", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 36,
-    key: "carbon-leader-application-3-final-confirm",
+    no: 45,
+    path: "/carbon-leader/application-3/final-confirm",
     user: "회원",
     type: "Page",
     status: "신규",
@@ -513,8 +636,8 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 37,
-    key: "carbon-leader-application-3-final-confirm-submit-confirm",
+    no: 46,
+    path: "/carbon-leader/application-3/final-confirm/submit-confirm",
     user: "회원",
     type: "Modal Popup",
     status: "신규",
@@ -524,8 +647,8 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "제출 확인 팝업", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 38,
-    key: "carbon-leader-application-3-result",
+    no: 47,
+    path: "/carbon-leader/application-3/result",
     user: "회원",
     type: "Page",
     status: "신규",
@@ -538,8 +661,8 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 39,
-    key: "carbon-leader-application-3-result-application-download",
+    no: 48,
+    path: "/carbon-leader/application-3/result/application-download",
     user: "",
     type: "Link",
     status: "신규",
@@ -549,19 +672,19 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "신청서", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 40,
-    key: "carbon-leader-application-3-result-result-certificate",
+    no: 49,
+    path: "/carbon-leader/application-3/result/result-certificate",
     user: "",
     type: "Link",
     status: "신규",
     uiux: "대기중",
     version: "미배포",
-    desc: "결과 보고서 다운로드 (콘텐츠 미수급), 제공 미정",
+    desc: "결과 보고서 다운로드  (콘텐츠 미수급), 제공 미정 * 공식 인증을 받는 절차 인하여 현재개발에 제외될 수 있음",
     cells: [{ level: 5, name: "결과 확인서", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 41,
-    key: "carbon-leader-application-history",
+    no: 50,
+    path: "/carbon-leader/application-history",
     user: "회원",
     type: "Link",
     status: "신규",
@@ -578,8 +701,8 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 42,
-    key: "k-taxonomy-assessment",
+    no: 51,
+    path: "/k-taxonomy-assessment",
     user: "비회원·회원",
     type: "Page",
     status: "변경",
@@ -592,8 +715,8 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 43,
-    key: "k-taxonomy-assessment-search",
+    no: 52,
+    path: "/k-taxonomy-assessment/search",
     user: "비회원·회원",
     type: "Page",
     status: "변경",
@@ -606,8 +729,8 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 44,
-    key: "k-taxonomy-assessment-search-result",
+    no: 53,
+    path: "/k-taxonomy-assessment/search/result",
     user: "비회원·회원",
     type: "Page",
     status: "변경",
@@ -617,8 +740,8 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "결과확인", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 45,
-    key: "k-taxonomy-assessment-search-classification-result",
+    no: 54,
+    path: "/k-taxonomy-assessment/search/classification-result",
     user: "비회원·회원",
     type: "Dialog",
     status: "변경",
@@ -628,8 +751,8 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "분류 결과", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 46,
-    key: "k-taxonomy-assessment-self-check",
+    no: 55,
+    path: "/k-taxonomy-assessment/self-check",
     user: "비회원·회원",
     type: "Page",
     status: "변경",
@@ -642,8 +765,8 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 47,
-    key: "k-taxonomy-assessment-self-check-detail-question",
+    no: 56,
+    path: "/k-taxonomy-assessment/self-check/detail-question",
     user: "비회원·회원",
     type: "Page",
     status: "변경",
@@ -653,8 +776,8 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "상세 질문", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 48,
-    key: "k-taxonomy-assessment-self-check-result",
+    no: 57,
+    path: "/k-taxonomy-assessment/self-check/result",
     user: "비회원·회원",
     type: "Page",
     status: "변경",
@@ -664,8 +787,8 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "결과확인", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 49,
-    key: "k-taxonomy-assessment-self-check-classification-result",
+    no: 58,
+    path: "/k-taxonomy-assessment/self-check/classification-result",
     user: "비회원·회원",
     type: "Dialog",
     status: "변경",
@@ -675,8 +798,8 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "분류 결과", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 50,
-    key: "k-taxonomy-assessment-expert-assessment",
+    no: 59,
+    path: "/k-taxonomy-assessment/expert-assessment",
     user: "기관 회원",
     type: "Page",
     status: "신규",
@@ -689,8 +812,8 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 51,
-    key: "k-taxonomy-assessment-expert-assessment-pre-info",
+    no: 60,
+    path: "/k-taxonomy-assessment/expert-assessment/pre-info",
     user: "기관 회원",
     type: "Page",
     status: "신규",
@@ -700,8 +823,8 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "사전정보입력", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 52,
-    key: "k-taxonomy-assessment-expert-assessment-eligibility-assessment",
+    no: 61,
+    path: "/k-taxonomy-assessment/expert-assessment/eligibility-assessment",
     user: "기관 회원",
     type: "Page",
     status: "신규",
@@ -711,19 +834,69 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "적합성 평가", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 53,
-    key: "status",
+    no: 62,
+    path: "/my-page",
+    user: "회원",
+    type: "Button",
+    status: "신규",
+    uiux: "대기중",
+    version: "미배포",
+    desc: "GNB메뉴 - 로그인 시에만 노출",
+    cells: [
+      { level: 2, name: "마이페이지", rowSpan: 5, colSpan: 1 },
+      { level: 0, name: "", rowSpan: 1, colSpan: 3 },
+    ],
+  },
+  {
+    no: 63,
+    path: "/my-page/sub-account",
     user: "회원",
     type: "Page",
-    status: "유지",
+    status: "신규",
+    uiux: "대기중",
+    version: "미배포",
+    desc: "기관회원에게만 제공. 하위계정 추가/삭제/수정 - 화면",
+    cells: [{ level: 3, name: "하위계정 관리", rowSpan: 1, colSpan: 3 }],
+  },
+  {
+    no: 64,
+    path: "/my-page/profile-edit",
+    user: "회원",
+    type: "Page",
+    status: "신규",
+    uiux: "대기중",
+    version: "미배포",
+    desc: "기업회원에게만 제공. 개인 정보 수정화면.",
+    cells: [
+      { level: 3, name: "회원정보 수정", rowSpan: 2, colSpan: 1 },
+      { level: 0, name: "", rowSpan: 1, colSpan: 2 },
+    ],
+  },
+  {
+    no: 65,
+    path: "/my-page/profile-edit/address-search",
+    user: "회원",
+    type: "Modal Popup",
+    status: "신규",
+    uiux: "대기중",
+    version: "미배포",
+    desc: "카카오 주소 검색 API  사용",
+    cells: [{ level: 4, name: "주소검색", rowSpan: 1, colSpan: 2 }],
+  },
+  {
+    no: 66,
+    path: "/my-page/status",
+    user: "회원",
+    type: "Page",
+    status: "변경",
     uiux: "대기중",
     version: "미배포",
     desc: "로그인 후에 노출되는 메뉴 화면, 선도기업 신청 내역 및 선도기업 신청 확인서 발급, 전문가 평가 결과 및 결과 다운로드",
-    cells: [{ level: 2, name: "현황조회", rowSpan: 1, colSpan: 4 }],
+    cells: [{ level: 3, name: "현황조회", rowSpan: 1, colSpan: 3 }],
   },
   {
-    no: 54,
-    key: "login",
+    no: 67,
+    path: "/login",
     user: "비회원",
     type: "Page",
     status: "유지",
@@ -736,8 +909,8 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 55,
-    key: "signup",
+    no: 68,
+    path: "/signup",
     user: "비회원",
     type: "Page",
     status: "유지",
@@ -747,14 +920,14 @@ const IA_ROWS = [
     cells: [{ level: 2, name: "회원가입", rowSpan: 1, colSpan: 4 }],
   },
   {
-    no: 56,
-    key: "footer",
+    no: 69,
+    path: "/footer",
     user: "비회원·회원",
-    type: "-",
+    type: "",
     status: "유지",
     uiux: "대기중",
     version: "미배포",
-    desc: "푸터 1) 이용안내, 개인정보 처리방침, 저작권 정책 2) 찾아오시는 길 : 선택 시 해당 화면으로 새창 열림. 3) SNS 아이콘 메뉴 : 페이스북, 트위터(X), 인스타그램, 유튜브, 네이버 블로그",
+    desc: "푸터  1) 이용안내, 개인정보 처리방침, 저작권 정책  2) 찾아오시는 길 : 선택 시 해당 화면으로 새창 열림.  3) SNS 아이콘 메뉴 : 페이스북, 트위터(X), 인스타그램, 유튜브, 네이버 블로그",
     cells: [{ level: 1, name: "푸터", rowSpan: 1, colSpan: 5 }],
   },
 ]
@@ -769,6 +942,9 @@ const UIUX_VARIANT = {
 } as const
 
 type UiuxKey = keyof typeof UIUX_VARIANT
+
+// 표 아래 범례에 쓰는 순서. UIUX_VARIANT 의 키와 일치해야 한다.
+const UIUX_KEYS = Object.keys(UIUX_VARIANT) as UiuxKey[]
 
 const getUiuxVariant = (uiux: string) =>
   uiux in UIUX_VARIANT ? UIUX_VARIANT[uiux as UiuxKey] : "outline"
@@ -786,6 +962,17 @@ const HANDOFF_PRESENTATION: Record<
   new: { label: "신규 추가", variant: "success" },
   overwrite: { label: "덮어쓰기", variant: "violet" },
 }
+
+// 화면 키는 라우트 경로에서 파생한다. 경로가 곧 유일한 출처다.
+const toScreenKey = (routePath: string) =>
+  routePath.replace(/^\//, "").replaceAll("/", "-")
+
+// 화면은 모두 (site)/(content) 아래에 만든다.
+// page.tsx 가 실제로 있는 행만 이름에 링크를 건다.
+const CONTENT_ROOT = join(process.cwd(), "app", "(site)", "(content)")
+
+const hasPage = (routePath: string) =>
+  existsSync(join(CONTENT_ROOT, routePath, "page.tsx"))
 
 // 방금 배포한 것만 강조한다. 두 표가 같은 배경색을 쓴다.
 // 표에 이미 회색 계열(bg-muted)이 쓰여 대비가 서도록 앰버를 골랐다.
@@ -935,10 +1122,6 @@ const PublishingIndexPage = () => {
               {releaseInfo.version}
             </span>
             {releasedAt && ` / ${releasedAt}`}
-          </p>
-          <p className="text-muted-foreground text-xs">
-            메뉴 자체가 화면인 행의 미사용 하위 뎁스는 병합된 &apos;-&apos;로
-            표시합니다.
           </p>
         </div>
 
@@ -1145,11 +1328,26 @@ const PublishingIndexPage = () => {
           </CardContent>
         </Card>
 
-        <p className="text-muted-foreground text-sm">
-          총{" "}
-          <span className="text-foreground font-medium">{IA_ROWS.length}</span>
-          개 화면
-        </p>
+        <div className="flex flex-col gap-3">
+          <p className="text-muted-foreground text-sm">
+            총{" "}
+            <span className="text-foreground font-medium">
+              {IA_ROWS.length}
+            </span>
+            개 화면
+          </p>
+          <p className="text-muted-foreground text-xs">
+            메뉴 자체가 화면인 행의 미사용 하위 뎁스는 병합된 &apos;-&apos;로
+            표시합니다.
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            {UIUX_KEYS.map((key) => (
+              <Badge key={key} variant={UIUX_VARIANT[key]}>
+                {key}
+              </Badge>
+            ))}
+          </div>
+        </div>
 
         <Table className="border-border border-t">
           <TableHeader>
@@ -1210,7 +1408,7 @@ const PublishingIndexPage = () => {
                           {index === screenCellIndex ? (
                             <ScreenKeyBadge
                               depth={cell.level}
-                              screenKey={row.key}
+                              screenKey={toScreenKey(row.path)}
                             />
                           ) : (
                             <Badge variant="outline" className="w-fit">
@@ -1218,7 +1416,16 @@ const PublishingIndexPage = () => {
                             </Badge>
                           )}
                           <span className="text-sm font-medium break-keep">
-                            {cell.name}
+                            {index === screenCellIndex && hasPage(row.path) ? (
+                              <Link
+                                href={row.path}
+                                className="text-primary rounded hover:underline"
+                              >
+                                {cell.name}
+                              </Link>
+                            ) : (
+                              cell.name
+                            )}
                           </span>
                         </span>
                       </th>
