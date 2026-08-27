@@ -113,13 +113,13 @@ docs/         컨벤션 문서
 이유: 퍼블리싱(화면 마크업)이 현재 작업이고, `next dev`는 타입체크를 하지 않아 화면 확인에 지장이 없다.
 원본 소스를 그대로 보존하는 쪽이 낫다는 판단.
 
-| 파일 | 건수 | 원인 | 사용 여부 |
-| --- | --- | --- | --- |
-| `components/ui/inno-prod-dialog.tsx` | 6 | `@/hooks/remote-store` 없음 | 미사용 |
-| `components/ui/wallpaper.tsx` | 4 | `@/lib/utils`의 `deepFlattenChildren`, `isIOS` 없음 | 미사용 |
-| `components/ui/support-facility-dialog.tsx` | 3 | `@/hooks/remote-store` 없음 | 미사용 |
-| `components/ui/core-tec-dialog.tsx` | 3 | `@/hooks/remote-store` 없음 | 미사용 |
-| `components/nav-bar.tsx` | 2 | `@/actions/logout` 없음, next-auth `User`에 `accessToken` 없음 | 사용 중 |
+| 파일                                        | 건수 | 원인                                                           | 사용 여부 |
+| ------------------------------------------- | ---- | -------------------------------------------------------------- | --------- |
+| `components/ui/inno-prod-dialog.tsx`        | 6    | `@/hooks/remote-store` 없음                                    | 미사용    |
+| `components/ui/wallpaper.tsx`               | 4    | `@/lib/utils`의 `deepFlattenChildren`, `isIOS` 없음            | 미사용    |
+| `components/ui/support-facility-dialog.tsx` | 3    | `@/hooks/remote-store` 없음                                    | 미사용    |
+| `components/ui/core-tec-dialog.tsx`         | 3    | `@/hooks/remote-store` 없음                                    | 미사용    |
+| `components/nav-bar.tsx`                    | 2    | `@/actions/logout` 없음, next-auth `User`에 `accessToken` 없음 | 사용 중   |
 
 나머지 60개 컴포넌트 파일은 에러가 없다.
 
