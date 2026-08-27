@@ -178,50 +178,45 @@ const NavBar = () => {
             >
               <NavigationMenu>
                 <NavigationMenuList className={"gap-0 lg:gap-5"}>
-                  {menuList.map((menu, index) => (
+                  {menuList.map((menu) => (
                     <NavigationMenuItem key={menu.title + "onTop"}>
                       <NavigationMenuTrigger
                         className={cn("cursor-pointer px-2 text-base")}
                       >
                         {menu.title}
                       </NavigationMenuTrigger>
-                      <NavigationMenuContent>
+                      <NavigationMenuContent
+                        className={"right-auto left-1/2 -translate-x-1/2"}
+                      >
                         <div
                           className={cn(
                             "flex flex-col gap-1 p-2 whitespace-nowrap",
                             isDark && "text-black dark:text-white",
                           )}
                         >
-                          {menu.contents
-                            .filter(
-                              (_, i) =>
-                                index !== 1 ||
-                                (i !== 2 && (i !== 3 || isLoggedIn)),
-                            )
-                            .map((content) => (
-                              <Link
-                                key={content.subTitle + "onTop"}
-                                href={menu.link + content.link}
-                                onClick={() => setIsOpen(false)}
-                                target={
-                                  (menu.link + content.link).startsWith("/")
-                                    ? undefined
-                                    : "_blank"
-                                }
+                          {menu.contents.map((content) => (
+                            <Link
+                              key={content.subTitle + "onTop"}
+                              href={menu.link + content.link}
+                              onClick={() => setIsOpen(false)}
+                              target={
+                                (menu.link + content.link).startsWith("/")
+                                  ? undefined
+                                  : "_blank"
+                              }
+                            >
+                              <Button
+                                variant="underLine"
+                                className={cn(
+                                  pathname.includes(menu.link + content.link) &&
+                                    "underline underline-offset-4",
+                                  "w-full items-center justify-start",
+                                )}
                               >
-                                <Button
-                                  variant="underLine"
-                                  className={cn(
-                                    pathname.includes(
-                                      menu.link + content.link,
-                                    ) && "underline underline-offset-4",
-                                    "w-full items-center justify-start",
-                                  )}
-                                >
-                                  {content.subTitle}
-                                </Button>
-                              </Link>
-                            ))}
+                                {content.subTitle}
+                              </Button>
+                            </Link>
+                          ))}
                         </div>
                       </NavigationMenuContent>
                     </NavigationMenuItem>
@@ -377,39 +372,33 @@ const NavBar = () => {
           </div>
           <div className={"flex h-lvh w-full flex-col gap-1 p-4"}>
             {activeMenuIndex !== -1 &&
-              menuList[activeMenuIndex].contents
-                .filter(
-                  (_, i) =>
-                    activeMenuIndex !== 1 ||
-                    (i !== 2 && (i !== 3 || isLoggedIn)),
-                )
-                .map((content) => (
-                  <div key={content.subTitle + "onSide"}>
-                    <Link
-                      href={menuList[activeMenuIndex].link + content.link}
-                      onClick={() => setIsOpen(false)}
-                      target={
-                        (
-                          menuList[activeMenuIndex].link + content.link
-                        ).startsWith("/")
-                          ? undefined
-                          : "_blank"
-                      }
+              menuList[activeMenuIndex].contents.map((content) => (
+                <div key={content.subTitle + "onSide"}>
+                  <Link
+                    href={menuList[activeMenuIndex].link + content.link}
+                    onClick={() => setIsOpen(false)}
+                    target={
+                      (
+                        menuList[activeMenuIndex].link + content.link
+                      ).startsWith("/")
+                        ? undefined
+                        : "_blank"
+                    }
+                  >
+                    <Button
+                      variant={"ghost"}
+                      className={cn(
+                        "w-full justify-start py-6 text-base font-medium",
+                        pathname.includes(
+                          menuList[activeMenuIndex].link + content.link,
+                        ) && "text-primary hover:text-primary",
+                      )}
                     >
-                      <Button
-                        variant={"ghost"}
-                        className={cn(
-                          "w-full justify-start py-6 text-base font-medium",
-                          pathname.includes(
-                            menuList[activeMenuIndex].link + content.link,
-                          ) && "text-primary hover:text-primary",
-                        )}
-                      >
-                        {content.subTitle}
-                      </Button>
-                    </Link>
-                  </div>
-                ))}
+                      {content.subTitle}
+                    </Button>
+                  </Link>
+                </div>
+              ))}
           </div>
         </div>
       </div>
