@@ -30,11 +30,14 @@
 릴리스 성공 후 내용은 자동으로 비워집니다.
 -->
 
-
 - 선도기업 신청 화면 6종과 자가진단 STEP 1·3 퍼블리싱(STEP 2 인벤토리 배출량은 삭제)
+- STEP 2 인벤토리 배출량은 만들었다가 걷어내 이번 전달본에 없다. Scope 설명 팝업(/carbon-leader/self-check/inventory-emission/scope-guide)만 남는다
 - 선도기업 공통 배너·팝업을 carbon-leader 로 모으고 섹션 레이아웃·constants·util 로 정리
 - GNB 를 신규 IA 기준으로 교체하고 마이페이지를 우측 유틸리티 영역으로 이동
 - 색상 토큰에 primitive 계층과 화면 전용 시맨틱을 추가
+- 릴리스 노트 전달 카드를 구분별 색으로 나누고 대상 파일·주의 영역 가독성 개선
+- 퍼블리싱 인덱스 표에 화면별 최종 반영 버전을 표시
+- 전달 범위에 constants·util 폴더 추가
 
 ## [신규 추가]
 
@@ -57,9 +60,7 @@
 
 ### 서브 비주얼 배너
 
-- 대상: app/(site)/(content)/carbon-leader/application/components/sub-visual.tsx
-  - app/(site)/(content)/carbon-leader/self-check/components/carbon-banner.tsx
-  - public/carbon-leader-illust.svg
+- 대상: public/carbon-leader-illust.svg
   - public/carbon-leader-illust-dark.svg
   - public/carbon-leader-illust-small.svg
   - public/carbon-leader-illust-small-dark.svg
@@ -67,6 +68,7 @@
 - 결과: 라이트·다크와 모바일·데스크톱 조합으로 네 장 중 한 장만 요청되고, preload 미사용·LCP 콘솔 경고가 없다
 - 결과: 브레드크럼은 모바일부터 노출되며 크기·굵기·간격을 시안에 맞췄다
 - 적용: 신규 파일 추가
+- 주의: 이 카드의 대상은 배너가 쓰는 일러스트다. 배너 컴포넌트는 carbon-leader/components/sub-visual.tsx 에 있다(선도기업 도메인 공통 컴포넌트 정리 참고)
 - 주의: html font-size 가 17px 이라 rem 유틸리티가 1.0625 배로 계산된다. 시안의 16px·8px·12px 은 가장 가까운 Tailwind 스케일(text-base · gap-2 · h-3)로 넣었다
 
 ### 자가진단 STEP 1 기업 정보 입력 화면
@@ -121,6 +123,23 @@
 - 결과: /carbon-leader/application-3/inventory-emission/scope-guide 에서 팝업이 열린 상태로 확인된다
 - 적용: 신규 파일 추가
 
+### 화면별 반영 버전 스냅샷
+
+- 대상: lib/publishing/screen-versions.generated.json
+- 변경: 인계 자산 버전과 같은 형태로, 화면(라우트)별 마지막 반영 릴리스를 담는 생성물을 추가했다
+- 결과: 퍼블리싱 인덱스가 이 스냅샷만 읽어 반영 버전을 표시한다. 화면에서 git 을 조회하지 않는다
+- 적용: 신규 파일 추가
+- 주의: 릴리스 때 자동으로 다시 만들어지는 파일이라 손으로 고치지 않는다. release-note.ts 가 import 하므로 지우면 빌드가 깨진다
+
+### 퍼블리싱 인덱스 화면 키값 복사 배지
+
+- 대상: components/publishing/screen-key-badge.tsx
+- 변경: IA 표의 마지막 뎁스 배지를 누르면 그 화면의 고유 키를 클립보드로 복사하고 토스트로 알린다. 상위 메뉴 뎁스는 여러 화면을 대표하므로 버튼으로 만들지 않았다
+- 결과: 퍼블리싱 인덱스에서 화면 키를 눈으로 옮겨 적지 않아도 된다
+- 적용: 신규 파일 추가
+- 주의: [퍼블리싱 노출용] 인덱스 전용 컴포넌트다. 전달본에 함께 들어가지만 서비스 화면에서는 쓰지 않는다
+- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/7005bb289d30768e0e3e2ea668eea4ec98d1556f)
+
 ## [덮어쓰기]
 
 ### GNB 메뉴 상수 교체
@@ -153,22 +172,7 @@
 - 변경: 배너와 metadata 를 섹션 layout.tsx 로 올려 page.tsx 는 본문만 렌더한다
 - 결과: 배너를 쓰는 화면 10곳이 같은 컴포넌트를 쓰고, 배너·본문 좌측 라인이 1276px 기준으로 맞는다
 - 적용: 지정한 파일만 교체
-- 주의: application/components/sub-visual.tsx · self-check/components/carbon-banner.tsx · self-check/components/scope-guide-dialog.tsx 는 삭제한다(배너·팝업이 carbon-leader/components 로 옮겨졌다)
-
-### 자가진단 인벤토리 배출량 화면 삭제
-
-- 대상: app/(site)/(content)/carbon-leader/self-check/inventory-emission/page.tsx
-  - app/(site)/(content)/carbon-leader/self-check/inventory-emission/item-select/page.tsx
-  - app/(site)/(content)/carbon-leader/self-check/components/inventory-emission.tsx
-  - app/(site)/(content)/carbon-leader/self-check/components/emission-input.tsx
-  - app/(site)/(content)/carbon-leader/self-check/components/item-select-dialog.tsx
-  - app/(site)/(content)/carbon-leader/self-check/components/item-select-pagination.tsx
-  - app/(site)/(content)/carbon-leader/self-check/components/step-nav.tsx
-  - constants/carbon-leader-self-check-emission-items.ts
-- 변경: STEP 2 인벤토리 배출량 화면과 배출항목 선택 팝업, 관련 컴포넌트·데이터를 지웠다
-- 결과: Scope 설명 팝업 화면(/carbon-leader/self-check/inventory-emission/scope-guide)만 남는다
-- 적용: 파일 삭제
-- 주의: 삭제 대상 파일을 그대로 지우면 된다. 다른 화면에서 참조하는 곳은 없다
+- 주의: 배너와 Scope 팝업은 carbon-leader/components 아래 한 벌만 둔다. 자가진단·신청 폴더에 같은 배너를 다시 만들지 않는다
 
 ### 색상 토큰 추가
 
@@ -249,6 +253,7 @@
 - 대상: app/layout.tsx
 - 변경: main 을 min-h-dvh flex 로 잡고 푸터에 mt-auto 를 줬다
 - 결과: 본문이 짧은 화면(팝업 전용 라우트 등)에서도 푸터가 화면 아래에 붙는다
+- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/691922f87149b0fdb32683244c4b84e1d68355cd)
 
 ### 자가진단 STEP 1 화면 정리
 
@@ -269,3 +274,37 @@
 - 결과: 목록에서 신규·유지·삭제 화면과 디자인·개발 확인이 필요한 행을 뱃지로 구분할 수 있다
 - 주의: [퍼블리싱 노출용] HEADER_STATE_ROWS 는 확인용 화면 표라 IA 화면 수에 넣지 않는다
 - 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/980c2671f0c4ac26c2e0add002404e66066461d7)
+
+### 퍼블리싱 인덱스 반영 버전 표시
+
+- 대상: lib/publishing/release-note.ts
+  - app/page.tsx
+- 변경: 인계 자산의 findAssetVersion 과 짝이 되는 findScreenVersion(경로) 을 추가했다
+- 변경: IA 표가 이 값을 읽어, 이번 릴리스에 나간 화면의 행에 강조색을 깔고 버전 배지를 채운다. 인계 자산 표와 같은 규칙이다
+- 변경: IA_ROWS 58행에 손으로 적던 version 필드를 지웠다. 반영 버전의 출처를 생성물 한 곳으로 모은다
+- 결과: 릴리스마다 행을 고칠 필요가 없고, 두 표가 같은 방식으로 이번 릴리스 항목을 보여준다
+- 주의: 생성물에 없는 경로는 '미배포'로 표시된다
+- 주의: 화면은 라우트 폴더·상위 layout.tsx·상위 components 를 함께 본다. 공통 컴포넌트를 고치면 그것을 쓰는 화면들의 반영 버전이 함께 올라가며, 실제로 함께 바뀌므로 의도한 동작이다
+- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/5e2e4f1d04191d05caf3fb12b7ae045b374d8e81)
+
+### 릴리스 노트 전달 카드와 버전 헤더
+
+- 대상: app/page.tsx
+- 변경: 카드 면색과 좌측 띠를 배지 계열로 나눴다. Diff 확인은 파랑, 덮어쓰기는 보라, 신규 추가는 초록이며, 좌측 띠는 항상 깔고 면색은 최신 릴리스 카드에만 얹는다
+- 변경: 대상 파일 패널을 흰색으로, 주의 콜아웃을 흰색에 가까운 노랑으로 고정했다. 카드 면색이 구분별로 달라지면서 기존 회색·하늘색으로는 묻혔다
+- 변경: 커밋 링크를 Diff 배지와 같은 파랑을 채운 버튼으로 바꿨다
+- 변경: 버전 헤더에 Diff 확인·덮어쓰기·신규 추가 건수를 카드와 같은 색 배지로 붙였다. 건수가 0인 구분은 그리지 않는다
+- 결과: 배지를 읽기 전에 색으로 카드 종류가 구분되고, 두 패널과 커밋 링크가 세 가지 카드 위에서 모두 같게 읽힌다
+- 결과: 헤더가 스크롤에 붙어 있어 카드를 세지 않아도, 접힌 이전 릴리스를 펼치지 않아도 구성이 보인다
+- 주의: 두 패널은 테마와 무관하게 밝은 색을 쓴다. 다크 모드에서도 흰색·연노랑 그대로다
+- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/c38764bb4535d17a6806db71d8ac08b7a124bd9e)
+
+### 전달 범위에 constants·util 추가
+
+- 대상: lib/publishing/handoff-assets.json
+- 변경: 인계 자산 목록에 constants·util 폴더를 넣고, 퍼블리싱 인덱스 전용인 components/publishing 을 화면 원본이 아님으로 표시했다
+- 결과: 이번 전달본부터 constants(화면 데이터 상수)와 util(공용 훅·포맷 함수) 폴더가 함께 전달된다
+- 결과: 전달 스크립트와 인계 자산 표가 같은 파일을 읽어 전달 범위와 화면 표기가 어긋나지 않는다
+- 주의: v0.0.1 전달본에는 두 폴더가 없었다. 이번 전달본부터 화면이 이 경로를 참조하므로 통째로 받아야 한다
+- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/acc4c7e1cbe5715c6e8addeb47a3a3285e16e8d6)
+- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/7005bb289d30768e0e3e2ea668eea4ec98d1556f)
