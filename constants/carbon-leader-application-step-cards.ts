@@ -34,7 +34,7 @@ const STEP_TEXT = {
     step: "STEP 3",
     title: "최종점검",
     description:
-      "중간점검 완료 후 2년이 경과하면 최종 감축 실적 및 이행 결과를 담은 **3차 신청서**를 작성합니다. 담당자의 최종점검 통과 후 선도기업 인증서가 발급됩니다.",
+      "중간점검 완료 후 **2년이 경과**하면 최종 감축 실적 및 이행 결과를 담은 **3차 신청서**를 작성합니다. 담당자의 최종점검 통과 후 선도기업 인증서가 발급됩니다.",
     actionLabel: "최종점검",
   },
 } as const
@@ -148,5 +148,7 @@ export const FINAL_COMPLETED: StepCardData[] = [
     tone: "violet",
     statusLabel: "점검완료",
     reviewHref: "/carbon-leader/application-3/final-confirm/result",
+    // 마지막 단계라 다음 액션이 없다. 시안에도 CTA 없이 현황조회만 있다.
+    hideAction: true,
   },
 ]

@@ -33,58 +33,64 @@ export interface StepCardData {
   statusLabel?: string
   /** complete 전용. 현황조회 버튼 링크 */
   reviewHref?: string
+  /** 다음 단계가 없어 CTA 자체를 그리지 않는다. 마지막 단계 완료 카드용 */
+  hideAction?: boolean
 }
 
 const CARD = {
-  default: "border-primary bg-background",
-  progress: "border-primary-light bg-background",
-  complete: "border-input bg-ash-200",
-  disabled: "border-input bg-ash-200",
+  default: "border-brand-primary bg-surface-card",
+  progress: "border-brand-progress bg-surface-card",
+  complete: "border-line-disabled bg-surface-disabled",
+  disabled: "border-line-disabled bg-surface-disabled",
 } as const
 
 const STEP_LABEL = {
-  default: "text-aqua-blue",
-  progress: "text-primary-light",
-  complete: "text-muted-foreground",
-  disabled: "text-muted-foreground",
+  default: "text-brand-info",
+  progress: "text-brand-progress",
+  complete: "text-ink-disabled",
+  disabled: "text-ink-disabled",
 } as const
 
 const DIVIDER = {
-  default: "border-border",
-  progress: "border-border",
-  complete: "border-input",
-  disabled: "border-input",
+  default: "border-line-divider",
+  progress: "border-line-divider",
+  complete: "border-line-disabled",
+  disabled: "border-line-disabled",
 } as const
 
 const TITLE = {
-  default: "text-foreground",
-  progress: "text-foreground",
-  complete: "text-muted-foreground",
-  disabled: "text-muted-foreground",
+  default: "text-ink-strong",
+  progress: "text-ink-strong",
+  complete: "text-ink-disabled",
+  disabled: "text-ink-disabled",
 } as const
 
 const DESCRIPTION = {
-  default: "text-ash-800",
-  progress: "text-ash-800",
-  complete: "text-muted-foreground",
-  disabled: "text-muted-foreground",
+  default: "text-ink-body",
+  progress: "text-ink-body",
+  complete: "text-ink-disabled",
+  disabled: "text-ink-disabled",
 } as const
 
 const META = {
-  default: "text-ash-700",
-  progress: "text-ash-800",
-  complete: "text-muted-foreground",
-  disabled: "text-muted-foreground",
+  // 라벨은 #666666, ** 로 감싼 날짜만 제목과 같은 강조색이다(다크에서 #FFFFFF).
+  default: "text-ink-muted [&_strong]:text-ink-strong",
+  progress: "text-ink-body",
+  complete: "text-ink-disabled",
+  disabled: "text-ink-disabled",
 } as const
 
 const TONE_BADGE = {
-  teal: "bg-lagoon-blue hover:bg-lagoon-blue dark:bg-lagoon-blue",
-  violet: "bg-neon-violet hover:bg-neon-violet dark:bg-neon-violet",
+  teal: "bg-brand-done-teal hover:bg-brand-done-teal dark:bg-brand-done-teal",
+  violet:
+    "bg-brand-done-violet hover:bg-brand-done-violet dark:bg-brand-done-violet",
 } as const
 
+// 현황조회 버튼: 배경은 카드 면색, 테두리·글자는 단계 강조색
 const TONE_REVIEW = {
-  teal: "text-lagoon-blue ring-lagoon-blue hover:bg-lagoon-blue/10",
-  violet: "text-neon-violet ring-neon-violet hover:bg-neon-violet/10",
+  teal: "bg-surface-card text-brand-done-teal ring-brand-done-teal hover:bg-surface-outline-hover",
+  violet:
+    "bg-surface-card text-brand-done-violet ring-brand-done-violet hover:bg-surface-outline-hover",
 } as const
 
 const DEFAULT_STATUS_LABEL = {
@@ -97,10 +103,10 @@ const DEFAULT_STATUS_LABEL = {
 const badgeStyle = (variant: StepCardVariant, tone: StepCardTone) => {
   if (variant === "complete") return TONE_BADGE[tone]
   if (variant === "progress")
-    return "bg-primary-light hover:bg-primary-light dark:bg-primary-light"
+    return "bg-brand-progress hover:bg-brand-progress dark:bg-brand-progress"
   if (variant === "disabled")
-    return "bg-ash-400 hover:bg-ash-400 dark:bg-ash-400"
-  return "bg-primary hover:bg-primary dark:bg-primary"
+    return "bg-fill-disabled hover:bg-fill-disabled dark:bg-fill-disabled text-ink-on-muted"
+  return "bg-brand-primary hover:bg-brand-primary dark:bg-brand-primary"
 }
 
 const StepCard = ({ data }: { data: StepCardData }) => {
@@ -115,6 +121,7 @@ const StepCard = ({ data }: { data: StepCardData }) => {
     tone = "teal",
     statusLabel,
     reviewHref,
+    hideAction = false,
   } = data
 
   // default 는 라우트가 아직 없어도 활성 CTA 로 보여야 한다. href 가 있을 때만 Link 로 감싼다.
@@ -134,7 +141,7 @@ const StepCard = ({ data }: { data: StepCardData }) => {
         </span>
         <Badge
           className={cn(
-            "text-primary-foreground shrink-0 border-transparent px-4 py-1 text-sm font-bold md:py-1.5",
+            "text-ink-on-brand shrink-0 border-transparent px-4 py-1 text-sm font-bold md:py-1.5",
             badgeStyle(variant, tone),
           )}
         >
@@ -178,11 +185,11 @@ const StepCard = ({ data }: { data: StepCardData }) => {
       </div>
 
       <div className="flex flex-col gap-2 pt-6 md:gap-2.5 lg:gap-2">
-        {isActionable ? (
+        {hideAction ? null : isActionable ? (
           <Button
             asChild={Boolean(href)}
             size="lg"
-            className="h-13 w-full text-base font-bold lg:text-sm"
+            className="bg-brand-primary hover:bg-brand-primary-hover active:bg-brand-primary-hover text-ink-on-brand h-13 w-full text-base font-bold lg:text-sm"
           >
             {href ? <Link href={href}>{actionLabel}</Link> : <>{actionLabel}</>}
           </Button>
@@ -190,7 +197,7 @@ const StepCard = ({ data }: { data: StepCardData }) => {
           <Button
             size="lg"
             disabled
-            className="bg-ash-400 text-ash-200 h-13 w-full text-base font-bold disabled:opacity-100 lg:text-sm"
+            className="bg-fill-disabled text-ink-on-disabled h-13 w-full text-base font-bold disabled:opacity-100 lg:text-sm"
           >
             {actionLabel}
           </Button>

@@ -23,21 +23,20 @@ const STEPS: FlowStep[] = [
 const ProcessFlow = () => {
   return (
     // 프로세스 바는 태블릿부터 노출한다.
-    <ol className="bg-sky-blue-light hidden flex-wrap items-center justify-center gap-x-0 gap-y-1 rounded-2xl px-3 py-3 md:flex lg:gap-x-2 lg:px-4">
+    <ol className="bg-surface-flow hidden flex-wrap items-center justify-center gap-x-0 gap-y-1 rounded-2xl px-3 py-3 md:flex lg:gap-x-2 lg:px-4">
       {STEPS.map((step, index) => (
         <li key={step.label} className="flex items-center gap-0 lg:gap-2">
           {index > 0 && (
             <ChevronRight
               aria-hidden="true"
-              className="text-ash-400 size-2 shrink-0 lg:size-3"
+              className="text-line-disabled size-2 shrink-0 lg:size-3"
             />
           )}
           <span
             className={cn(
               "text-xs whitespace-nowrap",
               step.isPeriod ? "font-normal" : "font-bold",
-              // 현재 단계 색은 토큰에 없어 primary 를 바 배경 위에 80% 로 얹어 맞춘다.
-              step.isCurrent ? "text-primary/80" : "text-foreground",
+              step.isCurrent ? "text-brand-step" : "text-ink-strong",
             )}
           >
             {step.label}
