@@ -22,7 +22,11 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import releaseInfo from "@/lib/publishing/release-info.json"
-import { RELEASE_NOTES, findAssetVersion } from "@/lib/publishing/release-note"
+import {
+  RELEASE_NOTES,
+  findAssetVersion,
+  findScreenVersion,
+} from "@/lib/publishing/release-note"
 import type {
   ReleaseNoteChange,
   ReleaseNoteDetail,
@@ -81,7 +85,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "완료",
-    version: "미배포",
     desc: "선행 이력이 없어 자가진단만 신청가능",
     cells: [
       { level: 1, name: "메인 홈", rowSpan: 58, colSpan: 1 },
@@ -99,7 +102,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "완료",
-    version: "미배포",
     desc: "자가진단 신청완료(현황조회 노출) / 선도기업 1차 신청가능",
     cells: [{ level: 4, name: "자가진단 완료", rowSpan: 1, colSpan: 2 }],
   },
@@ -112,7 +114,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "완료",
-    version: "미배포",
     desc: "자가진단·1차 신청 완료 / 중간점검 신청가능",
     cells: [{ level: 4, name: "1차 신청 완료", rowSpan: 1, colSpan: 2 }],
   },
@@ -125,7 +126,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "완료",
-    version: "미배포",
     desc: "중간점검 담당자 점검 진행중",
     cells: [{ level: 4, name: "중간점검 접수", rowSpan: 1, colSpan: 2 }],
   },
@@ -138,7 +138,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "완료",
-    version: "미배포",
     desc: "중간점검 완료 / 최종점검 신청가능",
     cells: [{ level: 4, name: "중간점검 완료", rowSpan: 1, colSpan: 2 }],
   },
@@ -151,7 +150,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "완료",
-    version: "미배포",
     desc: "전 단계 완료 / 다음 액션 없음",
     cells: [{ level: 4, name: "최종점검 완료", rowSpan: 1, colSpan: 2 }],
   },
@@ -164,7 +162,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "완료",
-    version: "미배포",
     desc: "Step 1, 정보 입력",
     cells: [
       { level: 3, name: "자가진단", rowSpan: 16, colSpan: 1 },
@@ -181,7 +178,6 @@ const IA_ROWS = [
     revise: true,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "기존 작성 중인 자가진단이 존재하는 경우 재진입 시 기존 작성내용을 이어서 작성할지 안내함",
     cells: [{ level: 5, name: "이어서 작성하기 팝업", rowSpan: 1, colSpan: 1 }],
   },
@@ -194,7 +190,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "완료",
-    version: "미배포",
     desc: "업종코드 조회 팝업 (확인필요)",
     cells: [{ level: 5, name: "업종코드 조회", rowSpan: 1, colSpan: 1 }],
   },
@@ -207,7 +202,6 @@ const IA_ROWS = [
     revise: true,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "Step 2, 정보 입력 / 계산결과 도출",
     cells: [
       { level: 4, name: "인벤토리 배출량 산정", rowSpan: 3, colSpan: 1 },
@@ -223,7 +217,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "인벤토리 항목 선택 팝업",
     cells: [{ level: 5, name: "항목 선택", rowSpan: 1, colSpan: 1 }],
   },
@@ -236,7 +229,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "완료",
-    version: "미배포",
     desc: "Scope 설명 팝업",
     cells: [{ level: 5, name: "Scope설명", rowSpan: 1, colSpan: 1 }],
   },
@@ -249,7 +241,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "완료",
-    version: "미배포",
     desc: "Step 3, 기준연도 배출량 확인, 정보 입력 / 계산결과 도출",
     cells: [
       { level: 4, name: "감축잠재량 산정", rowSpan: 3, colSpan: 1 },
@@ -265,7 +256,6 @@ const IA_ROWS = [
     revise: true,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "삭제 확인 팝업 - 사업 [삭제] 버튼 선택 시 노출",
     cells: [{ level: 5, name: "삭제 확인 팝업", rowSpan: 1, colSpan: 1 }],
   },
@@ -278,7 +268,6 @@ const IA_ROWS = [
     revise: true,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "입력필드 모두 입력 후, 감축 방법론 드롭다운 변경시, 확인팝업. - [변경] 선택 시, 입력필드 초기화",
     cells: [
       { level: 5, name: "감축방법론 변경 확인 팝업", rowSpan: 1, colSpan: 1 },
@@ -293,7 +282,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "Step 4, 탄소감축 목표 감축사업, 정보 입력 / 비교결과 도출",
     cells: [{ level: 4, name: "감축목표 설정", rowSpan: 1, colSpan: 2 }],
   },
@@ -306,7 +294,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "Step 5, 평가표 작성 / 점수 및 등급 도출 / 버튼 클릭시 결과 확인 모달 팝업 호출",
     cells: [
       { level: 4, name: "평가지표 작성", rowSpan: 4, colSpan: 1 },
@@ -322,7 +309,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: '설명 팝업 1.2.2 탄소중립 전문역량 향상 노력 [4번째 체크항목 "탄소중립 관련 의무 교육을 수료하고 있는 경우" 옆 ?] 선택 시 노출되는 팝업',
     cells: [
       {
@@ -342,7 +328,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: '설명 팝업 2.1.1 탄소배출량 산정 [3번째 항목 "(Scope 3) …" 의 * (예시) 중소기업 온실가스 배출원(Scope 1,2,3) 옆 ?] 선택 시 노출되는 팝업',
     cells: [
       {
@@ -362,7 +347,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: '설명 팝업 2.2.5 탄소감축 자발적 행동 [4번째 항목 "(제품·기술에 대한 환경분야 국가인증 취득) …" 옆 ?] 선택 시 노출되는 팝업.',
     cells: [
       {
@@ -382,7 +366,6 @@ const IA_ROWS = [
     revise: true,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "Step 6, 결과 확인 화면 , [신청서 출력], [작성완료], [선도기업 신청하기] 버튼 - [신청서 출력] : 선택 시, 신청서 PDF 다운로드 실행 - [작성완료] : 선택 시, 작성 완료 처리 BO에 해당 내역 저장처리되며, [선도기업 신청하기]버튼 활성화 - [선도기업 신청하기] : 선택 시, 선도기업 1차 신청화면으로 이동.",
     cells: [
       { level: 4, name: "결과 확인", rowSpan: 2, colSpan: 1 },
@@ -398,7 +381,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "결과 보고서 다운로드",
     cells: [{ level: 5, name: "결과 확인서", rowSpan: 1, colSpan: 1 }],
   },
@@ -411,7 +393,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "Step 1, 정보 입력(회원정보 및 자가진단 정보 일부 연동) - 탄소중립 기준연도 현황 (자가진단 데이터 불러오기)",
     cells: [
       { level: 3, name: "선도기업 신청 1차", rowSpan: 8, colSpan: 1 },
@@ -428,7 +409,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "카카오 주소 검색 API 사용",
     cells: [{ level: 5, name: "주소 검색", rowSpan: 1, colSpan: 1 }],
   },
@@ -441,7 +421,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "Step 2, 서류 제출 (파일 업로드 기능) , 이전, 다음 버튼",
     cells: [{ level: 4, name: "서류 제출", rowSpan: 1, colSpan: 2 }],
   },
@@ -454,7 +433,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "Step 3, 최종확인 화면, 수정하기, 제출하기 버튼",
     cells: [
       { level: 4, name: "최종 확인", rowSpan: 2, colSpan: 1 },
@@ -470,7 +448,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "신청서 제출 확인 팝업, 취소, 제출하기 버튼",
     cells: [{ level: 5, name: "제출 확인 팝업", rowSpan: 1, colSpan: 1 }],
   },
@@ -483,7 +460,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: true,
     uiux: "대기중",
-    version: "미배포",
     desc: "Step 4, 결과 확인 화면 , [출력물 받기], [신청내역 확인] 버튼 - [출력물 받기] : 선택 시, 신청서 PDF 다운로드 실행 - [작성완료] : 선택 시, 작성 완료 처리 BO에 해당 내역 저장처리되며, [신청내역 확인]버튼 활성화 - [신청내역 확인] : 선택 시, 현황조회 화면으로 이동.",
     cells: [
       { level: 4, name: "신청결과 확인", rowSpan: 3, colSpan: 1 },
@@ -499,7 +475,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "신청서 다운로드",
     cells: [{ level: 5, name: "신청서", rowSpan: 1, colSpan: 1 }],
   },
@@ -512,7 +487,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "결과 보고서 다운로드 (콘텐츠 미수급), 제공 미정 * 공식 인증을 받는 절차 인하여 현재 개발에 제외될 수 있음",
     cells: [{ level: 5, name: "결과 확인서 (미정)", rowSpan: 1, colSpan: 1 }],
   },
@@ -525,7 +499,6 @@ const IA_ROWS = [
     revise: true,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "Step 1, 정보 입력(회원정보 및 자가진단 정보 일부 연동) - 탄소중립 기준연도 현황 (자가진단 데이터 불러오기)",
     cells: [
       { level: 3, name: "선도기업 신청 2차", rowSpan: 8, colSpan: 1 },
@@ -542,7 +515,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "카카오 주소 검색 API 사용",
     cells: [{ level: 5, name: "주소 검색", rowSpan: 1, colSpan: 1 }],
   },
@@ -555,7 +527,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "Step 2, 서류 제출 (파일 업로드 기능), 이전, 다음 버튼",
     cells: [{ level: 4, name: "서류 제출", rowSpan: 1, colSpan: 2 }],
   },
@@ -568,7 +539,6 @@ const IA_ROWS = [
     revise: true,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "Step 3, 최종확인 화면, 수정하기, 제출하기 버튼",
     cells: [
       { level: 4, name: "최종 확인", rowSpan: 2, colSpan: 1 },
@@ -584,7 +554,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "신청서 제출 확인 팝업, 취소, 제출하기 버튼",
     cells: [{ level: 5, name: "제출 확인 팝업", rowSpan: 1, colSpan: 1 }],
   },
@@ -597,7 +566,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: true,
     uiux: "대기중",
-    version: "미배포",
     desc: "Step 4, 결과 확인 화면 , [출력물 받기], [신청내역 확인] 버튼 - [출력물 받기] : 선택 시, 신청서 PDF 다운로드 실행 - [작성완료] : 선택 시, 작성 완료 처리 BO에 해당 내역 저장처리되며, [신청내역 확인]버튼 활성화 - [신청내역 확인] : 선택 시, 현황조회 화면으로 이동.",
     cells: [
       { level: 4, name: "신청결과 확인", rowSpan: 3, colSpan: 1 },
@@ -613,7 +581,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "신청서 다운로드",
     cells: [{ level: 5, name: "신청서", rowSpan: 1, colSpan: 1 }],
   },
@@ -626,7 +593,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "결과 보고서 다운로드 (콘텐츠 미수급), 제공 미정 * 공식 인증을 받는 절차 인하여 현재 개발에 제외될 수 있음",
     cells: [{ level: 5, name: "결과 확인서 (미정)", rowSpan: 1, colSpan: 1 }],
   },
@@ -639,7 +605,6 @@ const IA_ROWS = [
     revise: true,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "Step 1, 정보 입력, 기업정보 - 내정보 불러오기, 탄소중립 기준연도현황 - 기존데이터 불러오기 기능",
     cells: [
       { level: 3, name: "선도기업 신청 3차", rowSpan: 12, colSpan: 1 },
@@ -656,7 +621,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "카카오 주소 검색 API 사용",
     cells: [{ level: 5, name: "주소 검색", rowSpan: 1, colSpan: 1 }],
   },
@@ -669,7 +633,6 @@ const IA_ROWS = [
     revise: true,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "Step 2, 정보 입력 / 계산결과 도출 (자가진단 -인벤토리 배출량 산정과 공통화면)",
     cells: [
       { level: 4, name: "인벤토리 배출량 산정", rowSpan: 3, colSpan: 1 },
@@ -685,7 +648,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "인벤토리 항목 선택 팝업",
     cells: [{ level: 5, name: "항목 선택", rowSpan: 1, colSpan: 1 }],
   },
@@ -698,7 +660,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "완료",
-    version: "미배포",
     desc: "Scope 설명 팝업",
     cells: [{ level: 5, name: "Scope설명", rowSpan: 1, colSpan: 1 }],
   },
@@ -711,7 +672,6 @@ const IA_ROWS = [
     revise: true,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "Step 3, 감축목표 설정 vs 배출량 실적 비교 결과 제시",
     cells: [{ level: 4, name: "목표달성 평가", rowSpan: 1, colSpan: 2 }],
   },
@@ -724,7 +684,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "Step 4, 서류 제출 (파일 업로드 기능), 이전, 다음 버튼",
     cells: [{ level: 4, name: "서류 제출", rowSpan: 1, colSpan: 2 }],
   },
@@ -737,7 +696,6 @@ const IA_ROWS = [
     revise: true,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "Step 5, 최종확인 화면, 수정하기, 제출하기 버튼",
     cells: [
       { level: 4, name: "최종 확인", rowSpan: 2, colSpan: 1 },
@@ -753,7 +711,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "신청서 제출 확인 팝업, 취소, 제출하기 버튼",
     cells: [{ level: 5, name: "제출 확인 팝업", rowSpan: 1, colSpan: 1 }],
   },
@@ -766,7 +723,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: true,
     uiux: "대기중",
-    version: "미배포",
     desc: "Step 6, 결과 확인 화면 , [출력물 받기], [신청내역 확인] 버튼 - [출력물 받기] : 선택 시, 신청서 PDF 다운로드 실행 - [작성완료] : 선택 시, 작성 완료 처리 BO에 해당 내역 저장처리되며, [신청내역 확인]버튼 활성화 - [신청내역 확인] : 선택 시, 현황조회 화면으로 이동.",
     cells: [
       { level: 4, name: "신청결과 확인", rowSpan: 3, colSpan: 1 },
@@ -782,7 +738,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "신청서 다운로드",
     cells: [{ level: 5, name: "신청서", rowSpan: 1, colSpan: 1 }],
   },
@@ -795,7 +750,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "결과 보고서 다운로드 (콘텐츠 미수급), 제공 미정 * 공식 인증을 받는 절차 인하여 현재 개발에 제외될 수 있음",
     cells: [{ level: 5, name: "결과 확인서 (미정)", rowSpan: 1, colSpan: 1 }],
   },
@@ -808,7 +762,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "로그인 상태에서 선택 시, 현황조회 화면으로 이동시킴 (화면은 없음)",
     cells: [
       {
@@ -828,7 +781,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "GNB메뉴 - 로그인 시에만 노출",
     cells: [
       { level: 2, name: "마이페이지", rowSpan: 7, colSpan: 1 },
@@ -844,7 +796,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "기관회원에게만 제공. 하위계정 추가/삭제/수정 - 화면",
     cells: [
       { level: 3, name: "하위계정 관리", rowSpan: 2, colSpan: 1 },
@@ -860,7 +811,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "하위계정 등록 팝업",
     cells: [{ level: 4, name: "하위계정 등록", rowSpan: 1, colSpan: 2 }],
   },
@@ -873,7 +823,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "기업회원에게만 제공. 개인 정보 수정화면.",
     cells: [
       { level: 3, name: "회원정보 수정", rowSpan: 2, colSpan: 1 },
@@ -889,7 +838,6 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "카카오 주소 검색 API 사용",
     cells: [{ level: 4, name: "주소검색", rowSpan: 1, colSpan: 2 }],
   },
@@ -902,7 +850,6 @@ const IA_ROWS = [
     revise: true,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "로그인 회원만 접근 가능 화면 선도기업 신청 내역 및 선도기업 신청 확인서 발급, 전문가 평가 결과 및 결과 다운로드 - [보안요청 보기] : 버튼 선택시, 보안 요청 팝업 노출.",
     cells: [
       { level: 3, name: "현황조회", rowSpan: 2, colSpan: 1 },
@@ -918,7 +865,6 @@ const IA_ROWS = [
     revise: true,
     devCheck: false,
     uiux: "대기중",
-    version: "미배포",
     desc: "BO 관리자가 보안요청 시, 입력한 보안요청 내용 문구 노출 - [닫기] 버튼",
     cells: [{ level: 4, name: "보안요청", rowSpan: 1, colSpan: 2 }],
   },
@@ -1169,11 +1115,6 @@ const formatReleasedAt = (isoDate: string) => {
 const PublishingIndexPage = () => {
   const releasedAt = formatReleasedAt(releaseInfo.releasedAt)
   const releaseNotes = RELEASE_NOTES
-  const latestVersion = releaseNotes[0]?.version
-
-  // IA 행은 자기 버전이 최신 릴리스와 같을 때 강조한다.
-  const isLatestScreen = (version: string) =>
-    latestVersion !== undefined && version === latestVersion
 
   return (
     <div className="flex w-full flex-col items-center px-4 py-10">
@@ -1546,6 +1487,9 @@ const PublishingIndexPage = () => {
           <TableBody>
             {IA_ROWS.map((row) => {
               const isTopLevel = row.cells[0]?.level === 1
+              const hasScreenFile = hasPage(row.path)
+              // 반영 버전은 릴리스 때 만들어진 스냅샷에서 읽는다. 행에는 적지 않는다.
+              const screenVersion = findScreenVersion(row.path)
               // level 0 은 병합된 빈 칸이다. 그 행이 가리키는 실제 화면은
               // 마지막 이름 있는 뎁스이며, 그 배지에만 키 복사를 붙인다.
               const screenCellIndex = row.cells.reduce(
@@ -1558,7 +1502,7 @@ const PublishingIndexPage = () => {
                   key={row.no}
                   className={cn(
                     isTopLevel && "bg-muted/40",
-                    isLatestScreen(row.version) && LATEST_HIGHLIGHT,
+                    screenVersion.isCurrent && LATEST_HIGHLIGHT,
                   )}
                 >
                   {row.cells.map((cell, index) =>
@@ -1590,7 +1534,7 @@ const PublishingIndexPage = () => {
                             </Badge>
                           )}
                           <span className="text-sm font-medium break-keep">
-                            {index === screenCellIndex && hasPage(row.path) ? (
+                            {index === screenCellIndex && hasScreenFile ? (
                               <Link
                                 href={row.path}
                                 className="text-primary rounded hover:underline"
@@ -1627,7 +1571,11 @@ const PublishingIndexPage = () => {
                     <Badge variant={getUiuxVariant(row.uiux)}>{row.uiux}</Badge>
                   </TableCell>
                   <TableCell className="align-top">
-                    <Badge variant="outline">{row.version}</Badge>
+                    <Badge
+                      variant={screenVersion.isCurrent ? "default" : "outline"}
+                    >
+                      {screenVersion.version}
+                    </Badge>
                   </TableCell>
                 </TableRow>
               )

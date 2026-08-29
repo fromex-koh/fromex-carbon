@@ -1,11 +1,12 @@
 // 릴리스 메타데이터를 '타입이 확정된 객체'로 만들어 export 하는 단일 관문.
 // 화면은 .generated.json 을 직접 import 하지 않고 반드시 여기서 가져온다.
 //
-// 두 생성물은 GitHub Actions 릴리스 단계에서 scripts/compute-asset-versions.mjs 가 만든다.
+// 세 생성물은 GitHub Actions 릴리스 단계에서 scripts/compute-asset-versions.mjs 가 만든다.
 // 전달본·로컬 빌드는 git 을 조회하지 않고 커밋된 이 스냅샷만 읽는다.
 
 import assetVersionsGenerated from "@/lib/publishing/asset-versions.generated.json"
 import releaseNotesGenerated from "@/lib/publishing/release-notes.generated.json"
+import screenVersionsGenerated from "@/lib/publishing/screen-versions.generated.json"
 
 export type ReleaseNoteHandoffMode = "diff" | "new" | "overwrite"
 
@@ -32,6 +33,13 @@ export interface ReleaseNote {
 
 export interface AssetVersion {
   name: string
+  version: string
+  isCurrent: boolean
+}
+
+// 화면은 라우트 경로가 이름을 겸한다. 목록은 (content) 아래 page.tsx 에서 생성된다.
+export interface ScreenVersion {
+  path: string
   version: string
   isCurrent: boolean
 }
@@ -99,6 +107,10 @@ const generatedAssets = (
   assetVersionsGenerated as { version: string; assets: AssetVersion[] }
 ).assets
 
+const generatedScreens = (
+  screenVersionsGenerated as { version: string; screens: ScreenVersion[] }
+).screens
+
 export const RELEASE_NOTES: ReleaseNote[] = generatedReleases.map(
   (release): ReleaseNote => ({
     version: release.version,
@@ -111,9 +123,27 @@ export const RELEASE_NOTES: ReleaseNote[] = generatedReleases.map(
 
 export const ASSET_VERSIONS: AssetVersion[] = generatedAssets
 
+export const SCREEN_VERSIONS: ScreenVersion[] = generatedScreens
+
 // 아직 어떤 릴리스에도 담기지 않은 자산의 표시 문구.
 // git-info 의 "-"(커밋 이력 없음)와 생성물 누락(첫 릴리스 전)을 한 문구로 합친다.
 export const UNRELEASED_ASSET_VERSION = "미반영"
+
+// IA 표는 '미배포'로 적어 왔다. 자산 표의 '미반영'과 뜻은 같고 문구만 다르다.
+export const UNRELEASED_SCREEN_VERSION = "미배포"
+
+// IA 표는 라우트 경로로 화면을 찾는다. 생성물에 없으면 아직 릴리스에 담기지 않은 화면이다.
+export const findScreenVersion = (
+  path: string,
+): { version: string; isCurrent: boolean } => {
+  const found = SCREEN_VERSIONS.find((screen) => screen.path === path)
+  const version =
+    found === undefined || found.version === "-"
+      ? UNRELEASED_SCREEN_VERSION
+      : found.version
+
+  return { version, isCurrent: found?.isCurrent ?? false }
+}
 
 // 인계 자산 표는 경로를 이름으로 쓴다. 생성물에 없으면 아직 추적 전이다.
 export const findAssetVersion = (
