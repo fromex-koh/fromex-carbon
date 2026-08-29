@@ -1,6 +1,5 @@
 "use client"
 
-import type { ReactNode } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -8,15 +7,6 @@ import { ArrowRight } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import {
-  Dialog,
-  DialogCloseButton,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
 import {
   Form,
   FormControl,
@@ -30,46 +20,11 @@ import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio"
 import { Stepper } from "@/components/ui/stepper"
 import StepMobileNav from "@/app/(site)/(content)/carbon-leader/self-check/components/step-mobile-nav"
-import { useDialogAutoOpen } from "@/util/use-dialog-auto-open"
+import IndustryCodeDialog from "@/app/(site)/(content)/carbon-leader/self-check/components/industry-code-dialog"
 import BaseInfo from "@/app/(site)/(content)/carbon-leader/self-check/components/base-info"
 import { cn } from "@/lib/utils"
 import { SELF_CHECK_STEPS } from "@/constants/carbon-leader-self-check-steps"
 import { withThousandsComma } from "@/util/format-number"
-
-// 업종코드 조회 팝업은 기존 컴포넌트(components/ui/lobzcd-dialog.tsx)를 그대로 붙인다.
-// 이 화면에서는 팝업이 뜨는 자리만 표시해 둔다.
-const IndustryCodeDialog = ({
-  children,
-  defaultOpen,
-}: {
-  children: ReactNode
-  defaultOpen?: boolean
-}) => {
-  const [open, setOpen] = useDialogAutoOpen(defaultOpen)
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="w-[calc(100%-1.25rem)] max-w-[560px] gap-0 rounded-xl p-0">
-        <DialogHeader className="border-input gap-0 border-b px-6 py-5 text-left">
-          <DialogTitle className="text-lg font-bold break-all">
-            업종을 검색해보세요
-          </DialogTitle>
-          <DialogDescription className="sr-only">
-            업종코드 조회 팝업이 들어갈 자리입니다.
-          </DialogDescription>
-          <DialogCloseButton className="absolute top-5 right-5" />
-        </DialogHeader>
-
-        <div className="px-6 py-10">
-          <p className="border-input text-muted-foreground rounded-md border border-dashed px-6 py-12 text-center text-sm break-all">
-            업종코드 조회 팝업 기존 사용
-          </p>
-        </div>
-      </DialogContent>
-    </Dialog>
-  )
-}
 
 const NOTICES = [
   "자가진단은 입력하신 기업 정보를 바탕으로 탄소중립 준비 수준을 진단해 드리는 서비스입니다.",
@@ -126,13 +81,13 @@ const UnitField = ({
     <Input
       isValid={isValid}
       className={cn(
-        "pr-16",
+        "border-line-field bg-surface-field text-ink-strong placeholder:text-ink-placeholder pr-16",
         !isValid && "hover:ring-destructive focus-visible:ring-destructive",
         className,
       )}
       {...props}
     />
-    <span className="text-muted-foreground pointer-events-none absolute inset-y-0 right-4 flex items-center text-sm">
+    <span className="text-ink-body pointer-events-none absolute inset-y-0 right-4 flex items-center text-sm">
       {unit}
     </span>
   </div>
@@ -174,7 +129,7 @@ const CompanyInfo = ({ openIndustryCode }: CompanyInfoProps) => {
       />
 
       <div className="flex flex-col gap-6 max-md:hidden lg:flex-row lg:items-center lg:justify-between lg:gap-8">
-        <h2 className="text-lg font-bold whitespace-nowrap md:text-3xl lg:text-4xl">
+        <h2 className="text-ink-strong text-lg font-bold whitespace-nowrap md:text-3xl lg:text-4xl">
           기업 정보 입력
         </h2>
         {/* Stepper 내부 ol 의 줄바꿈·폭을 밖에서 제어한다. 지우면 스테퍼가 접힌다. */}
@@ -191,202 +146,218 @@ const CompanyInfo = ({ openIndustryCode }: CompanyInfoProps) => {
           noValidate
           className="flex flex-col gap-10 max-md:px-5 max-md:pt-12 max-md:pb-10"
         >
-          <section className="border-border flex flex-col gap-8 rounded-2xl border p-5 md:p-10">
-            <div className="flex flex-col gap-2">
-              <h3 className="text-lg font-bold lg:text-2xl">기업 정보 입력</h3>
-              <p className="text-muted-foreground text-sm lg:text-base">
-                기업의 기본 정보를 입력해주세요
-              </p>
-            </div>
+          {/* 시안 간격: 카드 → 체크박스 20px, 체크박스 → 버튼 40px */}
+          <div className="flex flex-col gap-5">
+            <section className="border-line-card flex flex-col gap-8 rounded-2xl border p-5 md:p-10">
+              <div className="flex flex-col gap-2">
+                <h3 className="text-ink-strong text-lg font-bold lg:text-2xl">
+                  기업 정보 입력
+                </h3>
+                <p className="text-ink-body text-sm lg:text-base">
+                  기업의 기본 정보를 입력해주세요
+                </p>
+              </div>
 
-            <div className="grid gap-8 md:grid-cols-2 md:gap-x-12 md:gap-y-12">
-              <FormField
-                control={form.control}
-                name="industryCode"
-                render={({ field, fieldState }) => (
-                  <FormItem className="flex flex-col gap-3">
-                    <FormLabel
-                      htmlFor="industry-code"
-                      className="text-foreground"
-                    >
-                      업종코드
-                    </FormLabel>
-                    <IndustryCodeDialog defaultOpen={openIndustryCode}>
-                      <Button
-                        id="industry-code"
-                        type="button"
-                        variant="ghost"
-                        isValid={!fieldState.error}
-                        className="border-input hover:ring-ash-600 h-12 w-full justify-start rounded-md border px-3 text-sm font-semibold hover:ring-2"
-                      >
-                        {field.value || (
-                          <span className="text-muted-foreground font-normal">
-                            클릭하여 업종코드를 선택해주세요
-                          </span>
-                        )}
-                      </Button>
-                    </IndustryCodeDialog>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="businessYears"
-                render={({ field, fieldState }) => (
-                  <FormItem className="flex flex-col gap-3">
-                    <FormLabel
-                      htmlFor="business-years"
-                      className="text-foreground"
-                    >
-                      업력
-                    </FormLabel>
-                    <FormControl>
-                      <UnitField
-                        id="business-years"
-                        unit="년"
-                        placeholder="100,000"
-                        inputMode="numeric"
-                        isValid={!fieldState.error}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {[
-                {
-                  name: "wasteDirect" as const,
-                  label: "폐기물 직접 처리 여부",
-                },
-                {
-                  name: "processEmission" as const,
-                  label: "공정배출 해당여부",
-                },
-              ].map(({ name, label }) => (
+              <div className="grid gap-8 md:grid-cols-2 md:gap-x-12 md:gap-y-12">
                 <FormField
-                  key={name}
                   control={form.control}
-                  name={name}
+                  name="industryCode"
                   render={({ field, fieldState }) => (
                     <FormItem className="flex flex-col gap-3">
-                      <FormLabel isNotNeedHtmlFor className="text-foreground">
-                        {label}
+                      <FormLabel
+                        htmlFor="industry-code"
+                        className="text-ink-strong"
+                      >
+                        업종코드
                       </FormLabel>
-                      <FormControl>
-                        <RadioGroup
-                          name={name}
-                          value={field.value}
-                          onValueChange={field.onChange}
+                      <IndustryCodeDialog defaultOpen={openIndustryCode}>
+                        <Button
+                          id="industry-code"
+                          type="button"
+                          variant="ghost"
                           isValid={!fieldState.error}
-                          className="flex flex-wrap gap-6 md:gap-14"
+                          className="border-line-field bg-surface-field text-ink-strong hover:ring-ash-600 h-12 w-full justify-start rounded-md border px-3 text-sm font-semibold hover:ring-2"
                         >
-                          {YES_NO.map((option) => (
-                            <div
-                              key={option.value}
-                              className="flex items-center gap-2"
-                            >
-                              <RadioGroupItem
-                                value={option.value}
-                                id={`${name}-${option.value}`}
-                              />
-                              <Label
-                                htmlFor={`${name}-${option.value}`}
-                                className="text-base font-medium"
-                              >
-                                {option.label}
-                              </Label>
-                            </div>
-                          ))}
-                        </RadioGroup>
-                      </FormControl>
-                      <FormMessage />
+                          {field.value || (
+                            <span className="text-ink-placeholder font-normal">
+                              클릭하여 업종코드를 선택해주세요
+                            </span>
+                          )}
+                        </Button>
+                      </IndustryCodeDialog>
+                      <FormMessage className="text-ink-error" />
                     </FormItem>
                   )}
                 />
-              ))}
 
-              <div className="flex flex-col gap-3 md:col-span-2">
-                <div className="flex flex-col gap-1">
-                  <p className="text-base font-bold">직전 3개년 매출액</p>
-                  <p className="text-muted-foreground text-xs">
-                    최근 3개년도 매출액을 백만원 단위로 입력해주세요
-                  </p>
-                </div>
-                <div className="flex flex-col gap-4 md:flex-row md:gap-3">
-                  {SALES_YEARS.map((name) => (
-                    <FormField
-                      key={name}
-                      control={form.control}
-                      name={name}
-                      render={({ field, fieldState }) => (
-                        <FormItem className="flex flex-1 flex-col gap-2">
-                          <FormLabel
-                            htmlFor={name}
-                            className="text-muted-foreground text-sm font-medium"
+                <FormField
+                  control={form.control}
+                  name="businessYears"
+                  render={({ field, fieldState }) => (
+                    <FormItem className="flex flex-col gap-3">
+                      <FormLabel
+                        htmlFor="business-years"
+                        className="text-ink-strong"
+                      >
+                        업력
+                      </FormLabel>
+                      <FormControl>
+                        <UnitField
+                          id="business-years"
+                          unit="년"
+                          placeholder="10"
+                          inputMode="numeric"
+                          isValid={!fieldState.error}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-ink-error" />
+                    </FormItem>
+                  )}
+                />
+
+                {[
+                  {
+                    name: "wasteDirect" as const,
+                    label: "폐기물 직접 처리 여부",
+                  },
+                  {
+                    name: "processEmission" as const,
+                    label: "공정배출 해당여부",
+                  },
+                ].map(({ name, label }) => (
+                  <FormField
+                    key={name}
+                    control={form.control}
+                    name={name}
+                    render={({ field, fieldState }) => (
+                      <FormItem className="flex flex-col gap-3">
+                        <FormLabel isNotNeedHtmlFor className="text-ink-strong">
+                          {label}
+                        </FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            name={name}
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            isValid={!fieldState.error}
+                            className="flex flex-wrap gap-6 md:gap-14"
                           >
-                            {SALES_LABELS[name]}
-                          </FormLabel>
-                          <FormControl>
-                            <UnitField
-                              id={name}
-                              unit="백만원"
-                              placeholder="100,000"
-                              inputMode="numeric"
-                              isValid={!fieldState.error}
-                              {...field}
-                              onChange={(event) =>
-                                field.onChange(
-                                  withThousandsComma(event.target.value),
-                                )
-                              }
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  ))}
+                            {YES_NO.map((option) => (
+                              <div
+                                key={option.value}
+                                className="flex items-center gap-2"
+                              >
+                                <RadioGroupItem
+                                  value={option.value}
+                                  id={`${name}-${option.value}`}
+                                  className="data-[state=unchecked]:border-line-field data-[state=unchecked]:bg-surface-field"
+                                />
+                                <Label
+                                  htmlFor={`${name}-${option.value}`}
+                                  className="text-ink-strong text-base font-medium"
+                                >
+                                  {option.label}
+                                </Label>
+                              </div>
+                            ))}
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage className="text-ink-error" />
+                      </FormItem>
+                    )}
+                  />
+                ))}
+
+                <div className="flex flex-col gap-3 md:col-span-2">
+                  <p className="text-ink-strong text-base font-bold">
+                    직전 3개년 매출액
+                  </p>
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex flex-col gap-4 md:flex-row md:gap-3">
+                      {SALES_YEARS.map((name) => (
+                        <FormField
+                          key={name}
+                          control={form.control}
+                          name={name}
+                          render={({ field, fieldState }) => (
+                            <FormItem className="flex flex-1 flex-col gap-2">
+                              <FormLabel
+                                htmlFor={name}
+                                className="text-ink-strong text-sm font-medium"
+                              >
+                                {SALES_LABELS[name]}
+                              </FormLabel>
+                              <FormControl>
+                                <UnitField
+                                  id={name}
+                                  unit="백만원"
+                                  placeholder="100,000"
+                                  inputMode="numeric"
+                                  isValid={!fieldState.error}
+                                  {...field}
+                                  onChange={(event) =>
+                                    field.onChange(
+                                      withThousandsComma(event.target.value),
+                                    )
+                                  }
+                                />
+                              </FormControl>
+                              {/* 안내 문구가 입력칸 묶음 바로 아래(시안 6px)에 붙도록,
+                                  에러가 없을 때는 메시지 자리를 비워 두지 않는다. */}
+                              <FormMessage
+                                className={cn(
+                                  "text-ink-error",
+                                  !fieldState.error && "hidden",
+                                )}
+                              />
+                            </FormItem>
+                          )}
+                        />
+                      ))}
+                    </div>
+                    <p className="text-ink-disabled text-xs">
+                      최근 3개년도 매출액을 백만원 단위로 입력해주세요
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          </section>
+            </section>
 
-          <FormField
-            control={form.control}
-            name="agree"
-            render={({ field, fieldState }) => (
-              <FormItem className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <FormControl>
-                    <Checkbox
-                      id="agree"
-                      name="agree"
-                      checked={field.value ?? false}
-                      onCheckedChange={field.onChange}
-                      isValid={!fieldState.error}
-                    />
-                  </FormControl>
-                  <Label
-                    htmlFor="agree"
-                    className="text-base font-medium break-keep"
-                  >
-                    입력한 정보에 대해 기술보증기금이 활용하는 것에 동의합니다
-                  </Label>
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="agree"
+              render={({ field, fieldState }) => (
+                <FormItem className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <FormControl>
+                      <Checkbox
+                        id="agree"
+                        name="agree"
+                        checked={field.value ?? false}
+                        onCheckedChange={field.onChange}
+                        isValid={!fieldState.error}
+                        className="border-line-field bg-surface-card"
+                      />
+                    </FormControl>
+                    <Label
+                      htmlFor="agree"
+                      className="text-ink-strong text-base font-medium break-keep"
+                    >
+                      입력한 정보에 대해 기술보증기금이 활용하는 것에 동의합니다
+                    </Label>
+                  </div>
+                  <FormMessage className="text-ink-error" />
+                </FormItem>
+              )}
+            />
+          </div>
 
           <div className="flex md:justify-end">
             <Button
               type="submit"
               size="lg"
-              className="h-11 w-full font-bold [&_svg]:size-5 md:h-13 md:w-auto md:min-w-50"
+              className="disabled:bg-fill-disabled disabled:text-ink-on-disabled h-11 w-full font-bold disabled:opacity-100 [&_svg]:size-5 md:h-13 md:w-auto md:min-w-50"
             >
               다음으로
               <ArrowRight aria-hidden="true" />
