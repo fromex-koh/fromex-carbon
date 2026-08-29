@@ -7,7 +7,6 @@ import { useEffect, useState } from "react"
  *
  * 쓰는 곳
  * - /carbon-leader/self-check/company-info/industry-code-search (업종코드 조회)
- * - /carbon-leader/self-check/inventory-emission/item-select (인벤토리 항목 선택)
  * - /carbon-leader/self-check/inventory-emission/scope-guide (Scope 설명)
  *
  * 서버에서 연 채로 그리면 마크업이 어긋나고, 마운트 직후에 열면
