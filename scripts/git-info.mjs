@@ -8,9 +8,12 @@ const run = (command) =>
     .toString()
     .trim()
 
-const resolveLastCommit = (path) => {
+const resolveLastCommit = (paths) => {
+  if (paths.length === 0) return undefined
+
   try {
-    return run(`git log -1 --format=%H -- "${path}"`)
+    const pathspec = paths.map((path) => `"${path}"`).join(" ")
+    return run(`git log -1 --format=%H -- ${pathspec}`)
   } catch {
     return undefined
   }
@@ -19,8 +22,12 @@ const resolveLastCommit = (path) => {
 // 주어진 경로(파일·폴더)가 마지막으로 바뀐 시점을 '그 변경을 포함하는 가장 가까운 태그'로 표현한다.
 // 예: v0.1.0 이후 globals.css 만 바뀌었다면 → v0.1.0 은 그 변경을 포함하지 않으므로,
 //     다음 태그(v0.2.0)가 만들어져야 그 값이 나온다. 아직 태그되지 않았으면 '미배포'.
-export const resolvePathVersion = (path) => {
-  const lastCommit = resolveLastCommit(path)
+//
+// 화면 하나는 라우트 폴더·상위 레이아웃·공통 컴포넌트에 걸쳐 있어 경로가 여럿이다.
+// 배열을 넘기면 그중 가장 최근 커밋 하나를 기준으로 삼는다.
+export const resolvePathVersion = (pathOrPaths) => {
+  const paths = Array.isArray(pathOrPaths) ? pathOrPaths : [pathOrPaths]
+  const lastCommit = resolveLastCommit(paths)
   if (lastCommit === undefined) return "-"
   if (!lastCommit) return "-"
 

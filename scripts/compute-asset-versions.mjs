@@ -2,13 +2,16 @@
 // 결과 파일은 릴리스 커밋에 포함되며, 전달본·로컬 빌드는 git 을 다시 조회하지 않고 이 스냅샷만 읽는다.
 // ⚠️ 직접 실행할 때도 RELEASE_VERSION=vX.Y.Z 가 반드시 필요하다.
 
-import { readFileSync, writeFileSync } from "node:fs"
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs"
+import { dirname, join } from "node:path/posix"
 import { execFileSync } from "node:child_process"
 import { format, resolveConfig } from "prettier"
 import { resolvePathVersion } from "./git-info.mjs"
 
 const SOURCE = "lib/publishing/handoff-assets.json"
+const CONTENT_ROOT = "app/(site)/(content)"
 const ASSET_VERSIONS_OUTPUT = "lib/publishing/asset-versions.generated.json"
+const SCREEN_VERSIONS_OUTPUT = "lib/publishing/screen-versions.generated.json"
 const RELEASE_NOTES_OUTPUT = "lib/publishing/release-notes.generated.json"
 const RELEASE_NOTES_DRAFT = "RELEASE_NOTES_DRAFT.md"
 
@@ -74,6 +77,68 @@ const assets = handoffAssets.map(({ path }) => {
 writeFileSync(
   ASSET_VERSIONS_OUTPUT,
   await formatJson({ version: releaseVersion, assets }, ASSET_VERSIONS_OUTPUT),
+)
+
+// 화면 목록은 따로 적지 않는다. (content) 아래에서 page.tsx 가 있는 폴더가 곧 한 화면이며,
+// 퍼블리싱 인덱스의 라우트 경로와 같은 규칙이다.
+const collectScreenDirs = (dir) => {
+  const entries = readdirSync(dir, { withFileTypes: true })
+  const self = entries.some(
+    (entry) => entry.isFile() && entry.name === "page.tsx",
+  )
+    ? [dir]
+    : []
+
+  return entries
+    .filter((entry) => entry.isDirectory())
+    .flatMap((entry) => collectScreenDirs(join(dir, entry.name)))
+    .concat(self)
+}
+
+// 라우트 그룹 폴더는 URL 에 나타나지 않는다.
+const toRoutePath = (screenDir) =>
+  screenDir
+    .slice(CONTENT_ROOT.length)
+    .split("/")
+    .filter((segment) => segment !== "" && !segment.startsWith("("))
+    .reduce((path, segment) => `${path}/${segment}`, "")
+
+// 화면은 라우트 폴더 하나로 끝나지 않는다. 상위 레이아웃과 공통 컴포넌트가 바뀌어도
+// 그 화면의 결과물은 바뀌므로, 조상 경로의 layout.tsx · components 를 함께 추적한다.
+const collectTrackedPaths = (screenDir) => {
+  const tracked = [screenDir]
+
+  let cursor = screenDir
+  while (cursor !== CONTENT_ROOT && cursor.startsWith(CONTENT_ROOT)) {
+    cursor = dirname(cursor)
+    const layout = join(cursor, "layout.tsx")
+    const components = join(cursor, "components")
+    if (existsSync(layout)) tracked.push(layout)
+    if (existsSync(components)) tracked.push(components)
+  }
+
+  return tracked
+}
+
+const screens = collectScreenDirs(CONTENT_ROOT)
+  .map((screenDir) => {
+    const resolvedVersion = resolvePathVersion(collectTrackedPaths(screenDir))
+    const version =
+      resolvedVersion === "미배포" ? releaseVersion : resolvedVersion
+    return {
+      path: toRoutePath(screenDir),
+      version,
+      isCurrent: version === releaseVersion,
+    }
+  })
+  .toSorted((left, right) => left.path.localeCompare(right.path))
+
+writeFileSync(
+  SCREEN_VERSIONS_OUTPUT,
+  await formatJson(
+    { version: releaseVersion, screens },
+    SCREEN_VERSIONS_OUTPUT,
+  ),
 )
 
 const git = (...args) => execFileSync("git", args, { encoding: "utf8" }).trim()
@@ -197,8 +262,9 @@ if (process.env.PRESERVE_RELEASE_NOTES_DRAFT !== "true") {
 }
 
 const updated = assets.filter((asset) => asset.isCurrent).map((a) => a.name)
+const updatedScreens = screens.filter((screen) => screen.isCurrent)
 console.log(
   `릴리스 메타데이터 생성: ${releaseVersion} / 변경 자산 ${updated.length}건${
     updated.length > 0 ? ` (${updated.join(", ")})` : ""
-  }`,
+  } / 화면 ${screens.length}개 중 이번 릴리스 ${updatedScreens.length}개`,
 )
