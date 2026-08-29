@@ -891,14 +891,36 @@ export const metadata: Metadata = {
   title: "퍼블리싱 인덱스",
 }
 
-// 전달 카드 구분별 배지. kibo-ktop 의 Diff 확인·신규 추가·덮어쓰기 표기를 따른다.
+// 전달 카드 구분별 배지와 카드 색. kibo-ktop 의 Diff 확인·신규 추가·덮어쓰기 표기를 따른다.
+// accent 는 배지와 같은 계열의 좌측 띠라, 배지를 읽기 전에 색으로 구분이 먼저 온다.
+// highlight 는 최신 릴리스 카드에만 얹는 옅은 면색이다(같은 계열, 낮은 농도).
 const HANDOFF_PRESENTATION: Record<
   ReleaseNoteHandoffMode,
-  { label: string; variant: "blue" | "success" | "violet" }
+  {
+    label: string
+    variant: "blue" | "success" | "violet"
+    accent: string
+    highlight: string
+  }
 > = {
-  diff: { label: "Diff 확인", variant: "blue" },
-  new: { label: "신규 추가", variant: "success" },
-  overwrite: { label: "덮어쓰기", variant: "violet" },
+  diff: {
+    label: "Diff 확인",
+    variant: "blue",
+    accent: "border-l-blue-600",
+    highlight: "border-blue-500/40 bg-blue-500/10",
+  },
+  new: {
+    label: "신규 추가",
+    variant: "success",
+    accent: "border-l-green-600",
+    highlight: "border-green-500/40 bg-green-500/10",
+  },
+  overwrite: {
+    label: "덮어쓰기",
+    variant: "violet",
+    accent: "border-l-violet-600",
+    highlight: "border-violet-500/40 bg-violet-500/10",
+  },
 }
 
 // 카드 정렬 순서. 기존 파일을 손대는 것부터 먼저 보고 신규는 마지막에 본다.
@@ -924,10 +946,6 @@ const hasPage = (routePath: string) =>
 // cn 이 tailwind-merge 라 나중에 들어오는 className 쪽이 이긴다.
 const LATEST_HIGHLIGHT = "bg-primary/15 hover:bg-primary/25"
 
-// 최신 릴리스의 전달 카드 강조. 본문이 길어 배경 농도는 낮추고 좌측 띠로 눈에 띄게 한다.
-const LATEST_CARD_HIGHLIGHT =
-  "border-primary/40 border-l-4 border-l-primary bg-primary/10"
-
 const COMMIT_LINK_LABELS = ["커밋", "GitHub Diff", "Diff 링크"]
 const MARKDOWN_LINK_PATTERN = /\[([^\]]+)\]\(([^)]+)\)/g
 
@@ -950,6 +968,8 @@ const ReleaseNoteDetailValue = ({
   const commitLinks = parseCommitLinks(label, value)
 
   if (commitLinks.length > 0) {
+    // 커밋 링크는 카드에서 유일하게 밖으로 나가는 동선이라 본문 글자색으로 두면 묻힌다.
+    // Diff 배지와 같은 파랑을 채워 버튼처럼 보이게 한다.
     return (
       <span className="flex flex-col gap-1">
         {commitLinks.map((link) => (
@@ -958,7 +978,7 @@ const ReleaseNoteDetailValue = ({
             href={link.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary inline-flex w-fit items-center gap-1.5 rounded font-medium hover:underline"
+            className="inline-flex w-fit items-center gap-1.5 rounded-md bg-blue-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
           >
             <ExternalLink aria-hidden="true" className="size-4 shrink-0" />
             {link.text} (새 창)
@@ -992,7 +1012,8 @@ const ReleaseNoteHandoffCard = ({
   /** 최신 릴리스의 카드만 배경으로 강조한다 */
   isLatest?: boolean
 }) => {
-  const { label, variant } = HANDOFF_PRESENTATION[change.mode]
+  const { label, variant, accent, highlight } =
+    HANDOFF_PRESENTATION[change.mode]
   const groups = groupDetails(change.details)
   // 대상은 경로 목록, 주의는 경고 블록으로 따로 뽑는다. 나머지는 본문에 그대로 쌓는다.
   const targets = groups
@@ -1009,8 +1030,10 @@ const ReleaseNoteHandoffCard = ({
   return (
     <section
       className={cn(
-        "border-border bg-card flex flex-col gap-4 rounded-lg border p-5",
-        isLatest && LATEST_CARD_HIGHLIGHT,
+        "border-border bg-card flex flex-col gap-4 rounded-lg border border-l-4 p-5",
+        isLatest && highlight,
+        // 좌측 띠는 면색보다 뒤에 둬야 tailwind-merge 가 남긴다.
+        accent,
       )}
     >
       <div className="flex flex-col gap-2">
@@ -1021,9 +1044,10 @@ const ReleaseNoteHandoffCard = ({
       </div>
 
       {targets.length > 0 && (
-        // 파일 경로 패널. 카드 강조(파랑) 위에서도 보이도록 회색 면색과 좌측 띠를 준다.
-        <div className="bg-muted border-border border-l-muted-foreground/50 flex flex-col gap-2 rounded-md border border-l-4 p-3">
-          <p className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium">
+        // 파일 경로 패널. 카드 면색이 구분별로 달라져 회색으로는 묻힌다.
+        // 어느 카드 위에서도 같게 읽히도록 흰 면색과 짙은 글자로 고정한다.
+        <div className="flex flex-col gap-2 rounded-md border border-l-4 border-slate-300 border-l-slate-400 bg-white p-3">
+          <p className="flex items-center gap-1.5 text-xs font-medium text-slate-600">
             <Folder aria-hidden="true" className="size-3.5 shrink-0" />
             대상 파일
           </p>
@@ -1033,15 +1057,17 @@ const ReleaseNoteHandoffCard = ({
                 {target.endsWith("/") ? (
                   <Folder
                     aria-hidden="true"
-                    className="text-primary mt-0.5 size-3.5 shrink-0"
+                    className="mt-0.5 size-3.5 shrink-0 text-blue-600"
                   />
                 ) : (
                   <FileText
                     aria-hidden="true"
-                    className="text-muted-foreground mt-0.5 size-3.5 shrink-0"
+                    className="mt-0.5 size-3.5 shrink-0 text-slate-500"
                   />
                 )}
-                <code className="font-mono text-xs break-all">{target}</code>
+                <code className="font-mono text-xs break-all text-slate-900">
+                  {target}
+                </code>
               </li>
             ))}
           </ul>
@@ -1066,15 +1092,15 @@ const ReleaseNoteHandoffCard = ({
       )}
 
       {cautions.length > 0 && (
-        // 경고 콜아웃. 회색인 대상 패널과 구분되도록 하늘색으로 채운다.
-        <div className="flex flex-col gap-2 rounded-md border border-l-4 border-sky-500/50 border-l-sky-500 bg-sky-500/15 p-3">
-          <p className="flex items-center gap-1.5 text-xs font-medium text-sky-700 dark:text-sky-300">
+        // 경고 콜아웃. 흰색인 대상 패널과 구분되도록 흰색에 가까운 노랑으로 채운다.
+        <div className="flex flex-col gap-2 rounded-md border border-l-4 border-yellow-300 border-l-yellow-500 bg-yellow-50 p-3">
+          <p className="flex items-center gap-1.5 text-xs font-medium text-yellow-800">
             <TriangleAlert aria-hidden="true" className="size-3.5 shrink-0" />
             주의
           </p>
           <ul className="flex flex-col gap-1.5">
             {cautions.map((caution) => (
-              <li key={caution} className="text-sm break-keep">
+              <li key={caution} className="text-sm break-keep text-yellow-950">
                 {caution}
               </li>
             ))}
@@ -1215,6 +1241,14 @@ const PublishingIndexPage = () => {
                           handoffRank(left.mode) - handoffRank(right.mode),
                       )
 
+                    // 구분별 건수. 카드를 세지 않아도, 접힌 릴리스를 펼치지 않아도
+                    // 이번 릴리스의 규모를 머리에서 바로 읽을 수 있다.
+                    const handoffCounts = HANDOFF_ORDER.map((mode) => ({
+                      mode,
+                      count: handoffs.filter((change) => change.mode === mode)
+                        .length,
+                    })).filter((entry) => entry.count > 0)
+
                     const heading = (
                       <div className="flex flex-wrap items-center gap-2">
                         <Badge
@@ -1230,6 +1264,14 @@ const PublishingIndexPage = () => {
                             최신
                           </span>
                         )}
+                        {handoffCounts.map(({ mode, count }) => (
+                          <Badge
+                            key={mode}
+                            variant={HANDOFF_PRESENTATION[mode].variant}
+                          >
+                            {HANDOFF_PRESENTATION[mode].label} {count}
+                          </Badge>
+                        ))}
                       </div>
                     )
 
