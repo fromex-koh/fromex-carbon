@@ -5,7 +5,6 @@ import ProcessFlow from "@/app/(site)/(content)/carbon-leader/application/compon
 import StepCards from "@/app/(site)/(content)/carbon-leader/application/components/step-cards"
 import StepCardsLoading from "@/app/(site)/(content)/carbon-leader/application/components/step-cards-loading"
 import { type StepCardData } from "@/app/(site)/(content)/carbon-leader/application/components/step-card"
-import SubVisual from "@/app/(site)/(content)/carbon-leader/application/components/sub-visual"
 
 const NOTICES = [
   "탄소중립 선도기업 신청은 **자가진단**을 시작으로 총 3차 신청 및 점검 절차에 따라 진행됩니다.",
@@ -20,9 +19,8 @@ const NOTICES = [
 const ApplicationScreen = ({ cards }: { cards: StepCardData[] }) => {
   return (
     <>
-      <SubVisual />
       <div className="flex w-full max-w-[1344px] flex-col gap-8 px-5 py-10 md:px-7 lg:px-8">
-        <h2 className="text-2xl font-bold md:text-3xl lg:text-4xl">
+        <h2 className="text-ink-strong text-2xl font-bold md:text-3xl lg:text-4xl">
           탄소중립 선도기업
         </h2>
 
@@ -32,11 +30,11 @@ const ApplicationScreen = ({ cards }: { cards: StepCardData[] }) => {
 
         <section className="flex flex-col gap-10">
           <div className="flex flex-col gap-2">
-            <h3 className="text-2xl font-bold md:text-3xl lg:text-2xl">
+            <h3 className="text-ink-strong text-2xl font-bold md:text-3xl lg:text-2xl">
               신청 안내
             </h3>
             {/* 문장 단위로 줄을 나눈다. 해상도와 무관하게 동일. */}
-            <p className="text-ash-800 text-base break-all">
+            <p className="text-ink-body text-base break-all">
               <span className="block">
                 탄소중립 선도기업 신청을 위해 먼저 자가진단을 진행해 주세요.
               </span>

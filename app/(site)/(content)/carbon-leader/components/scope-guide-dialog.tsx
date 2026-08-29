@@ -1,8 +1,5 @@
 "use client"
 
-import { Info } from "lucide-react"
-
-import { Button } from "@/components/ui/button"
 import { useDialogAutoOpen } from "@/util/use-dialog-auto-open"
 import {
   Dialog,
@@ -11,7 +8,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 
 const SCOPES = [
@@ -35,25 +31,14 @@ const ScopeGuideDialog = ({ defaultOpen }: { defaultOpen?: boolean }) => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          type="button"
-          variant="outline"
-          className="text-muted-foreground ring-muted-foreground hover:bg-ash-100 h-11 rounded-md px-3 text-sm [&_svg]:size-5 md:text-xs"
-        >
-          <Info aria-hidden="true" />
-          Scope 설명
-        </Button>
-      </DialogTrigger>
-
       <DialogContent className="w-[calc(100%-1.25rem)] max-w-[340px] gap-0 rounded-xl px-5 pt-6 pb-10 sm:w-[calc(100%-4rem)] sm:max-w-[640px] sm:p-8 sm:pb-12 lg:p-15">
         <DialogCloseButton className="absolute -top-10 right-0 lg:top-5 lg:right-5" />
 
         <DialogHeader className="border-border gap-2 border-b pb-4 text-left sm:gap-1.5 sm:pb-6 lg:pb-8">
-          <DialogTitle className="text-xl font-bold break-all sm:text-2xl">
+          <DialogTitle className="text-ink-strong text-xl font-bold break-all sm:text-2xl">
             Scope 1, 2, 3이란?
           </DialogTitle>
-          <DialogDescription className="text-muted-foreground text-base font-medium break-all sm:text-ash-700">
+          <DialogDescription className="text-ink-body text-base font-medium break-all">
             기업의 온실가스 배출이 발생하는 위치와 원인에 따라 구분한
             기준입니다.
           </DialogDescription>
@@ -67,7 +52,7 @@ const ScopeGuideDialog = ({ defaultOpen }: { defaultOpen?: boolean }) => {
                   {scope.label}
                 </span>
               </dt>
-              <dd className="text-foreground text-base break-all">
+              <dd className="text-ink-strong text-base break-all">
                 {scope.description}
               </dd>
             </div>

@@ -1,19 +1,12 @@
-import type { Metadata } from "next"
-
-import CarbonBanner from "@/app/(site)/(content)/carbon-leader/self-check/components/carbon-banner"
-import CompanyInfo from "@/app/(site)/(content)/carbon-leader/self-check/components/company-info"
-
-export const metadata: Metadata = {
-  title: "자가진단 · 업종코드 조회",
-}
+import IndustryCodeDialog from "@/app/(site)/(content)/carbon-leader/self-check/components/industry-code-dialog"
 
 // IA 9번 "업종코드 조회 팝업".
-// Step 1 화면 위에 뜨는 모달이라, 같은 화면을 모달이 열린 상태로 렌더한다.
+// Step 1 화면 위에 뜨는 모달이라, 본문은 비워 두고 모달만 열린 상태로 둔다.
 const IndustryCodeSearchPage = () => {
   return (
     <>
-      <CarbonBanner />
-      <CompanyInfo openIndustryCode />
+      <div className="flex w-full max-w-[1344px] flex-col gap-8 px-5 py-10 md:px-7 lg:px-8" />
+      <IndustryCodeDialog defaultOpen />
     </>
   )
 }
