@@ -60,6 +60,13 @@ for (const asset of handoffAssets.filter((item) => item.copy)) {
   copy(asset.path)
 }
 
+// prune 은 "부모 폴더째 복사되지만 이번 전달에서는 빼는" 경로다.
+// copy:false 만으로는 부모 폴더 복사에 딸려 오므로 복사 뒤에 지운다.
+// (components/ui 처럼 copy:false 지만 전달해야 하는 항목과 구분된다.)
+for (const asset of handoffAssets.filter((item) => item.prune)) {
+  rmSync(resolve(outputDirectory, asset.path), { recursive: true, force: true })
+}
+
 for (const path of [".DS_Store", "app/.DS_Store", "components/.DS_Store"]) {
   rmSync(resolve(outputDirectory, path), { force: true })
 }

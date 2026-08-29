@@ -1,6 +1,341 @@
 {
   "releases": [
     {
+      "version": "v0.0.2",
+      "releasedAt": "2026-08-27",
+      "changes": [
+        "탄소중립 선도기업 신청 화면 6종과 자가진단 STEP 1·2 화면 퍼블리싱",
+        "본문 폰트를 Pretendard Variable 로 교체",
+        "화면 데이터는 constants, 공용 훅·함수는 util 로 분리하고 import 를 @/ 절대 경로로 통일",
+        "GNB 헤더 메뉴를 신규 IA 기준으로 교체하고, 로그인 여부별 구성을 확인용 화면으로 분리",
+        "색상 토큰에 primitive 계층을 도입하고, 선도기업 신청 화면은 시안 값으로 만든 전용 시맨틱 토큰만 사용",
+        {
+          "type": "handoff",
+          "mode": "new",
+          "title": "(content) 라우트 그룹 공통 레이아웃",
+          "details": [
+            { "label": "대상", "value": "app/(site)/(content)/layout.tsx" },
+            {
+              "label": "변경",
+              "value": "배너를 화면 폭 가득 깔고 본문만 가운데로 모으는 래퍼를 그룹 레이아웃으로 한 번만 잡았다"
+            },
+            {
+              "label": "결과",
+              "value": "하위 page.tsx 는 배너와 본문만 순서대로 렌더하면 된다"
+            },
+            { "label": "적용", "value": "신규 파일 추가" }
+          ]
+        },
+        {
+          "type": "handoff",
+          "mode": "new",
+          "title": "선도기업 신청 화면과 신청 플로우 6단계 페이지",
+          "details": [
+            {
+              "label": "대상",
+              "value": "app/(site)/(content)/carbon-leader/application/\nconstants/carbon-leader-application-step-cards.ts"
+            },
+            {
+              "label": "변경",
+              "value": "안내 박스·진행 플로우 바·단계 카드 4장으로 구성된 화면을 만들고, 신청 이력에 따른 6가지 상태를 라우트별 페이지로 나눴다"
+            },
+            {
+              "label": "결과",
+              "value": "initial · self-check-done · first-done · middle-review · middle-done · final-done 경로에서 상태별 카드(default·progress·complete·disabled)를 확인할 수 있다. 카드 4상태와 버튼 Default·Hover·Active·Disabled 를 라이트·다크 시안 값으로 맞췄다"
+            },
+            { "label": "적용", "value": "신규 파일 추가" },
+            {
+              "label": "주의",
+              "value": "마지막 최종점검 완료 카드만 다음 단계가 없어 CTA 없이 현황조회만 그린다(hideAction)"
+            },
+            {
+              "label": "주의",
+              "value": "카드 상태·날짜는 constants 의 정적 값이다. 신청 이력 API 를 붙일 때는 components/step-cards.tsx 를 async 로 바꾸면 상위 Suspense 가 로딩 화면을 처리한다"
+            }
+          ]
+        },
+        {
+          "type": "handoff",
+          "mode": "new",
+          "title": "서브 비주얼 배너",
+          "details": [
+            {
+              "label": "대상",
+              "value": "app/(site)/(content)/carbon-leader/application/components/sub-visual.tsx\napp/(site)/(content)/carbon-leader/self-check/components/carbon-banner.tsx\npublic/carbon-leader-illust.svg\npublic/carbon-leader-illust-dark.svg\npublic/carbon-leader-illust-small.svg\npublic/carbon-leader-illust-small-dark.svg"
+            },
+            {
+              "label": "변경",
+              "value": "신청·자가진단 화면 상단 배너를 만들고, 일러스트는 next/image 대신 CSS 배경으로 넣어 조건에 맞는 한 장만 내려받게 했다"
+            },
+            {
+              "label": "결과",
+              "value": "라이트·다크와 모바일·데스크톱 조합으로 네 장 중 한 장만 요청되고, preload 미사용·LCP 콘솔 경고가 없다"
+            },
+            {
+              "label": "결과",
+              "value": "브레드크럼은 모바일부터 노출되며 크기·굵기·간격을 시안에 맞췄다"
+            },
+            { "label": "적용", "value": "신규 파일 추가" },
+            {
+              "label": "주의",
+              "value": "html font-size 가 17px 이라 rem 유틸리티가 1.0625 배로 계산된다. 시안의 16px·8px·12px 은 가장 가까운 Tailwind 스케일(text-base · gap-2 · h-3)로 넣었다"
+            }
+          ]
+        },
+        {
+          "type": "handoff",
+          "mode": "new",
+          "title": "자가진단 STEP 1 기업 정보 입력 화면",
+          "details": [
+            {
+              "label": "대상",
+              "value": "app/(site)/(content)/carbon-leader/self-check/company-info/\napp/(site)/(content)/carbon-leader/self-check/components/company-info.tsx\napp/(site)/(content)/carbon-leader/self-check/components/base-info.tsx\napp/(site)/(content)/carbon-leader/self-check/components/step-nav.tsx\napp/(site)/(content)/carbon-leader/self-check/components/step-mobile-nav.tsx\nconstants/carbon-leader-self-check-steps.ts"
+            },
+            {
+              "label": "변경",
+              "value": "업종코드·업력·폐기물/공정배출 여부·3개년 매출액 입력 폼과 유효성 메시지를 만들고, 업종코드 조회 팝업이 열린 상태의 페이지를 하위 경로로 추가했다"
+            },
+            {
+              "label": "결과",
+              "value": "/carbon-leader/self-check/company-info 와 하위 industry-code-search 경로에서 폼과 팝업을 확인할 수 있다"
+            },
+            { "label": "적용", "value": "신규 파일 추가" },
+            {
+              "label": "주의",
+              "value": "업종코드 팝업은 기존 공통 다이얼로그를 그대로 쓴다는 것만 표시해 둔 상태다"
+            }
+          ]
+        },
+        {
+          "type": "handoff",
+          "mode": "new",
+          "title": "자가진단 STEP 2 인벤토리 배출량 산정 화면",
+          "details": [
+            {
+              "label": "대상",
+              "value": "app/(site)/(content)/carbon-leader/self-check/inventory-emission/\napp/(site)/(content)/carbon-leader/self-check/components/inventory-emission.tsx\napp/(site)/(content)/carbon-leader/self-check/components/item-select-dialog.tsx\napp/(site)/(content)/carbon-leader/self-check/components/item-select-pagination.tsx\napp/(site)/(content)/carbon-leader/self-check/components/scope-guide-dialog.tsx\nconstants/carbon-leader-self-check-emission-items.ts"
+            },
+            {
+              "label": "변경",
+              "value": "항목 미선택 빈 상태 화면과 인벤토리 항목 선택 모달(Scope·대분류·중분류 3뎁스 트리, 검색, 5건 페이징), Scope 설명 다이얼로그를 만들었다"
+            },
+            {
+              "label": "결과",
+              "value": "item-select · scope-guide 경로로 각 모달이 열린 화면을 볼 수 있고, 모달을 다시 열면 이전에 고른 항목이 복원된다"
+            },
+            { "label": "적용", "value": "신규 파일 추가" },
+            {
+              "label": "주의",
+              "value": "분류·항목 373건은 화면 확인용 정적 데이터다. 실제로는 API 응답으로 대체된다"
+            }
+          ]
+        },
+        {
+          "type": "handoff",
+          "mode": "new",
+          "title": "인벤토리 선택 항목별 값 입력 화면",
+          "details": [
+            {
+              "label": "대상",
+              "value": "app/(site)/(content)/carbon-leader/self-check/components/emission-input.tsx"
+            },
+            {
+              "label": "변경",
+              "value": "모달에서 고른 항목마다 연도별 입력 필드를 만들고, 하폐수는 세부 입력표를, 하단에는 온실가스 총배출량 패널을 붙였다. 입력값은 폼으로 묶여 천 단위 쉼표가 적용된다"
+            },
+            {
+              "label": "결과",
+              "value": "항목을 선택하면 빈 상태 카드가 값 입력 카드로 바뀌고, 필수 대분류를 고르지 않으면 안내 줄이 노출된다"
+            },
+            { "label": "적용", "value": "신규 파일 추가" },
+            {
+              "label": "주의",
+              "value": "단위·총배출량은 화면 확인용 예시값이다. 실제 산정식은 입력값 × 배출계수이며 Scope 1 + Scope 2 만 합산한다"
+            }
+          ]
+        },
+        {
+          "type": "handoff",
+          "mode": "new",
+          "title": "다이얼로그 자동 오픈 훅과 숫자 포맷 함수",
+          "details": [
+            {
+              "label": "대상",
+              "value": "util/use-dialog-auto-open.ts\nutil/format-number.ts"
+            },
+            {
+              "label": "변경",
+              "value": "팝업 전용 라우트로 진입했을 때 다이얼로그를 여는 훅과, 천 단위 쉼표 포맷 함수를 공용으로 뺐다"
+            },
+            {
+              "label": "결과",
+              "value": "팝업 라우트 3곳과 금액·배출량 입력이 같은 코드를 쓴다"
+            },
+            { "label": "적용", "value": "신규 파일 추가" }
+          ]
+        },
+        {
+          "type": "handoff",
+          "mode": "new",
+          "title": "헤더 로그인 상태 확인용 화면",
+          "details": [
+            { "label": "대상", "value": "app/(site)/preview/header/page.tsx" },
+            {
+              "label": "변경",
+              "value": "로그인·로그아웃별 헤더 메뉴 구성만 보는 화면을 만들었다. 본문은 비우고 컨테이너만 헤더와 같은 max-w-[1276px] · px-4 로 맞췄다"
+            },
+            {
+              "label": "결과",
+              "value": "/preview/header 는 로그아웃, /preview/header?login=true 는 로그인 헤더를 보여준다. 헤더 로고와 본문 좌측 선이 1440·1280·1100·768·375px 에서 모두 일치한다"
+            },
+            { "label": "적용", "value": "신규 파일 추가" },
+            {
+              "label": "주의",
+              "value": "[퍼블리싱 노출용] 확인용 화면이라 IA 화면 개수에 넣지 않았다. 실제 로그인 연동 시 app/(site)/preview 폴더째 삭제하면 된다"
+            }
+          ]
+        },
+        {
+          "type": "handoff",
+          "mode": "overwrite",
+          "title": "GNB 메뉴 상수 교체",
+          "details": [
+            { "label": "대상", "value": "lib/const.ts" },
+            {
+              "label": "변경",
+              "value": "menuList 를 신규 IA 기준으로 교체했다. 탄소감축 → 탄소중립 선도기업, K-택소노미 → K-택소노미 적합성평가로 바꾸고 마이페이지 메뉴를 추가했다. 고객지원은 그대로 뒀다"
+            },
+            {
+              "label": "변경",
+              "value": "마이페이지에 loginOnly 플래그를 넣었다. nav-bar 가 이 값으로 메뉴를 가린다"
+            },
+            {
+              "label": "결과",
+              "value": "헤더에 4개 메뉴가 노출되고 서브메뉴 링크가 IA 경로(/carbon-leader · /k-taxonomy-assessment · /my-page)로 연결된다"
+            },
+            { "label": "적용", "value": "지정한 파일만 교체" },
+            {
+              "label": "주의",
+              "value": "loginOnly 는 [퍼블리싱 노출용] 주석이 달린, 원본에 없던 값이다. 노출 규칙이 정해지면 nav-bar 의 필터와 함께 정리한다"
+            }
+          ]
+        },
+        {
+          "type": "handoff",
+          "mode": "overwrite",
+          "title": "색상 토큰 primitive 계층 도입",
+          "details": [
+            { "label": "대상", "value": "app/globals.css" },
+            {
+              "label": "변경",
+              "value": "시맨틱 변수에 직접 박혀 있던 HSL 값을 primitive 로 분리하고 var() 로 참조하게 바꿨다. 값 문자열을 그대로 옮겨 렌더 결과는 달라지지 않는다"
+            },
+            {
+              "label": "변경",
+              "value": "선도기업 신청 화면은 기존 토큰을 쓰지 않고, 시안에서 뽑은 전용 시맨틱 23개(--ink-* · --surface-* · --line-* · --brand-*)를 따로 쓴다"
+            },
+            {
+              "label": "결과",
+              "value": "기존 토큰 값을 하나도 건드리지 않아 다른 화면 색이 그대로다. 시맨틱 54토큰 × 2모드와 컴파일된 유틸리티 CSS 5,020개 규칙을 전후 대조해 차이 0 을 확인했다"
+            },
+            { "label": "적용", "value": "지정한 파일만 교체" },
+            {
+              "label": "주의",
+              "value": "신규 primitive·시맨틱은 주석으로 기존과 구분해 두었다. 다른 화면에 쓰기 전에 그 화면 시안을 확인할 것"
+            }
+          ]
+        },
+        {
+          "type": "handoff",
+          "mode": "overwrite",
+          "title": "본문 폰트 Pretendard Variable 교체",
+          "details": [
+            {
+              "label": "대상",
+              "value": "app/layout.tsx\napp/(font)/PretendardVariable.woff2\napp/(font)/LICENSE-PRETENDARD.txt"
+            },
+            {
+              "label": "변경",
+              "value": "PretendardGOVVariable 대신 Pretendard Variable 을 로드하고 weight 범위를 100 900 으로 맞췄다"
+            },
+            {
+              "label": "결과",
+              "value": "전 화면 본문 서체가 Pretendard 로 표시된다"
+            },
+            { "label": "적용", "value": "지정한 파일만 교체" },
+            {
+              "label": "주의",
+              "value": "기존 app/(font)/PretendardGOVVariable.woff2 는 삭제한다"
+            }
+          ]
+        },
+        {
+          "type": "handoff",
+          "mode": "diff",
+          "title": "GNB 드롭다운 위치와 서브메뉴 노출",
+          "details": [
+            { "label": "대상", "value": "components/nav-bar.tsx" },
+            {
+              "label": "변경",
+              "value": "드롭다운 패널을 트리거 기준 가운데로 옮기고, 서브메뉴를 가리던 인덱스 하드코딩 필터를 PC·모바일 2곳에서 제거했다"
+            },
+            {
+              "label": "결과",
+              "value": "패널이 각 메뉴 아래 가운데에 뜨고 menuList 의 서브메뉴가 모두 노출된다"
+            },
+            {
+              "label": "주의",
+              "value": "위치는 shadcn 원본(components/ui/navigation-menu.tsx)의 right-0 을 className 으로 덮어썼다. 원본 파일은 건드리지 않았다"
+            },
+            {
+              "label": "주의",
+              "value": "제거한 필터는 두 번째 메뉴의 3·4번째 항목을 숨기는 코드였다. 새 메뉴 구조에서는 K-택소노미의 전문평가가 항상 가려졌다"
+            },
+            {
+              "label": "커밋",
+              "value": "[변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/6676beb9a6fd97e32eece93e6a8c13841c06eaaa)"
+            }
+          ]
+        },
+        {
+          "type": "handoff",
+          "mode": "diff",
+          "title": "GNB 로그인 상태 전환과 로고 축소 대응",
+          "details": [
+            { "label": "대상", "value": "components/nav-bar.tsx" },
+            {
+              "label": "변경",
+              "value": "?login=true 로 로그인 헤더를 볼 수 있게 분기를 넣고, loginOnly 메뉴를 로그아웃 상태에서 가린다. 로그인 로직은 타지 않는다"
+            },
+            {
+              "label": "변경",
+              "value": "헤더 우측 현황조회 버튼을 PC·모바일에서 뺐다. 마이페이지 서브메뉴에 이미 있어 중복이다"
+            },
+            {
+              "label": "변경",
+              "value": "로고에 shrink-0 을 주고 메뉴 간격을 줄였으며, PC·모바일 전환 폭을 910px 에서 1080px 로 올렸다"
+            },
+            {
+              "label": "결과",
+              "value": "로그아웃은 탄소중립 선도기업 · K-택소노미 적합성평가 · 고객지원 + 회원가입 · 로그인, 로그인은 여기에 마이페이지가 붙고 로그아웃 버튼으로 바뀐다"
+            },
+            {
+              "label": "결과",
+              "value": "1024px 안팎에서 로고가 240px 에서 81px 로 눌리던 현상이 없어졌다. 1440~375px 전 구간에서 로고 폭이 고정되고 가로 스크롤도 없다"
+            },
+            {
+              "label": "주의",
+              "value": "?login=true 분기와 loginOnly 필터에는 [퍼블리싱 노출용] 주석을 달아 뒀다. 실제 세션이 붙으면 searchParams 조건만 지우면 원본 동작으로 돌아간다"
+            },
+            {
+              "label": "주의",
+              "value": "모바일 메뉴는 activeMenuIndex 가 원본 배열 인덱스를 쓰기 때문에, 가릴 항목을 걸러내지 않고 null 로 렌더한다"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "version": "v0.0.1",
       "releasedAt": "2026-08-25",
       "changes": [
