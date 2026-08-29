@@ -32,15 +32,6 @@ export const menuList = [
     ],
   },
   {
-    title: "마이페이지",
-    link: "/my-page",
-    contents: [
-      { subTitle: "하위계정 관리", link: "/sub-account", subContents: [] },
-      { subTitle: "회원정보 수정", link: "/profile-edit", subContents: [] },
-      { subTitle: "현황조회", link: "/status", subContents: [] },
-    ],
-  },
-  {
     title: "고객지원",
     link: "",
     contents: [
@@ -57,3 +48,16 @@ export const menuList = [
     ],
   },
 ]
+
+// [퍼블리싱 노출용] 마이페이지는 GNB 드롭다운 행이 아니라
+// 우측 유틸 영역(비로그인 상태의 '회원가입' 자리)에 놓인다.
+// menuList 와 형태를 맞춰 두어 nav-bar 가 같은 드롭다운 마크업을 재사용한다.
+export const myPageMenu = {
+  title: "마이페이지",
+  link: "/my-page",
+  contents: [
+    { subTitle: "하위계정 관리", link: "/sub-account", subContents: [] },
+    { subTitle: "회원정보 수정", link: "/profile-edit", subContents: [] },
+    { subTitle: "현황조회", link: "/status", subContents: [] },
+  ],
+}
