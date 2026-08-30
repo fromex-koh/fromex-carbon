@@ -21,6 +21,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio"
 import { Stepper } from "@/components/ui/stepper"
 import StepMobileNav from "@/app/(site)/(content)/carbon-leader/self-check/components/step-mobile-nav"
 import IndustryCodeDialog from "@/app/(site)/(content)/carbon-leader/self-check/components/industry-code-dialog"
+import ResumeNoticeDialog from "@/app/(site)/(content)/carbon-leader/self-check/components/resume-notice-dialog"
 import BaseInfo from "@/app/(site)/(content)/carbon-leader/self-check/components/base-info"
 import { cn } from "@/lib/utils"
 import { SELF_CHECK_STEPS } from "@/constants/carbon-leader-self-check-steps"
@@ -96,9 +97,14 @@ const UnitField = ({
 interface CompanyInfoProps {
   /** 업종코드 조회 팝업을 연 채로 진입 (IA 9) */
   openIndustryCode?: boolean
+  /** 이어서 작성 안내 팝업을 연 채로 진입 (IA 8) */
+  openResumeNotice?: boolean
 }
 
-const CompanyInfo = ({ openIndustryCode }: CompanyInfoProps) => {
+const CompanyInfo = ({
+  openIndustryCode,
+  openResumeNotice,
+}: CompanyInfoProps) => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     // 제출을 눌러 처음 검사한 뒤에는 입력할 때마다 다시 검사한다.
@@ -365,6 +371,7 @@ const CompanyInfo = ({ openIndustryCode }: CompanyInfoProps) => {
           </div>
         </form>
       </Form>
+      <ResumeNoticeDialog defaultOpen={openResumeNotice} />
     </div>
   )
 }
