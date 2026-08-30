@@ -151,6 +151,8 @@
   --color-surface-tag-selected: hsl(var(--surface-tag-selected));
   --color-ink-on-selected: hsl(var(--ink-on-selected));
   --color-line-selected: hsl(var(--line-selected));
+  --color-surface-info: hsl(var(--surface-info));
+  --color-surface-error: hsl(var(--surface-error));
 }
 
 /*
@@ -199,6 +201,7 @@
     --blue-60: 217 91% 60%;
     --blue-69: 220 58% 69%;
     --blue-90: 221 54% 90%;
+    --blue-92-4: 212.3 100% 92.4%;
     --blue-95: 220 46% 95%;
     --cyan-24: 197 37% 24%;
     --gray-0: 0 0% 0%;
@@ -238,6 +241,7 @@
     --red-60-2: 0 84.2% 60.2%;
     --red-61: 12 76% 61%;
     --red-69: 10 81% 69%;
+    --red-92-2: 0 85% 92.2%;
     --sky-61-c: 212, 100%, 61%;
     --slate-11: 222.2 15.4% 11%;
     --slate-15: 222.2 15.4% 15%;
@@ -391,6 +395,8 @@
     --surface-tag-selected: var(--blue-95);
     --ink-on-selected: var(--gray-20);
     --line-selected: var(--blue-69);
+    --surface-info: var(--blue-92-4);
+    --surface-error: var(--red-92-2);
   }
 
   :root .light {
@@ -500,6 +506,8 @@
     --surface-tag-selected: var(--blue-95);
     --ink-on-selected: var(--gray-20);
     --line-selected: var(--blue-69);
+    --surface-info: var(--blue-92-4);
+    --surface-error: var(--red-92-2);
   }
 
   .dark {
@@ -607,6 +615,8 @@
     --surface-tag-selected: var(--blue-89-8);
     --ink-on-selected: var(--gray-20);
     --line-selected: var(--blue-89-8);
+    --surface-info: var(--blue-92-4);
+    --surface-error: var(--red-92-2);
   }
 }
 
