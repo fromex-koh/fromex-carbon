@@ -30,14 +30,13 @@
 릴리스 성공 후 내용은 자동으로 비워집니다.
 -->
 
-- 선도기업 신청 화면 6종과 자가진단 STEP 1·3 퍼블리싱(STEP 2 인벤토리 배출량은 삭제)
-- STEP 2 인벤토리 배출량은 만들었다가 걷어내 이번 전달본에 없다. Scope 설명 팝업(/carbon-leader/self-check/inventory-emission/scope-guide)만 남는다
-- 선도기업 공통 배너·팝업을 carbon-leader 로 모으고 섹션 레이아웃·constants·util 로 정리
+- 자가진단 STEP 1·3 과 선도기업 신청 화면 6종 퍼블리싱. STEP 2 인벤토리 배출량은 빠지고 Scope 설명 팝업만 남는다
+- 자가진단 확인 팝업 3종(삭제 · 감축방법론 변경 · 이어서 작성) 추가
 - GNB 를 신규 IA 기준으로 교체하고 마이페이지를 우측 유틸리티 영역으로 이동
-- 색상 토큰에 primitive 계층과 화면 전용 시맨틱을 추가
-- 릴리스 노트 전달 카드를 구분별 색으로 나누고 대상 파일·주의 영역 가독성 개선
-- 퍼블리싱 인덱스 표에 화면별 최종 반영 버전을 표시
-- 전달 범위에 constants·util 폴더 추가
+- 선도기업 공통 배너·팝업을 carbon-leader/components 로 모으고, 배너와 metadata 를 섹션 layout.tsx 로 올림
+- 색상 토큰에 primitive 계층과 화면 전용 시맨틱 추가
+- 전달 범위에 constants·util 폴더 추가. 화면 데이터 상수와 공용 훅·포맷 함수가 여기 있다
+- 감축잠재량 산정 폼의 중복 id 와 라벨 없는 입력 정리
 
 ## [신규 추가]
 
@@ -140,6 +139,31 @@
 - 주의: [퍼블리싱 노출용] 인덱스 전용 컴포넌트다. 전달본에 함께 들어가지만 서비스 화면에서는 쓰지 않는다
 - 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/7005bb289d30768e0e3e2ea668eea4ec98d1556f)
 
+### 자가진단 확인 팝업 공용 컴포넌트
+
+- 대상: app/(site)/(content)/carbon-leader/self-check/components/confirm-dialog.tsx
+- 변경: 삭제 확인과 감축방법론 변경 확인이 시안에서 같은 모양이라 껍데기를 하나로 뽑았다. 제목·설명·버튼 문구와 확인 동작만 프롭으로 받는다
+- 결과: 화면 안에서는 open/onOpenChange 로, 모달 전용 라우트에서는 defaultOpen 으로 쓴다
+- 적용: 신규 파일 추가
+- 주의: 360 제목만 변경 팝업이 한 단계 작아(20 vs 24) compactTitleOnMobile 프롭으로 분리했다. 시안이 두 팝업에서 다른 값이라 디자이너 확인이 필요하다
+
+### 자가진단 STEP 3 확인 팝업 라우트 2종
+
+- 대상: app/(site)/(content)/carbon-leader/self-check/reduction-potential/delete-confirm/
+  - app/(site)/(content)/carbon-leader/self-check/reduction-potential/change-confirm/
+- 변경: 사업 삭제 확인과 감축방법론 변경 확인 팝업이 열린 상태의 화면을 각각 라우트로 추가했다
+- 결과: /carbon-leader/self-check/reduction-potential 아래 delete-confirm · change-confirm 경로에서 팝업만 확인할 수 있다
+- 적용: 신규 파일 추가
+
+### 자가진단 STEP 1 이어서 작성 안내 팝업
+
+- 대상: app/(site)/(content)/carbon-leader/self-check/components/resume-notice-dialog.tsx
+  - app/(site)/(content)/carbon-leader/self-check/company-info/resume/
+- 변경: 현재년도 자가진단 수행 내역이 있을 때 뜨는 안내 팝업을 만들었다. 닫기(X) 없이 [확인] 하나만 두고, 진행상태 칸은 status 프롭으로 받는다
+- 결과: /carbon-leader/self-check/company-info/resume 에서 기업 정보 입력 화면 위에 팝업이 뜬 상태를 확인할 수 있다
+- 적용: 신규 파일 추가
+- 주의: 360 에서 라이트와 다크의 칸 간격이 시안상 다르다(16 vs 20). 라이트 값으로 맞췄고 디자이너 확인이 필요하다
+
 ## [덮어쓰기]
 
 ### GNB 메뉴 상수 교체
@@ -216,6 +240,86 @@
 - 결과: 남아 있는 팝업 전용 라우트 3곳만 주석에 남는다
 - 적용: 지정한 파일만 교체
 
+### 퍼블리싱 인덱스 IA V1.3 반영
+
+- 대상: app/page.tsx
+- 변경: IA 문서 V1.3 기준으로 화면 목록을 다시 만들고, 메뉴명·경로·화면 Type 을 문서와 1:1로 맞췄다
+- 변경: 수정필요 칼럼을 비고로 바꾸고, 디자인≠개발 · 개발확인필요 뱃지를 추가했다
+- 변경: 로그인 여부별 헤더 구성을 HEADER_STATE_ROWS 로 분리해 화면 개수 집계에서 뺐다
+- 결과: 목록에서 신규·유지·삭제 화면과 디자인·개발 확인이 필요한 행을 뱃지로 구분할 수 있다
+- 적용: 지정한 파일만 교체
+- 주의: [퍼블리싱 노출용] HEADER_STATE_ROWS 는 확인용 화면 표라 IA 화면 수에 넣지 않는다
+- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/980c2671f0c4ac26c2e0add002404e66066461d7)
+
+### 퍼블리싱 인덱스 반영 버전 표시
+
+- 대상: lib/publishing/release-note.ts
+  - app/page.tsx
+- 변경: 인계 자산의 findAssetVersion 과 짝이 되는 findScreenVersion(경로) 을 추가했다
+- 변경: IA 표가 이 값을 읽어, 이번 릴리스에 나간 화면의 행에 강조색을 깔고 버전 배지를 채운다. 인계 자산 표와 같은 규칙이다
+- 변경: IA_ROWS 58행에 손으로 적던 version 필드를 지웠다. 반영 버전의 출처를 생성물 한 곳으로 모은다
+- 결과: 릴리스마다 행을 고칠 필요가 없고, 두 표가 같은 방식으로 이번 릴리스 항목을 보여준다
+- 적용: 지정한 파일만 교체
+- 주의: 생성물에 없는 경로는 '미배포'로 표시된다
+- 주의: 화면은 라우트 폴더·상위 layout.tsx·상위 components 를 함께 본다. 공통 컴포넌트를 고치면 그것을 쓰는 화면들의 반영 버전이 함께 올라가며, 실제로 함께 바뀌므로 의도한 동작이다
+- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/5e2e4f1d04191d05caf3fb12b7ae045b374d8e81)
+
+### 릴리스 노트 전달 카드와 버전 헤더
+
+- 대상: app/page.tsx
+- 변경: 카드 면색과 좌측 띠를 배지 계열로 나눴다. Diff 확인은 파랑, 덮어쓰기는 보라, 신규 추가는 초록이며, 좌측 띠는 항상 깔고 면색은 최신 릴리스 카드에만 얹는다
+- 변경: 대상 파일 패널을 흰색으로, 주의 콜아웃을 흰색에 가까운 노랑으로 고정했다. 카드 면색이 구분별로 달라지면서 기존 회색·하늘색으로는 묻혔다
+- 변경: 커밋 링크를 Diff 배지와 같은 파랑을 채운 버튼으로 바꿨다
+- 변경: 버전 헤더에 Diff 확인·덮어쓰기·신규 추가 건수를 카드와 같은 색 배지로 붙였다. 건수가 0인 구분은 그리지 않는다
+- 결과: 배지를 읽기 전에 색으로 카드 종류가 구분되고, 두 패널과 커밋 링크가 세 가지 카드 위에서 모두 같게 읽힌다
+- 결과: 헤더가 스크롤에 붙어 있어 카드를 세지 않아도, 접힌 이전 릴리스를 펼치지 않아도 구성이 보인다
+- 적용: 지정한 파일만 교체
+- 주의: 두 패널은 테마와 무관하게 밝은 색을 쓴다. 다크 모드에서도 흰색·연노랑 그대로다
+- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/c38764bb4535d17a6806db71d8ac08b7a124bd9e)
+
+### 전달 범위에 constants·util 추가
+
+- 대상: lib/publishing/handoff-assets.json
+- 변경: 인계 자산 목록에 constants·util 폴더를 넣고, 퍼블리싱 인덱스 전용인 components/publishing 을 화면 원본이 아님으로 표시했다
+- 결과: 이번 전달본부터 constants(화면 데이터 상수)와 util(공용 훅·포맷 함수) 폴더가 함께 전달된다
+- 결과: 전달 스크립트와 인계 자산 표가 같은 파일을 읽어 전달 범위와 화면 표기가 어긋나지 않는다
+- 적용: 지정한 파일만 교체
+- 주의: v0.0.1 전달본에는 두 폴더가 없었다. 이번 전달본부터 화면이 이 경로를 참조하므로 통째로 받아야 한다
+- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/acc4c7e1cbe5715c6e8addeb47a3a3285e16e8d6)
+- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/7005bb289d30768e0e3e2ea668eea4ec98d1556f)
+
+### 퍼블리싱 인덱스를 IA 문서 V1.3(작성중 3) 기준으로 재대조
+
+- 대상: app/page.tsx
+- 변경: 문서에 있는데 빠져 있던 '탄소중립 선도기업' 제도 설명 화면을 1번 행으로 넣고, 상위 뎁스 rowSpan 을 다시 셌다(메인 홈 59 · 탄소중립 선도기업 52)
+- 변경: 선도기업 신청 3차 인벤토리 배출량 산정의 상태를 '변경·신규' → '변경' 으로 맞췄다
+- 결과: 화면 59개가 되고, 문서와 상태값·대상 사용자·화면 Type 이 모두 일치한다
+- 적용: 지정한 파일만 교체
+- 주의: 자가진단·3차의 '항목 선택' 두 행과 선도기업 신청 상태 화면 6종은 문서와 다르지만 의도한 표기라 그대로 뒀다
+
+### 퍼블리싱 인덱스 비고 배지 정리
+
+- 대상: app/page.tsx
+- 변경: IA 문서에 '디자인 변경 완료'(노랑) 범례가 새로 생겨 '디자인 수정완료' 배지를 추가했다. 문서에서 노랑이 붙은 확인 팝업 3종에 달고, 같은 행의 '디자인≠개발' 은 뗐다
+- 변경: 비고 배지 정의를 REMARK_BADGES 한 곳에 모으고 표와 범례가 같은 컴포넌트를 쓰게 했다
+- 결과: 배지 모양이 두 곳에서 어긋나지 않고, 배지가 줄바꿈으로 잘리지 않는다
+- 적용: 지정한 파일만 교체
+- 주의: '디자인 수정완료' 는 badge.tsx 의 미사용 변형이 노랑 계열뿐이라 위 배지와 겹쳐, brand-done-teal 토큰으로 덮어썼다
+
+### 퍼블리싱 인덱스 범례를 배지 뜻풀이로 교체
+
+- 대상: app/page.tsx
+- 변경: 줄글로 늘어놓던 비고·UIUX 설명을 배지와 뜻을 나란히 두는 목록으로 바꿨다. 건수는 IA 행에서 직접 센다
+- 결과: 실제로 쓰이는 배지만 나오고, 한 건도 없는 값은 그리지 않는다
+- 적용: 지정한 파일만 교체
+
+### 퍼블리싱 인덱스 다크 링크 대비
+
+- 대상: app/page.tsx
+- 변경: 링크 글자에 dark:text-primary-light 를 더했다
+- 결과: 다크에서 표 화면명·경로·저장소 링크 대비가 3.63:1 → 4.67:1 로 올라 WCAG AA(4.5:1)를 넘는다. 라이트는 5.50:1 그대로다
+- 적용: 지정한 파일만 교체
+
 ## [Diff 확인]
 
 ### GNB 드롭다운 위치와 서브메뉴 노출
@@ -265,46 +369,39 @@
 - 결과: /carbon-leader/self-check/company-info 의 매출액 영역 간격·문구 위치가 시안과 같아진다
 - 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/2492e900dcd4d9a29cfddf49e46f872f80c0692a)
 
-### 퍼블리싱 인덱스 IA V1.3 반영
+### 자가진단 확인 팝업을 공용 컴포넌트로 교체
 
-- 대상: app/page.tsx
-- 변경: IA 문서 V1.3 기준으로 화면 목록을 다시 만들고, 메뉴명·경로·화면 Type 을 문서와 1:1로 맞췄다
-- 변경: 수정필요 칼럼을 비고로 바꾸고, 디자인≠개발 · 개발확인필요 뱃지를 추가했다
-- 변경: 로그인 여부별 헤더 구성을 HEADER_STATE_ROWS 로 분리해 화면 개수 집계에서 뺐다
-- 결과: 목록에서 신규·유지·삭제 화면과 디자인·개발 확인이 필요한 행을 뱃지로 구분할 수 있다
-- 주의: [퍼블리싱 노출용] HEADER_STATE_ROWS 는 확인용 화면 표라 IA 화면 수에 넣지 않는다
-- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/980c2671f0c4ac26c2e0add002404e66066461d7)
+- 대상: app/(site)/(content)/carbon-leader/self-check/components/business-card.tsx
+- 변경: 카드 안에 있던 Dialog 두 벌을 confirm-dialog.tsx 로 바꿨다
+- 변경: 감축방법론 변경 팝업 문구를 시안대로 고쳤다. 제목 '감축 방법론을'(띄어쓰기), 설명 '삭제 처리', 버튼 취소/확인 → 취소하기/삭제하기
+- 결과: 화면 안 팝업과 팝업 전용 라우트가 같은 마크업을 쓴다
+- 주의: 설명 줄바꿈이 해상도별로 다르다. PC 만 한 줄이고 태블릿 이하는 쉼표 뒤에서 끊긴다
+- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/7d04eb6ad6899195599fcdd249605c5ceb08fad0)
 
-### 퍼블리싱 인덱스 반영 버전 표시
+### 자가진단 STEP 1 에 이어서 작성 안내 팝업 연결
 
-- 대상: lib/publishing/release-note.ts
-  - app/page.tsx
-- 변경: 인계 자산의 findAssetVersion 과 짝이 되는 findScreenVersion(경로) 을 추가했다
-- 변경: IA 표가 이 값을 읽어, 이번 릴리스에 나간 화면의 행에 강조색을 깔고 버전 배지를 채운다. 인계 자산 표와 같은 규칙이다
-- 변경: IA_ROWS 58행에 손으로 적던 version 필드를 지웠다. 반영 버전의 출처를 생성물 한 곳으로 모은다
-- 결과: 릴리스마다 행을 고칠 필요가 없고, 두 표가 같은 방식으로 이번 릴리스 항목을 보여준다
-- 주의: 생성물에 없는 경로는 '미배포'로 표시된다
-- 주의: 화면은 라우트 폴더·상위 layout.tsx·상위 components 를 함께 본다. 공통 컴포넌트를 고치면 그것을 쓰는 화면들의 반영 버전이 함께 올라가며, 실제로 함께 바뀌므로 의도한 동작이다
-- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/5e2e4f1d04191d05caf3fb12b7ae045b374d8e81)
+- 대상: app/(site)/(content)/carbon-leader/self-check/components/company-info.tsx
+- 변경: openResumeNotice 프롭을 받아 화면 안에 팝업을 붙였다. 기존 openIndustryCode 와 같은 방식이다
+- 결과: /company-info/resume 라우트가 화면을 그대로 그리면서 팝업만 연다
+- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/1d9c4675958897af2b28993a5e49e1ef2a366dc3)
 
-### 릴리스 노트 전달 카드와 버전 헤더
+### 감축잠재량 산정 폼의 입력 id 정리
 
-- 대상: app/page.tsx
-- 변경: 카드 면색과 좌측 띠를 배지 계열로 나눴다. Diff 확인은 파랑, 덮어쓰기는 보라, 신규 추가는 초록이며, 좌측 띠는 항상 깔고 면색은 최신 릴리스 카드에만 얹는다
-- 변경: 대상 파일 패널을 흰색으로, 주의 콜아웃을 흰색에 가까운 노랑으로 고정했다. 카드 면색이 구분별로 달라지면서 기존 회색·하늘색으로는 묻혔다
-- 변경: 커밋 링크를 Diff 배지와 같은 파랑을 채운 버튼으로 바꿨다
-- 변경: 버전 헤더에 Diff 확인·덮어쓰기·신규 추가 건수를 카드와 같은 색 배지로 붙였다. 건수가 0인 구분은 그리지 않는다
-- 결과: 배지를 읽기 전에 색으로 카드 종류가 구분되고, 두 패널과 커밋 링크가 세 가지 카드 위에서 모두 같게 읽힌다
-- 결과: 헤더가 스크롤에 붙어 있어 카드를 세지 않아도, 접힌 이전 릴리스를 펼치지 않아도 구성이 보인다
-- 주의: 두 패널은 테마와 무관하게 밝은 색을 쓴다. 다크 모드에서도 흰색·연노랑 그대로다
-- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/c38764bb4535d17a6806db71d8ac08b7a124bd9e)
+- 대상: app/(site)/(content)/carbon-leader/self-check/components/business-detail.tsx
+  - app/(site)/(content)/carbon-leader/self-check/components/business-card.tsx
+- 변경: 상세 입력 칸 id 가 셀 참조만 써서(cell-D20) 사업이 둘 이상이고 같은 방법론이면 겹쳤다. 사업 id 를 앞에 붙이는 fieldPrefix 를 카드에서 내려 준다
+- 변경: 폐열회수는 같은 항목을 태블릿용·PC용 두 표로 각각 그려 한 사업 안에서도 겹쳤다. 벌마다 -compact · -wide 꼬리표를 붙였다
+- 변경: 데이터 근거의 입력 4종(출처·제품수명·스팀 배출계수·배출계수 근거)에 id 가 없었다. 값 키를 그대로 id 로 쓴다
+- 결과: 방법론 4종을 한 화면에 띄워도 폼 필드 42개 전부 id 를 갖고 중복이 0이다
+- 주의: 라디오·체크박스에서 나는 'No label associated with a form field' 는 Radix 가 form 안에서 그리는 숨은 input 때문이다. 바깥에서 id·aria-label 을 넣을 통로가 없어 남겨 뒀다. 보이는 컨트롤은 라벨이 정상 연결돼 있다
+- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/a938c6ee5ef409f2b041a5aecb45986d07348fbb)
 
-### 전달 범위에 constants·util 추가
+### 팝업 라우트 주석의 IA 번호 갱신
 
-- 대상: lib/publishing/handoff-assets.json
-- 변경: 인계 자산 목록에 constants·util 폴더를 넣고, 퍼블리싱 인덱스 전용인 components/publishing 을 화면 원본이 아님으로 표시했다
-- 결과: 이번 전달본부터 constants(화면 데이터 상수)와 util(공용 훅·포맷 함수) 폴더가 함께 전달된다
-- 결과: 전달 스크립트와 인계 자산 표가 같은 파일을 읽어 전달 범위와 화면 표기가 어긋나지 않는다
-- 주의: v0.0.1 전달본에는 두 폴더가 없었다. 이번 전달본부터 화면이 이 경로를 참조하므로 통째로 받아야 한다
-- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/acc4c7e1cbe5715c6e8addeb47a3a3285e16e8d6)
-- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/7005bb289d30768e0e3e2ea668eea4ec98d1556f)
+- 대상: app/(site)/(content)/carbon-leader/self-check/company-info/industry-code-search/page.tsx
+  - app/(site)/(content)/carbon-leader/self-check/inventory-emission/scope-guide/page.tsx
+  - app/(site)/(content)/carbon-leader/self-check/reduction-potential/page.tsx
+  - app/(site)/(content)/carbon-leader/application-3/inventory-emission/scope-guide/page.tsx
+- 변경: 제도 설명 화면이 1번으로 들어가 번호가 한 칸씩 밀려 주석을 표 데이터에서 다시 계산해 넣었다
+- 결과: 주석의 IA 번호와 표의 번호가 같아진다
+- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/aac9a5360cec0ffb97c5c7f51c4cbb6bd6318df0)
