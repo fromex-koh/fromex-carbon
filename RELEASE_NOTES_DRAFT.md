@@ -30,13 +30,12 @@
 릴리스 성공 후 내용은 자동으로 비워집니다.
 -->
 
-- 자가진단 STEP 1·3 과 선도기업 신청 화면 6종 퍼블리싱. STEP 2 인벤토리 배출량은 빠지고 Scope 설명 팝업만 남는다
-- 자가진단 확인 팝업 3종(삭제 · 감축방법론 변경 · 이어서 작성) 추가
+- 자가진단 STEP 1 · 3 · 4 · 5 와 선도기업 신청 화면 6종 퍼블리싱. STEP 2 인벤토리 배출량은 빠지고 Scope 설명 팝업만 남는다
+- 팝업 6종 추가. 자가진단 확인 3종(삭제 · 감축방법론 변경 · 이어서 작성)과 평가지표 설명 3종이다
 - GNB 를 신규 IA 기준으로 교체하고 마이페이지를 우측 유틸리티 영역으로 이동
-- 선도기업 공통 배너·팝업을 carbon-leader/components 로 모으고, 배너와 metadata 를 섹션 layout.tsx 로 올림
-- 색상 토큰에 primitive 계층과 화면 전용 시맨틱 추가
-- 전달 범위에 constants·util 폴더 추가. 화면 데이터 상수와 공용 훅·포맷 함수가 여기 있다
-- 감축잠재량 산정 폼의 중복 id 와 라벨 없는 입력 정리
+- 선도기업 공통 배너·팝업을 carbon-leader/components 로 모으고, 배너와 metadata 를 섹션 layout.tsx 로 올렸다. 하위 page.tsx 는 본문만 그린다
+- 색상 토큰에 primitive 계층과 화면 전용 시맨틱 추가. 기존 토큰은 건드리지 않고 추가만 했다
+- 전달 범위에 constants · util 폴더 추가. 화면 데이터 상수와 공용 훅 · 포맷 함수가 여기 있다
 
 ## [신규 추가]
 
@@ -163,6 +162,51 @@
 - 결과: /carbon-leader/self-check/company-info/resume 에서 기업 정보 입력 화면 위에 팝업이 뜬 상태를 확인할 수 있다
 - 적용: 신규 파일 추가
 - 주의: 360 에서 라이트와 다크의 칸 간격이 시안상 다르다(16 vs 20). 라이트 값으로 맞췄고 디자이너 확인이 필요하다
+
+### 자가진단 STEP 4 감축목표 설정 화면
+
+- 대상: app/(site)/(content)/carbon-leader/self-check/components/reduction-target.tsx
+  - app/(site)/(content)/carbon-leader/self-check/reduction-target/page.tsx
+  - app/(site)/(content)/carbon-leader/self-check/reduction-target/fit/page.tsx
+  - app/(site)/(content)/carbon-leader/self-check/reduction-target/unfit/page.tsx
+  - constants/carbon-leader-reduction-target.ts
+- 변경: (1) 감축사업 기대효과 표와 (2) 목표 설정 카드 두 덩어리다. 감축율 select 는 4 · 6 · 8 · 10% 이고, 기준연도 배출량 · 목표 감축량 · 예상 감축량은 disabled 가 아니라 readOnly 다
+- 결과: /reduction-target 은 판정 전, /fit 은 적정, /unfit 은 부적정 상태다. 계획 적정성 박스는 surface-info · surface-error 를 쓴다
+- 적용: 신규 파일 추가
+- 주의: 표시 값은 constants 고정이다. 감축율을 골라도 목표 감축량이나 계획 적정성이 따라 바뀌지 않는다. 연동은 개발에서 붙인다
+
+### 자가진단 STEP 5 평가지표 작성 화면
+
+- 대상: app/(site)/(content)/carbon-leader/self-check/components/evaluation-index.tsx
+  - app/(site)/(content)/carbon-leader/self-check/evaluation-index/page.tsx
+  - constants/carbon-leader-evaluation-index-items.ts
+- 변경: 2 대분류 · 4 중분류 · 15 지표를 details/summary 아코디언으로 그렸다. 여닫힘은 openMap 하나로 관리하고, 모두 열기 · 닫기 버튼이 지표 15개와 요약 카드를 함께 다룬다
+- 변경: 지표 유형이 셋이다. 정성은 라디오 칩, 체크는 체크박스 목록, 계량은 readOnly 입력 칸이다. 체크 지표는 충족 개수로 등급이 정해지고(0개 E ~ 전부 A) 예상등급 배지와 등급 기준표 강조가 같이 움직인다
+- 결과: /evaluation-index. [다음으로] 를 누르면 미응답 지표에 오류 문구가 뜨고 전부 펼쳐지며 첫 오류 지표로 포커스가 간다
+- 적용: 신규 파일 추가
+- 주의: 유효성 검사 대상은 선택지가 있는 정성 지표 7개뿐이다. 체크 지표는 미체크도 E 등급이라 선택 입력이다
+- 주의: 산출점수 · 총점 · 최종등급은 constants 고정값이다. 체크 수에 따른 등급 계산만 화면에서 돈다
+
+### 평가지표 설명 팝업 3종
+
+- 대상: app/(site)/(content)/carbon-leader/self-check/components/mandatory-training-dialog.tsx
+  - app/(site)/(content)/carbon-leader/self-check/components/emission-source-example-dialog.tsx
+  - app/(site)/(content)/carbon-leader/self-check/components/certification-type-dialog.tsx
+  - app/(site)/(content)/carbon-leader/self-check/evaluation-index/mandatory-training/page.tsx
+  - app/(site)/(content)/carbon-leader/self-check/evaluation-index/emission-source-example/page.tsx
+  - app/(site)/(content)/carbon-leader/self-check/evaluation-index/certification-type/page.tsx
+  - constants/carbon-leader-evaluation-index.ts
+- 변경: 의무 교육 기관 · 온실가스 배출원 예시 · 환경분야 인증 종류 세 팝업이다. children 을 받으면 DialogTrigger 로 감싸므로 업종코드 조회 팝업과 같은 방식으로 화면 안 버튼에 붙는다
+- 결과: 평가지표 1.2.2 · 2.1.1 · 2.2.5 의 물음표 버튼에서 열리고, 모달 전용 라우트로 직접 열어 볼 수도 있다
+- 적용: 신규 파일 추가
+- 주의: 카드에 스크롤을 걸면 좁은 화면에서 카드 밖으로 나온 닫기 버튼이 잘린다. 스크롤은 안쪽 래퍼에 있다
+
+### 평가지표 등급 배지 컴포넌트
+
+- 대상: app/(site)/(content)/carbon-leader/self-check/components/grade-badge.tsx
+- 변경: 기본은 테두리 알약, variant="fill" 은 등급색 알약에 흰 글자, variant="circle" 은 알파벳만 담은 동그라미, grade={null} 은 "미선택" 회색 알약이다
+- 결과: A 청록 · B 파랑 · C 보라 · D 분홍 · E 남색이며 라이트 · 다크가 같은 색이다
+- 적용: 신규 파일 추가
 
 ## [덮어쓰기]
 
@@ -320,6 +364,19 @@
 - 결과: 다크에서 표 화면명·경로·저장소 링크 대비가 3.63:1 → 4.67:1 로 올라 WCAG AA(4.5:1)를 넘는다. 라이트는 5.50:1 그대로다
 - 적용: 지정한 파일만 교체
 
+### 색상 토큰 추가 — 계획 적정성 안내 면색
+
+- 대상: app/globals.css
+- 변경: primitive 에 blue-92-4 · red-92-2 를, 시맨틱에 surface-info · surface-error 를 넣고 @theme 에 노출했다
+- 적용: 지정한 파일만 교체
+- 주의: 기존 토큰은 하나도 지우거나 바꾸지 않았다. 추가만 했고 줄바꿈도 원본 CRLF 그대로다
+
+### 퍼블리싱 인덱스 IA 번호와 완료 표시 갱신
+
+- 대상: app/page.tsx
+- 변경: IA 문서에 없는 /carbon-leader 행을 지우고 번호를 1~60 으로 다시 매겼다. 감축목표 설정 3종과 평가지표 작성 4종을 완료로 바꿨다
+- 적용: 지정한 파일만 교체
+
 ## [Diff 확인]
 
 ### GNB 드롭다운 위치와 서브메뉴 노출
@@ -405,3 +462,24 @@
 - 변경: 제도 설명 화면이 1번으로 들어가 번호가 한 칸씩 밀려 주석을 표 데이터에서 다시 계산해 넣었다
 - 결과: 주석의 IA 번호와 표의 번호가 같아진다
 - 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/aac9a5360cec0ffb97c5c7f51c4cbb6bd6318df0)
+
+### 팝업·화면 주석의 IA 번호 재정렬
+
+- 대상: app/(site)/(content)/carbon-leader/self-check/company-info/resume/page.tsx
+  - app/(site)/(content)/carbon-leader/self-check/company-info/industry-code-search/page.tsx
+  - app/(site)/(content)/carbon-leader/self-check/inventory-emission/scope-guide/page.tsx
+  - app/(site)/(content)/carbon-leader/self-check/reduction-potential/page.tsx
+  - app/(site)/(content)/carbon-leader/self-check/reduction-potential/delete-confirm/page.tsx
+  - app/(site)/(content)/carbon-leader/self-check/reduction-potential/change-confirm/page.tsx
+  - app/(site)/(content)/carbon-leader/application-3/inventory-emission/scope-guide/page.tsx
+- 변경: 퍼블리싱 인덱스에서 /carbon-leader 행이 빠지며 8번 이후가 한 칸씩 당겨졌다. 각 라우트 주석의 IA 번호만 새 번호로 맞췄다
+- 주의: 주석만 바뀐 변경이라 화면에는 영향이 없다
+- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/f9bfe737e0735b4f6445ea140e89bc57a9f0ae8d)
+
+### Select 숨은 입력에 name 속성 추가
+
+- 대상: app/(site)/(content)/carbon-leader/self-check/components/business-card.tsx
+  - app/(site)/(content)/carbon-leader/self-check/components/business-detail.tsx
+- 변경: Radix Select 가 form 안에 그리는 숨은 input 에 name 이 없었다. 업종선택 · 에너지 항목 · 감축방법론 셀렉트와 상세 표 셀 셀렉트에 이미 쓰던 id 값을 name 으로 같이 넘긴다
+- 결과: 감축잠재량 산정 화면의 'A form field element should have an id or name attribute' 경고가 사라진다
+- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/e915103a6c78bff4cd89943a0fa6a3bf23c78b1d)
