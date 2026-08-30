@@ -7,15 +7,8 @@ import { ko } from "date-fns/locale"
 import { CalendarSearch, Check, ChevronDown, ChevronUp, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogCloseButton,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
 import BusinessDetail from "@/app/(site)/(content)/carbon-leader/self-check/components/business-detail"
+import ConfirmDialog from "@/app/(site)/(content)/carbon-leader/self-check/components/confirm-dialog"
 import { Calendar } from "@/components/ui/calendar"
 import { Input } from "@/components/ui/input"
 import {
@@ -639,80 +632,34 @@ const BusinessCard = ({
           )}
         </div>
       )}
-      <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
-        {/* 기존 Scope 설명·업종코드 모달과 같은 규격을 쓴다. */}
-        <DialogContent className="w-[calc(100%-1.25rem)] max-w-[480px] gap-0 rounded-xl px-5 pt-6 pb-8 sm:w-[calc(100%-4rem)] sm:p-8">
-          <DialogCloseButton className="absolute -top-10 right-0 sm:top-5 sm:right-5" />
-          <DialogHeader className="gap-2 text-center">
-            <DialogTitle className="text-ink-strong text-xl font-bold break-keep sm:text-2xl">
-              선택하신 사업 정보를 삭제하시겠습니까?
-            </DialogTitle>
-            <DialogDescription className="text-ink-body text-base font-medium break-keep">
-              입력한 정보가 모두 사라집니다.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="grid grid-cols-2 gap-3 pt-8">
-            <Button
-              type="button"
-              variant="outline"
-              className="border-line-field text-ink-strong h-13 font-bold"
-              onClick={() => setIsConfirmOpen(false)}
-            >
-              취소하기
-            </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              className="h-13 font-bold"
-              onClick={() => {
-                setIsConfirmOpen(false)
-                onRemove()
-              }}
-            >
-              삭제하기
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-      <Dialog
+      <ConfirmDialog
+        open={isConfirmOpen}
+        onOpenChange={setIsConfirmOpen}
+        title="선택하신 사업 정보를 삭제하시겠습니까?"
+        description="입력한 정보가 모두 사라집니다."
+        confirmLabel="삭제하기"
+        onConfirm={onRemove}
+      />
+      <ConfirmDialog
         open={!!pendingChange}
-        onOpenChange={(open) => (open ? null : setPendingChange(null))}
-      >
-        <DialogContent className="w-[calc(100%-1.25rem)] max-w-[480px] gap-0 rounded-xl px-5 pt-6 pb-8 sm:w-[calc(100%-4rem)] sm:p-8">
-          <DialogCloseButton className="absolute -top-10 right-0 sm:top-5 sm:right-5" />
-          <DialogHeader className="gap-2 text-center">
-            <DialogTitle className="text-ink-strong text-xl font-bold break-keep sm:text-2xl">
-              감축방법론을 변경하시겠습니까?
-            </DialogTitle>
-            <DialogDescription className="text-ink-body text-base font-medium break-keep">
-              감축방법론 변경 시, 상세 입력 정보가 모두 삭제처리 됩니다.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="grid grid-cols-2 gap-3 pt-8">
-            <Button
-              type="button"
-              variant="outline"
-              className="border-line-field text-ink-strong h-13 font-bold"
-              onClick={() => setPendingChange(null)}
-            >
-              취소
-            </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              className="h-13 font-bold"
-              onClick={() => {
-                if (pendingChange) onChange(pendingChange)
-                setPendingChange(null)
-              }}
-            >
-              확인
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+        onOpenChange={(next) => {
+          if (!next) setPendingChange(null)
+        }}
+        compactTitleOnMobile
+        title="감축 방법론을 변경하시겠습니까?"
+        description={
+          <>
+            감축방법론 변경 시,
+            {/* 시안은 PC 만 한 줄, 태블릿 이하는 쉼표 뒤에서 끊는다 */}
+            <br className="lg:hidden" /> 상세 입력 정보가 모두 삭제 처리 됩니다.
+          </>
+        }
+        confirmLabel="삭제하기"
+        onConfirm={() => {
+          if (pendingChange) onChange(pendingChange)
+          setPendingChange(null)
+        }}
+      />
     </section>
   )
 }
