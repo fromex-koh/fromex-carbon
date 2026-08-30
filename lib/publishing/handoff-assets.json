@@ -18,6 +18,18 @@
     "copy": false
   },
   {
+    "path": "components/publishing",
+    "kind": "폴더",
+    "role": "퍼블리싱 인덱스 전용 — 화면 원본 소스가 아님",
+    "copy": false
+  },
+  {
+    "path": "constants",
+    "kind": "폴더",
+    "role": "화면 데이터 상수 — 신청 단계 카드·자가진단 항목 등",
+    "copy": true
+  },
+  {
     "path": "lib",
     "kind": "폴더",
     "role": "공용 유틸과 GNB 상수",
@@ -28,6 +40,12 @@
     "kind": "폴더",
     "role": "퍼블리싱 인덱스 전용 데이터 — 화면 원본 소스가 아님",
     "copy": false
+  },
+  {
+    "path": "util",
+    "kind": "폴더",
+    "role": "공용 훅과 포맷 함수",
+    "copy": true
   },
   {
     "path": "public",

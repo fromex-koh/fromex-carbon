@@ -33,7 +33,9 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className={pretendard.className}>
-        <main>
+        {/* 본문이 짧은 화면에서 푸터 아래 빈 공간이 보이지 않도록
+            껍데기를 뷰포트 높이만큼 세우고 푸터를 아래로 민다. */}
+        <main className="flex min-h-dvh flex-col">
           {/* <AuthProvider> */}
           <RybbitProvider />
           <ThemeProvider
@@ -48,7 +50,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
               </Suspense>
               {children}
               <Toaster />
-              <FooterBar />
+              <FooterBar className="mt-auto" />
             </QueryProvider>
           </ThemeProvider>
           {/* </AuthProvider> */}

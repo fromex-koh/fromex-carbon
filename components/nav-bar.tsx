@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button"
 import { ModeToggle } from "@/components/ui/mode-toggle"
 import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
-import { menuList, navBarHeight } from "@/lib/const"
+import { menuList, myPageMenu, navBarHeight } from "@/lib/const"
 // import { logout } from "@/actions/logout"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useSession } from "@/components/auth-provider"
@@ -35,10 +35,19 @@ const NavBar = () => {
   const [lastScrollY, setLastScrollY] = useState(0)
 
   const session = useSession()
-  const isLoggedIn = !!session?.user?.accessToken
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const mode = searchParams.get("mode") ?? ""
+
+  // [퍼블리싱 노출용] ?login=true 는 원래 소스에 없던 분기다.
+  // 로그인 로직을 타지 않고 로그인 상태 헤더를 보여주려고 넣었다.
+  // 실제 세션이 붙으면 searchParams 조건만 지우면 원본 동작으로 돌아간다.
+  const isLoggedIn =
+    searchParams.get("login") === "true" || !!session?.user?.accessToken
+
+  // 모바일·태블릿 패널은 hover 가 없어 마이페이지도 다른 메뉴처럼 탭 목록에 넣는다.
+  // 목록 끝에 붙이므로 activeMenuIndex 가 가리키는 기존 인덱스는 그대로다.
+  const sideMenuList = isLoggedIn ? [...menuList, myPageMenu] : menuList
 
   const activeCurrentMenu = () => {
     setActiveMenuIndex(
@@ -165,8 +174,11 @@ const NavBar = () => {
         <div
           className={"flex w-full max-w-[1276px] items-center justify-between"}
         >
-          <div className={"flex items-center justify-between gap-5 lg:gap-20"}>
-            <Link href={isTaxonomy() ? "/k-taxonomy/guide" : "/home"}>
+          <div className={"flex items-center justify-between gap-5 xl:gap-10"}>
+            <Link
+              href={isTaxonomy() ? "/k-taxonomy/guide" : "/home"}
+              className="shrink-0"
+            >
               {isTaxonomy() ? (
                 <LogoTaxonomy isDark={isDark} />
               ) : (
@@ -174,54 +186,52 @@ const NavBar = () => {
               )}
             </Link>
             <div
-              className={cn("flex max-[910px]:hidden", isDark && "text-white!")}
+              className={cn(
+                "flex max-[1080px]:hidden",
+                isDark && "text-white!",
+              )}
             >
               <NavigationMenu>
-                <NavigationMenuList className={"gap-0 lg:gap-5"}>
-                  {menuList.map((menu, index) => (
+                <NavigationMenuList className={"gap-0 xl:gap-4"}>
+                  {menuList.map((menu) => (
                     <NavigationMenuItem key={menu.title + "onTop"}>
                       <NavigationMenuTrigger
                         className={cn("cursor-pointer px-2 text-base")}
                       >
                         {menu.title}
                       </NavigationMenuTrigger>
-                      <NavigationMenuContent>
+                      <NavigationMenuContent
+                        className={"right-auto left-1/2 -translate-x-1/2"}
+                      >
                         <div
                           className={cn(
                             "flex flex-col gap-1 p-2 whitespace-nowrap",
                             isDark && "text-black dark:text-white",
                           )}
                         >
-                          {menu.contents
-                            .filter(
-                              (_, i) =>
-                                index !== 1 ||
-                                (i !== 2 && (i !== 3 || isLoggedIn)),
-                            )
-                            .map((content) => (
-                              <Link
-                                key={content.subTitle + "onTop"}
-                                href={menu.link + content.link}
-                                onClick={() => setIsOpen(false)}
-                                target={
-                                  (menu.link + content.link).startsWith("/")
-                                    ? undefined
-                                    : "_blank"
-                                }
+                          {menu.contents.map((content) => (
+                            <Link
+                              key={content.subTitle + "onTop"}
+                              href={menu.link + content.link}
+                              onClick={() => setIsOpen(false)}
+                              target={
+                                (menu.link + content.link).startsWith("/")
+                                  ? undefined
+                                  : "_blank"
+                              }
+                            >
+                              <Button
+                                variant="underLine"
+                                className={cn(
+                                  pathname.includes(menu.link + content.link) &&
+                                    "underline underline-offset-4",
+                                  "w-full items-center justify-start",
+                                )}
                               >
-                                <Button
-                                  variant="underLine"
-                                  className={cn(
-                                    pathname.includes(
-                                      menu.link + content.link,
-                                    ) && "underline underline-offset-4",
-                                    "w-full items-center justify-start",
-                                  )}
-                                >
-                                  {content.subTitle}
-                                </Button>
-                              </Link>
-                            ))}
+                                {content.subTitle}
+                              </Button>
+                            </Link>
+                          ))}
                         </div>
                       </NavigationMenuContent>
                     </NavigationMenuItem>
@@ -233,36 +243,73 @@ const NavBar = () => {
           <div className={"flex items-center gap-2"}>
             <ModeToggle
               variant={"roundedGhost"}
-              className={cn("max-[910px]:hidden", isDark && "text-white")}
+              className={cn("max-[1080px]:hidden", isDark && "text-white")}
             />
             {status === "loading" && (
-              <Skeleton className="h-10 w-[100px] bg-muted/20 max-[910px]:hidden" />
+              <Skeleton className="h-10 w-[100px] bg-muted/20 max-[1080px]:hidden" />
             )}
-            <div className={"h-3 w-[1px] border max-[910px]:hidden"}></div>
+            <div className={"h-3 w-[1px] border max-[1080px]:hidden"}></div>
             {isLoggedIn && (
               <div className={"flex items-center gap-2"}>
-                <Link
-                  href={`/status-inquiry${isTaxonomy() ? "?mode=k-taxonomy" : ""}`}
+                {/* 비로그인 상태의 '회원가입' 과 같은 자리다.
+                    원래 소스에서 '현황조회' 가 있던 위치이기도 하다.
+                    GNB 메뉴와 같은 마크업이라 hover 시 같은 드롭다운이 열린다. */}
+                <NavigationMenu
+                  className={cn("max-[1080px]:hidden", isDark && "text-white!")}
                 >
-                  <Button
-                    className={cn(
-                      "max-[910px]:hidden",
-                      isDark && "text-white",
-                      "font-bold",
-                    )}
-                    variant={"underLine"}
-                  >
-                    현황조회
-                  </Button>
-                </Link>
-                <div className={"h-3 w-[1] border max-[910px]:hidden"}></div>
+                  <NavigationMenuList>
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger
+                        className={cn(
+                          "cursor-pointer bg-transparent px-2 text-base font-bold",
+                          isDark && "text-white",
+                        )}
+                      >
+                        마이페이지
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent
+                        className={"right-0 left-auto translate-x-0"}
+                      >
+                        <div
+                          className={cn(
+                            "flex flex-col gap-1 p-2 whitespace-nowrap",
+                            isDark && "text-black dark:text-white",
+                          )}
+                        >
+                          {myPageMenu.contents.map((content) => (
+                            <Link
+                              key={content.subTitle + "myPage"}
+                              href={myPageMenu.link + content.link}
+                              onClick={() => setIsOpen(false)}
+                            >
+                              <Button
+                                variant="underLine"
+                                className={cn(
+                                  pathname.includes(
+                                    myPageMenu.link + content.link,
+                                  ) && "underline underline-offset-4",
+                                  "w-full items-center justify-start",
+                                )}
+                              >
+                                {content.subTitle}
+                              </Button>
+                            </Link>
+                          ))}
+                        </div>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                  </NavigationMenuList>
+                </NavigationMenu>
+                <div className={"h-3 w-[1] border max-[1080px]:hidden"}></div>
                 <Button
                   className={cn(
-                    "ml-3 max-w-[119px] border-none px-10 max-[910px]:hidden dark:bg-white dark:text-black dark:hover:bg-white/90",
+                    "ml-3 max-w-[119px] border-none px-10 max-[1080px]:hidden dark:bg-white dark:text-black dark:hover:bg-white/90",
                     isDark && "bg-white text-black",
                   )}
                   variant={"login"}
-                  onClick={() => {/* logout(isTaxonomy()) */}}
+                  onClick={() => {
+                    /* logout(isTaxonomy()) */
+                  }}
                 >
                   로그아웃
                 </Button>
@@ -272,7 +319,7 @@ const NavBar = () => {
               <div className={"flex items-center gap-2"}>
                 <Button
                   className={cn(
-                    "max-[910px]:hidden",
+                    "max-[1080px]:hidden",
                     isDark && "text-white",
                     "font-bold",
                   )}
@@ -281,10 +328,10 @@ const NavBar = () => {
                 >
                   회원가입
                 </Button>
-                <div className={"h-3 w-[1] border max-[910px]:hidden"}></div>
+                <div className={"h-3 w-[1] border max-[1080px]:hidden"}></div>
                 <Button
                   className={cn(
-                    "ml-3 max-w-[119px] border-none px-10 max-[910px]:hidden dark:bg-white dark:text-black dark:hover:bg-white/90",
+                    "ml-3 max-w-[119px] border-none px-10 max-[1080px]:hidden dark:bg-white dark:text-black dark:hover:bg-white/90",
                     isDark && "bg-white text-black",
                   )}
                   variant={"login"}
@@ -298,7 +345,7 @@ const NavBar = () => {
               <Button
                 aria-label={"메뉴 펼치기"}
                 className={cn(
-                  "hidden max-[910px]:inline-flex [&_svg]:size-6",
+                  "hidden max-[1080px]:inline-flex [&_svg]:size-6",
                   isDark && "text-white",
                 )}
                 variant={"ghost"}
@@ -314,7 +361,7 @@ const NavBar = () => {
 
       <div
         className={cn(
-          "fixed top-0 right-0 z-2 hidden h-lvh w-full transform bg-background shadow-md transition-transform max-[910px]:block",
+          "fixed top-0 right-0 z-2 hidden h-lvh w-full transform bg-background shadow-md transition-transform max-[1080px]:block",
           isOpen ? "translate-x-0" : "translate-x-full",
         )}
       >
@@ -333,14 +380,12 @@ const NavBar = () => {
           )}
           {isLoggedIn && (
             <div className="flex gap-x-2">
-              <Link
-                href={`/status-inquiry${isTaxonomy() ? "?mode=k-taxonomy" : ""}`}
+              <Button
+                variant={"ghost"}
+                onClick={() => {
+                  /* logout(isTaxonomy()) */
+                }}
               >
-                <Button variant={"ghost"} onClick={() => setIsOpen(false)}>
-                  현황조회
-                </Button>
-              </Link>
-              <Button variant={"ghost"} onClick={() => {/* logout(isTaxonomy()) */}}>
                 <LogOut />
                 로그아웃
               </Button>
@@ -359,7 +404,7 @@ const NavBar = () => {
 
         <div className="flex">
           <div className={"flex h-lvh flex-col gap-2 bg-active p-4"}>
-            {menuList.map((menu, index) => (
+            {sideMenuList.map((menu, index) => (
               <Button
                 className={cn(
                   "py-6 text-lg font-bold",
@@ -377,46 +422,40 @@ const NavBar = () => {
           </div>
           <div className={"flex h-lvh w-full flex-col gap-1 p-4"}>
             {activeMenuIndex !== -1 &&
-              menuList[activeMenuIndex].contents
-                .filter(
-                  (_, i) =>
-                    activeMenuIndex !== 1 ||
-                    (i !== 2 && (i !== 3 || isLoggedIn)),
-                )
-                .map((content) => (
-                  <div key={content.subTitle + "onSide"}>
-                    <Link
-                      href={menuList[activeMenuIndex].link + content.link}
-                      onClick={() => setIsOpen(false)}
-                      target={
-                        (
-                          menuList[activeMenuIndex].link + content.link
-                        ).startsWith("/")
-                          ? undefined
-                          : "_blank"
-                      }
+              sideMenuList[activeMenuIndex].contents.map((content) => (
+                <div key={content.subTitle + "onSide"}>
+                  <Link
+                    href={sideMenuList[activeMenuIndex].link + content.link}
+                    onClick={() => setIsOpen(false)}
+                    target={
+                      (
+                        sideMenuList[activeMenuIndex].link + content.link
+                      ).startsWith("/")
+                        ? undefined
+                        : "_blank"
+                    }
+                  >
+                    <Button
+                      variant={"ghost"}
+                      className={cn(
+                        "w-full justify-start py-6 text-base font-medium",
+                        pathname.includes(
+                          sideMenuList[activeMenuIndex].link + content.link,
+                        ) && "text-primary hover:text-primary",
+                      )}
                     >
-                      <Button
-                        variant={"ghost"}
-                        className={cn(
-                          "w-full justify-start py-6 text-base font-medium",
-                          pathname.includes(
-                            menuList[activeMenuIndex].link + content.link,
-                          ) && "text-primary hover:text-primary",
-                        )}
-                      >
-                        {content.subTitle}
-                      </Button>
-                    </Link>
-                  </div>
-                ))}
+                      {content.subTitle}
+                    </Button>
+                  </Link>
+                </div>
+              ))}
           </div>
         </div>
       </div>
 
       {isOpen && (
         <div
-          className="bg-opacity-50 fixed inset-0 z-1 hidden bg-black max-[910px]:block"
+          className="bg-opacity-50 fixed inset-0 z-1 hidden bg-black max-[1080px]:block"
           onClick={() => setIsOpen(false)}
         />
       )}
