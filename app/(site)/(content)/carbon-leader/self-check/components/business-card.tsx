@@ -403,6 +403,7 @@ const BusinessCard = ({
                 <div className="flex min-w-0 flex-col gap-2 md:gap-2.5">
                   <FieldLabel htmlFor={field("industry")}>업종선택</FieldLabel>
                   <Select
+                    name={field("industry")}
                     data-invalid={!!errorOf("industry") || undefined}
                     value={business.industry}
                     onValueChange={(value) => set("industry", value)}
@@ -521,6 +522,7 @@ const BusinessCard = ({
                   에너지 항목 선택
                 </FieldLabel>
                 <Select
+                  name={field("category")}
                   data-invalid={!!errorOf("category") || undefined}
                   value={business.category}
                   onValueChange={(value) =>
@@ -564,6 +566,7 @@ const BusinessCard = ({
                   감축방법론 선택
                 </FieldLabel>
                 <Select
+                  name={field("methodology")}
                   data-invalid={!!errorOf("methodology") || undefined}
                   value={business.methodology}
                   disabled={!business.category}

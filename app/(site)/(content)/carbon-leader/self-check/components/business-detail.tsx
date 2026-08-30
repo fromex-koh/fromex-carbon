@@ -353,6 +353,7 @@ const BusinessDetail = ({
       <div className="flex flex-col gap-1">
         <ColumnLabel side={side} single={isSingle} />
         <Select
+          name={cellDomId(fieldPrefix, key)}
           value={cells[key] ?? ""}
           onValueChange={(next) => onCellChange(key, next)}
         >
