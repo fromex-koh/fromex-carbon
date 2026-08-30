@@ -1,6 +1,6 @@
 import ConfirmDialog from "@/app/(site)/(content)/carbon-leader/self-check/components/confirm-dialog"
 
-// IA 16번 "변경 확인 팝업" — 입력을 마친 뒤 감축 방법론을 바꿀 때 뜬다.
+// IA 15번 "변경 확인 팝업" — 입력을 마친 뒤 감축 방법론을 바꿀 때 뜬다.
 // 감축잠재량 산정 화면 위에 뜨는 모달이라, 본문은 비워 두고 모달만 열린 상태로 둔다.
 const ChangeConfirmPage = () => {
   return (
