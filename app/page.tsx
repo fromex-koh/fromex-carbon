@@ -78,6 +78,23 @@ const HEADER_STATE_ROWS = [
 const IA_ROWS = [
   {
     no: 1,
+    path: "/carbon-leader",
+    user: "비회원·회원",
+    type: "Page",
+    status: "변경",
+    revise: false,
+    devCheck: false,
+    uiux: "대기중",
+    desc: "탄소중립 선도기업 제도 설명 화면 / 자가진단으로 이동",
+    cells: [
+      { level: 1, name: "메인 홈", rowSpan: 59, colSpan: 1 },
+      { level: 2, name: "탄소중립 선도기업", rowSpan: 52, colSpan: 1 },
+      // 메뉴 자체가 화면이라 3~5뎁스는 병합해 '-'로 둔다
+      { level: 0, name: "", rowSpan: 1, colSpan: 3 },
+    ],
+  },
+  {
+    no: 2,
     path: "/carbon-leader/application/initial",
     user: "비회원·회원",
     type: "Page",
@@ -87,14 +104,12 @@ const IA_ROWS = [
     uiux: "완료",
     desc: "선행 이력이 없어 자가진단만 신청가능",
     cells: [
-      { level: 1, name: "메인 홈", rowSpan: 58, colSpan: 1 },
-      { level: 2, name: "탄소중립 선도기업", rowSpan: 51, colSpan: 1 },
       { level: 3, name: "선도기업 신청", rowSpan: 6, colSpan: 1 },
       { level: 4, name: "최초 진입", rowSpan: 1, colSpan: 2 },
     ],
   },
   {
-    no: 2,
+    no: 3,
     path: "/carbon-leader/application/self-check-done",
     user: "비회원·회원",
     type: "Page",
@@ -106,7 +121,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "자가진단 완료", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 3,
+    no: 4,
     path: "/carbon-leader/application/first-done",
     user: "비회원·회원",
     type: "Page",
@@ -118,7 +133,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "1차 신청 완료", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 4,
+    no: 5,
     path: "/carbon-leader/application/middle-review",
     user: "비회원·회원",
     type: "Page",
@@ -130,7 +145,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "중간점검 접수", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 5,
+    no: 6,
     path: "/carbon-leader/application/middle-done",
     user: "비회원·회원",
     type: "Page",
@@ -142,7 +157,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "중간점검 완료", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 6,
+    no: 7,
     path: "/carbon-leader/application/final-done",
     user: "비회원·회원",
     type: "Page",
@@ -154,7 +169,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "최종점검 완료", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 7,
+    no: 8,
     path: "/carbon-leader/self-check/company-info",
     user: "비회원·회원",
     type: "Page",
@@ -170,19 +185,19 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 8,
+    no: 9,
     path: "/carbon-leader/self-check/company-info/resume",
     user: "회원",
     type: "Modal Popup",
     status: "미표기",
-    revise: true,
+    reviseDone: true,
     devCheck: false,
-    uiux: "대기중",
+    uiux: "완료",
     desc: "기존 작성 중인 자가진단이 존재하는 경우 재진입 시 기존 작성내용을 이어서 작성할지 안내함",
     cells: [{ level: 5, name: "이어서 작성하기 팝업", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 9,
+    no: 10,
     path: "/carbon-leader/self-check/company-info/industry-code-search",
     user: "비회원·회원",
     type: "Modal Popup",
@@ -194,7 +209,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "업종코드 조회", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 10,
+    no: 11,
     path: "/carbon-leader/self-check/inventory-emission",
     user: "비회원·회원",
     type: "Page",
@@ -209,19 +224,19 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 11,
+    no: 12,
     path: "/carbon-leader/self-check/inventory-emission/item-select",
     user: "비회원·회원",
     type: "Modal Popup",
     status: "신규",
-    revise: false,
+    revise: true,
     devCheck: false,
     uiux: "대기중",
     desc: "인벤토리 항목 선택 팝업",
     cells: [{ level: 5, name: "항목 선택", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 12,
+    no: 13,
     path: "/carbon-leader/self-check/inventory-emission/scope-guide",
     user: "비회원·회원",
     type: "Dialog",
@@ -233,7 +248,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "Scope설명", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 13,
+    no: 14,
     path: "/carbon-leader/self-check/reduction-potential",
     user: "비회원·회원",
     type: "Page",
@@ -248,33 +263,33 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 14,
+    no: 15,
     path: "/carbon-leader/self-check/reduction-potential/delete-confirm",
     user: "비회원·회원",
     type: "Dialog",
     status: "신규",
-    revise: true,
+    reviseDone: true,
     devCheck: false,
-    uiux: "대기중",
+    uiux: "완료",
     desc: "삭제 확인 팝업 - 사업 [삭제] 버튼 선택 시 노출",
     cells: [{ level: 5, name: "삭제 확인 팝업", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 15,
+    no: 16,
     path: "/carbon-leader/self-check/reduction-potential/change-confirm",
     user: "비회원·회원",
     type: "Modal Popup",
     status: "미표기",
-    revise: true,
+    reviseDone: true,
     devCheck: false,
-    uiux: "대기중",
+    uiux: "완료",
     desc: "입력필드 모두 입력 후, 감축 방법론 드롭다운 변경시, 확인팝업. - [변경] 선택 시, 입력필드 초기화",
     cells: [
       { level: 5, name: "감축방법론 변경 확인 팝업", rowSpan: 1, colSpan: 1 },
     ],
   },
   {
-    no: 16,
+    no: 17,
     path: "/carbon-leader/self-check/reduction-target",
     user: "비회원·회원",
     type: "Page",
@@ -286,7 +301,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "감축목표 설정", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 17,
+    no: 18,
     path: "/carbon-leader/self-check/evaluation-index",
     user: "비회원·회원",
     type: "Page",
@@ -301,7 +316,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 18,
+    no: 19,
     path: "/carbon-leader/self-check/evaluation-index/mandatory-training",
     user: "비회원·회원",
     type: "Dialog",
@@ -320,7 +335,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 19,
+    no: 20,
     path: "/carbon-leader/self-check/evaluation-index/emission-source-example",
     user: "비회원·회원",
     type: "Dialog",
@@ -339,7 +354,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 20,
+    no: 21,
     path: "/carbon-leader/self-check/evaluation-index/certification-type",
     user: "비회원·회원",
     type: "Dialog",
@@ -358,7 +373,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 21,
+    no: 22,
     path: "/carbon-leader/self-check/result",
     user: "비회원·회원",
     type: "Page",
@@ -373,7 +388,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 22,
+    no: 23,
     path: "/carbon-leader/self-check/result/result-certificate",
     user: "비회원·회원",
     type: "Link",
@@ -385,7 +400,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "결과 확인서", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 23,
+    no: 24,
     path: "/carbon-leader/application-1/application-form",
     user: "회원",
     type: "Page",
@@ -401,7 +416,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 24,
+    no: 25,
     path: "/carbon-leader/application-1/application-form/address-search",
     user: "회원",
     type: "Modal Popup",
@@ -413,7 +428,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "주소 검색", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 25,
+    no: 26,
     path: "/carbon-leader/application-1/document-submit",
     user: "회원",
     type: "Page",
@@ -425,7 +440,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "서류 제출", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 26,
+    no: 27,
     path: "/carbon-leader/application-1/final-confirm",
     user: "회원",
     type: "Page",
@@ -440,7 +455,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 27,
+    no: 28,
     path: "/carbon-leader/application-1/final-confirm/submit-confirm",
     user: "회원",
     type: "Modal Popup",
@@ -452,7 +467,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "제출 확인 팝업", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 28,
+    no: 29,
     path: "/carbon-leader/application-1/result",
     user: "회원",
     type: "Page",
@@ -467,7 +482,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 29,
+    no: 30,
     path: "/carbon-leader/application-1/result/application-download",
     user: "비회원·회원",
     type: "Button",
@@ -479,7 +494,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "신청서", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 30,
+    no: 31,
     path: "/carbon-leader/application-1/result/result-certificate",
     user: "비회원·회원",
     type: "Button",
@@ -491,7 +506,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "결과 확인서 (미정)", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 31,
+    no: 32,
     path: "/carbon-leader/application-2/application-form",
     user: "회원",
     type: "Page",
@@ -507,7 +522,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 32,
+    no: 33,
     path: "/carbon-leader/application-2/application-form/address-search",
     user: "회원",
     type: "Modal Popup",
@@ -519,7 +534,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "주소 검색", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 33,
+    no: 34,
     path: "/carbon-leader/application-2/document-submit",
     user: "회원",
     type: "Page",
@@ -531,7 +546,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "서류 제출", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 34,
+    no: 35,
     path: "/carbon-leader/application-2/final-confirm",
     user: "회원",
     type: "Page",
@@ -546,7 +561,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 35,
+    no: 36,
     path: "/carbon-leader/application-2/final-confirm/submit-confirm",
     user: "회원",
     type: "Modal Popup",
@@ -558,7 +573,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "제출 확인 팝업", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 36,
+    no: 37,
     path: "/carbon-leader/application-2/result",
     user: "회원",
     type: "Page",
@@ -573,7 +588,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 37,
+    no: 38,
     path: "/carbon-leader/application-2/result/application-download",
     user: "비회원·회원",
     type: "Button",
@@ -585,7 +600,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "신청서", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 38,
+    no: 39,
     path: "/carbon-leader/application-2/result/result-certificate",
     user: "비회원·회원",
     type: "Button",
@@ -597,7 +612,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "결과 확인서 (미정)", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 39,
+    no: 40,
     path: "/carbon-leader/application-3/application-form",
     user: "회원",
     type: "Page",
@@ -613,7 +628,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 40,
+    no: 41,
     path: "/carbon-leader/application-3/application-form/address-search",
     user: "회원",
     type: "Modal Popup",
@@ -625,11 +640,11 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "주소 검색", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 41,
+    no: 42,
     path: "/carbon-leader/application-3/inventory-emission",
     user: "회원",
     type: "Page",
-    status: "변경·신규",
+    status: "변경",
     revise: true,
     devCheck: false,
     uiux: "대기중",
@@ -640,19 +655,19 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 42,
+    no: 43,
     path: "/carbon-leader/application-3/inventory-emission/item-select",
     user: "회원",
     type: "Modal Popup",
     status: "신규",
-    revise: false,
+    revise: true,
     devCheck: false,
     uiux: "대기중",
     desc: "인벤토리 항목 선택 팝업",
     cells: [{ level: 5, name: "항목 선택", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 43,
+    no: 44,
     path: "/carbon-leader/application-3/inventory-emission/scope-guide",
     user: "회원",
     type: "Dialog",
@@ -664,7 +679,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "Scope설명", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 44,
+    no: 45,
     path: "/carbon-leader/application-3/target-achievement",
     user: "회원",
     type: "Page",
@@ -676,7 +691,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "목표달성 평가", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 45,
+    no: 46,
     path: "/carbon-leader/application-3/document-submit",
     user: "회원",
     type: "Page",
@@ -688,7 +703,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "서류 제출", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 46,
+    no: 47,
     path: "/carbon-leader/application-3/final-confirm",
     user: "회원",
     type: "Page",
@@ -703,7 +718,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 47,
+    no: 48,
     path: "/carbon-leader/application-3/final-confirm/submit-confirm",
     user: "회원",
     type: "Modal Popup",
@@ -715,7 +730,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "제출 확인 팝업", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 48,
+    no: 49,
     path: "/carbon-leader/application-3/result",
     user: "회원",
     type: "Page",
@@ -730,7 +745,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 49,
+    no: 50,
     path: "/carbon-leader/application-3/result/application-download",
     user: "비회원·회원",
     type: "Button",
@@ -742,7 +757,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "신청서", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 50,
+    no: 51,
     path: "/carbon-leader/application-3/result/result-certificate",
     user: "비회원·회원",
     type: "Button",
@@ -754,7 +769,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "결과 확인서 (미정)", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 51,
+    no: 52,
     path: "/carbon-leader/application-history",
     user: "회원",
     type: "Link",
@@ -773,7 +788,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 52,
+    no: 53,
     path: "/my-page",
     user: "회원",
     type: "Button",
@@ -788,7 +803,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 53,
+    no: 54,
     path: "/my-page/sub-account",
     user: "회원",
     type: "Page",
@@ -803,7 +818,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 54,
+    no: 55,
     path: "/my-page/sub-account/register",
     user: "회원",
     type: "Modal Popup",
@@ -815,7 +830,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "하위계정 등록", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 55,
+    no: 56,
     path: "/my-page/profile-edit",
     user: "회원",
     type: "Page",
@@ -830,7 +845,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 56,
+    no: 57,
     path: "/my-page/profile-edit/address-search",
     user: "회원",
     type: "Modal Popup",
@@ -842,7 +857,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "주소검색", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 57,
+    no: 58,
     path: "/my-page/status",
     user: "회원",
     type: "Page",
@@ -857,7 +872,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 58,
+    no: 59,
     path: "/my-page/status/security-request",
     user: "회원",
     type: "Modal Popup",
@@ -879,7 +894,54 @@ const UIUX_VARIANT = {
   최종완료: "violet",
 } as const
 
+// 비고 칼럼 배지. 모양과 뜻을 한 곳에 두어 표와 범례가 어긋나지 않게 한다.
+// badge.tsx 의 미사용 변형은 노랑 계열뿐이라 '디자인 수정완료' 만 토큰으로 덮는다.
+const REMARK_BADGES = {
+  revise: {
+    label: "디자인≠개발",
+    variant: "warning",
+    className: "",
+    desc: "IA 문서에서 셀이 초록색으로 채워진 행. 문서 표기로는 '디자인 > 퍼블 수정필요 부분(개발싱크 또는 현업 전달 사항)'.",
+  },
+  reviseDone: {
+    label: "디자인 수정완료",
+    variant: "default",
+    className: "bg-brand-done-teal hover:bg-brand-done-teal text-white",
+    desc: "'디자인≠개발' 로 잡혔던 부분을 시안대로 반영해 퍼블리싱을 마친 행.",
+  },
+  devCheck: {
+    label: "개발확인필요",
+    variant: "tertiary",
+    className: "",
+    desc: "IA 문서 뎁스 셀에 '- 개발 확인 필요'가 적히고 회색으로 채워진 행.",
+  },
+} as const
+
+type RemarkKey = keyof typeof REMARK_BADGES
+
+const REMARK_KEYS = Object.keys(REMARK_BADGES) as RemarkKey[]
+
+const RemarkBadge = ({ kind }: { kind: RemarkKey }) => {
+  const { label, variant, className } = REMARK_BADGES[kind]
+
+  return (
+    <Badge variant={variant} className={cn("whitespace-nowrap", className)}>
+      {label}
+    </Badge>
+  )
+}
+
 type UiuxKey = keyof typeof UIUX_VARIANT
+
+// UIUX 진행 상태의 뜻. 범례에서 배지 옆에 함께 보여준다.
+const UIUX_DESC: Record<keyof typeof UIUX_VARIANT, string> = {
+  대기중: "아직 퍼블리싱을 시작하지 않은 화면.",
+  진행중: "퍼블리싱 작업 중인 화면.",
+  수정요청: "확인 결과 고칠 부분이 나온 화면.",
+  보완: "요청받은 수정을 반영하는 중인 화면.",
+  완료: "시안대로 퍼블리싱을 마친 화면.",
+  최종완료: "개발·현업 확인까지 끝난 화면.",
+}
 
 // 표 아래 범례에 쓰는 순서. UIUX_VARIANT 의 키와 일치해야 한다.
 const UIUX_KEYS = Object.keys(UIUX_VARIANT) as UiuxKey[]
@@ -944,6 +1006,10 @@ const hasPage = (routePath: string) =>
 // 방금 배포한 것만 강조한다. 두 표와 릴리스 카드가 같은 파랑 계열을 쓴다.
 // TableRow 원본의 hover:bg-muted/50 이 강조를 덮으므로 hover 도 같이 지정한다.
 // cn 이 tailwind-merge 라 나중에 들어오는 className 쪽이 이긴다.
+// 링크 글자색. 다크의 --primary 는 카드 위 대비가 3.63:1 로 AA(4.5:1)에 못 미친다.
+// 같은 브랜드 계열 한 단계 밝은 --primary-light 로 올려 4.67:1 을 확보한다.
+// 라이트는 --primary 가 5.50:1 이라 그대로 둔다.
+
 const LATEST_HIGHLIGHT = "bg-primary/15 hover:bg-primary/25"
 
 const COMMIT_LINK_LABELS = ["커밋", "GitHub Diff", "Diff 링크"]
@@ -1186,7 +1252,7 @@ const PublishingIndexPage = () => {
                       href={link.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-primary inline-flex items-center gap-1.5 rounded font-medium break-all hover:underline"
+                      className="text-primary dark:text-primary-light inline-flex items-center gap-1.5 rounded font-medium break-all hover:underline"
                     >
                       <GitBranch
                         aria-hidden="true"
@@ -1453,7 +1519,7 @@ const PublishingIndexPage = () => {
                     <TableCell className="align-top font-mono text-sm">
                       <Link
                         href={row.path}
-                        className="text-primary hover:underline"
+                        className="text-primary dark:text-primary-light hover:underline"
                       >
                         {row.path}
                       </Link>
@@ -1485,21 +1551,56 @@ const PublishingIndexPage = () => {
             메뉴 자체가 화면인 행의 미사용 하위 뎁스는 병합된 &apos;-&apos;로
             표시합니다.
           </p>
-          <p className="text-muted-foreground text-xs">
-            비고 &apos;디자인≠개발&apos; = IA 문서에서 셀이 초록색으로 채워진
-            행입니다. 문서 표기로는 &apos;디자인 &gt; 퍼블 수정필요
-            부분(개발싱크 또는 현업 전달 사항)&apos; 입니다.
-          </p>
-          <p className="text-muted-foreground text-xs">
-            비고 &apos;개발확인필요&apos; = IA 문서 뎁스 셀에 &apos;- 개발 확인
-            필요&apos;가 적히고 회색으로 채워진 행입니다.
-          </p>
-          <div className="flex flex-wrap items-center gap-2">
-            {UIUX_KEYS.map((key) => (
-              <Badge key={key} variant={UIUX_VARIANT[key]}>
-                {key}
-              </Badge>
-            ))}
+          {/* 배지 뜻풀이. 표에 실제로 쓰인 것만 건수와 함께 보여준다.
+              한 건도 없는 값(진행중·수정요청 등)은 그리지 않는다. */}
+          <div className="border-border bg-muted/30 flex flex-col gap-4 rounded-lg border p-4">
+            {[
+              {
+                column: "비고",
+                items: REMARK_KEYS.map((kind) => ({
+                  key: kind,
+                  badge: <RemarkBadge kind={kind} />,
+                  desc: REMARK_BADGES[kind].desc,
+                  count: IA_ROWS.filter((row) => row[kind]).length,
+                })),
+              },
+              {
+                column: "UIUX",
+                items: UIUX_KEYS.map((key) => ({
+                  key,
+                  badge: <Badge variant={UIUX_VARIANT[key]}>{key}</Badge>,
+                  desc: UIUX_DESC[key],
+                  count: IA_ROWS.filter((row) => row.uiux === key).length,
+                })),
+              },
+            ].map((group) => {
+              const used = group.items.filter((item) => item.count > 0)
+              if (used.length === 0) return null
+
+              return (
+                <div key={group.column} className="flex flex-col gap-2">
+                  <p className="text-foreground text-xs font-bold">
+                    {group.column} 칼럼
+                  </p>
+                  <dl className="flex flex-col gap-2">
+                    {used.map((item) => (
+                      <div
+                        key={item.key}
+                        className="flex flex-col gap-1 sm:flex-row sm:gap-3"
+                      >
+                        <dt className="shrink-0 sm:w-30">{item.badge}</dt>
+                        <dd className="text-muted-foreground text-xs break-keep">
+                          {item.desc}{" "}
+                          <span className="text-foreground font-medium">
+                            {item.count}건
+                          </span>
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              )
+            })}
           </div>
         </div>
 
@@ -1517,7 +1618,7 @@ const PublishingIndexPage = () => {
               <TableHead className="border-border min-w-[5rem] border-r">
                 화면 Type
               </TableHead>
-              <TableHead className="border-border min-w-[7rem] border-r">
+              <TableHead className="border-border min-w-[8rem] border-r">
                 비고
               </TableHead>
               <TableHead className="border-border min-w-[5rem] border-r">
@@ -1579,7 +1680,7 @@ const PublishingIndexPage = () => {
                             {index === screenCellIndex && hasScreenFile ? (
                               <Link
                                 href={row.path}
-                                className="text-primary rounded hover:underline"
+                                className="text-primary dark:text-primary-light rounded hover:underline"
                               >
                                 {cell.name}
                               </Link>
@@ -1596,14 +1697,11 @@ const PublishingIndexPage = () => {
                     {row.type}
                   </TableCell>
                   <TableCell className="border-border border-r align-top">
-                    {row.revise || row.devCheck ? (
+                    {row.revise || row.reviseDone || row.devCheck ? (
                       <span className="flex flex-col items-start gap-1">
-                        {row.revise && (
-                          <Badge variant="warning">디자인≠개발</Badge>
-                        )}
-                        {row.devCheck && (
-                          <Badge variant="tertiary">개발확인필요</Badge>
-                        )}
+                        {row.revise && <RemarkBadge kind="revise" />}
+                        {row.reviseDone && <RemarkBadge kind="reviseDone" />}
+                        {row.devCheck && <RemarkBadge kind="devCheck" />}
                       </span>
                     ) : (
                       <span className="text-muted-foreground text-sm">-</span>
