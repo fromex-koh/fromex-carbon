@@ -23,6 +23,14 @@ const LIFETIME_KEY = "life"
 const fuelCellKey = (cellRef: string) => `dd:${cellRef}`
 /** 데이터 근거 출처 입력을 담는 키 */
 const basisCellKey = (key: string) => `src:${key}`
+/**
+ * 셀 키를 입력 칸 id 로 바꾼다.
+ *
+ * 키에는 콜론이 들어가 CSS 선택자에서 이스케이프가 필요하므로 하이픈으로 바꾼다.
+ * scope 는 같은 칸을 두 번 그리는 레이아웃을 갈라 주는 꼬리표다.
+ */
+const cellDomId = (prefix: string, key: string, scope = "") =>
+  `${prefix}-${key.replaceAll(":", "-")}${scope}`
 
 // ③ 상세 입력 · ④ 결과. 표 구성은 시안(case1~4), 계산은 기획 사이트를 따른다.
 
@@ -240,6 +248,14 @@ interface DetailProps {
   cells: Record<string, string>
   /** 다음으로를 누른 뒤부터 빈 칸을 표시한다 */
   showErrors?: boolean
+  /**
+   * 입력 칸 id 앞에 붙는 사업별 접두어.
+   *
+   * 셀 참조(D20 · G20 …)는 방법론마다 정해진 값이라 사업이 둘 이상이고
+   * 같은 방법론을 고르면 그대로 겹친다. 사업 카드의 다른 입력들과 같은
+   * 규칙으로 앞에 사업 id 를 붙여 문서 안에서 유일하게 만든다.
+   */
+  fieldPrefix: string
   onCellChange: (cellRef: string, value: string) => void
 }
 
@@ -251,6 +267,7 @@ const BusinessDetail = ({
   schema,
   cells,
   showErrors = false,
+  fieldPrefix,
   onCellChange,
 }: DetailProps) => {
   // 값은 계산하지 않고 시안 수치를 그대로 보여준다.
@@ -266,7 +283,9 @@ const BusinessDetail = ({
     ? "md:grid-cols-[1fr_1fr]"
     : "md:grid-cols-[1fr_1fr_1fr]"
 
-  const renderCell = (row: SchemaRow, side: "Before" | "After") => {
+  // scope 는 같은 칸을 두 번 그리는 레이아웃(폐열회수의 태블릿용·PC용 표)을
+  // id 에서 갈라 주는 꼬리표다. 한 번만 그리는 표에서는 비워 둔다.
+  const renderCell = (row: SchemaRow, side: "Before" | "After", scope = "") => {
     const ref = side === "Before" ? row.cellRefBefore : row.cellRefAfter
     // 시안에서 개선전이 비어 있는 행은 칸 자체를 두지 않는다.
     if (!ref || (row.afterOnly && side === "Before")) return <div />
@@ -281,7 +300,7 @@ const BusinessDetail = ({
         <ColumnLabel side={side} single={isSingle} />
         <div className="relative">
           <Input
-            id={`cell-${ref}`}
+            id={cellDomId(fieldPrefix, ref, scope)}
             isValid={!invalid}
             data-invalid={invalid || undefined}
             value={isReadOnly ? sample : (cells[ref] ?? "")}
@@ -367,7 +386,7 @@ const BusinessDetail = ({
     ...schema.basisRows.filter((row) => row.rowType === "lifetime"),
   ]
 
-  const renderBasis = (row: SchemaRow) => {
+  const renderBasis = (row: SchemaRow, scope = "") => {
     const invalidOf = (key: string) =>
       showErrors && !String(cells[key] ?? "").trim()
     if (row.rowType === "lifetime") {
@@ -381,6 +400,7 @@ const BusinessDetail = ({
         <div className="flex flex-col gap-1">
           <div className="relative">
             <Input
+              id={cellDomId(fieldPrefix, LIFETIME_KEY, scope)}
               type="number"
               min={1}
               max={50}
@@ -433,6 +453,7 @@ const BusinessDetail = ({
           <div className="flex flex-col gap-2.5 md:flex-row md:items-center md:gap-2">
             <div className="flex min-w-0 items-center gap-2 md:contents">
               <Input
+                id={cellDomId(fieldPrefix, row.cellRef as string, scope)}
                 isValid={!invalidOf(row.cellRef as string)}
                 data-invalid={invalidOf(row.cellRef as string) || undefined}
                 value={cells[row.cellRef] ?? ""}
@@ -449,6 +470,7 @@ const BusinessDetail = ({
               <span className="text-ink-body shrink-0 text-sm">{row.unit}</span>
             </div>
             <Input
+              id={cellDomId(fieldPrefix, basisCellKey(row.key || ""), scope)}
               value={cells[basisCellKey(row.key || "")] ?? ""}
               isValid={!invalidOf(basisCellKey(row.key || ""))}
               data-invalid={invalidOf(basisCellKey(row.key || "")) || undefined}
@@ -475,6 +497,7 @@ const BusinessDetail = ({
     return (
       <div className="flex flex-col gap-1">
         <Input
+          id={cellDomId(fieldPrefix, basisCellKey(row.key || ""), scope)}
           isValid={!invalidOf(basisCellKey(row.key || ""))}
           data-invalid={invalidOf(basisCellKey(row.key || "")) || undefined}
           value={cells[basisCellKey(row.key || "")] ?? ""}
@@ -496,28 +519,33 @@ const BusinessDetail = ({
 
   // 폐열회수 시안은 입력 항목과 근거 항목을 좌우 두 표에 반씩 나눠 담는다.
   const visible = (rows: SchemaRow[]) => rows.filter((row) => !row.hidden)
-  const singleRows = isSingle
-    ? [
-        ...visible(schema.dropdowns).map((row) => ({
-          key: `dd-${row.key}`,
-          label: row.label,
-          control: renderFuel(row, "Before"),
-        })),
-        ...visible(schema.inputRows).map((row) => ({
-          key: `in-${row.key}`,
-          label: row.label,
-          control: renderCell(row, "Before"),
-        })),
-        ...visible(basisRows).map((row) => ({
-          key: `bs-${row.key}`,
-          label: row.label,
-          control: renderBasis(row),
-        })),
-      ]
-    : []
+  // 폐열회수는 같은 항목을 태블릿용 한 표와 PC용 두 표로 각각 그린다.
+  // 둘 다 DOM 에 남고 CSS 로만 감추므로, 입력 칸 id 가 겹치지 않게 벌을 나눈다.
+  const buildSingleRows = (scope: string) =>
+    isSingle
+      ? [
+          ...visible(schema.dropdowns).map((row) => ({
+            key: `dd-${row.key}`,
+            label: row.label,
+            control: renderFuel(row, "Before"),
+          })),
+          ...visible(schema.inputRows).map((row) => ({
+            key: `in-${row.key}`,
+            label: row.label,
+            control: renderCell(row, "Before", scope),
+          })),
+          ...visible(basisRows).map((row) => ({
+            key: `bs-${row.key}`,
+            label: row.label,
+            control: renderBasis(row, scope),
+          })),
+        ]
+      : []
+  const compactRows = buildSingleRows("-compact")
+  const wideRows = buildSingleRows("-wide")
   const singleColumnGroups = [
-    singleRows.slice(0, Math.ceil(singleRows.length / 2)),
-    singleRows.slice(Math.ceil(singleRows.length / 2)),
+    wideRows.slice(0, Math.ceil(wideRows.length / 2)),
+    wideRows.slice(Math.ceil(wideRows.length / 2)),
   ]
 
   // '구분 / 값 입력' 표 한 벌. 시안은 태블릿 이하 한 표, PC 두 표다.
@@ -563,7 +591,7 @@ const BusinessDetail = ({
               {schema.sheetName}
             </p>
             {/* 태블릿 이하는 한 표에 모든 항목 */}
-            <div className="lg:hidden">{renderSingleTable(singleRows)}</div>
+            <div className="lg:hidden">{renderSingleTable(compactRows)}</div>
             {/* PC 는 좌우 두 표로 나눈다 */}
             <div className="hidden items-start gap-6 lg:grid lg:grid-cols-2">
               {singleColumnGroups.map((group, index) => (

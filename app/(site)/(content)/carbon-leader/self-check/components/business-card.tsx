@@ -609,6 +609,7 @@ const BusinessCard = ({
               <BusinessDetail
                 schema={schemaOf(business.methodology)!}
                 cells={business.cells}
+                fieldPrefix={field("detail")}
                 showErrors={showErrors && !detailErrorsOff}
                 onCellChange={(cellRef, value) =>
                   onChange({
