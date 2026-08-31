@@ -29,7 +29,7 @@ import { cn } from "@/lib/utils"
 //   설명→버튼      40         40         40
 //   버튼 높이      48         54         54
 //   버튼 사이      8          10         10
-//   닫기 버튼      위 바깥    위 바깥    안쪽 우상단 20 / 20
+//   닫기 버튼      위 바깥 10 위 바깥 10 안쪽 우상단 20 / 20
 //
 // 색은 전부 시맨틱 토큰이라 라이트·다크가 같은 마크업으로 갈린다.
 // 시안 값과 토큰을 하나씩 맞춰 둔 결과다(라이트 / 다크).
@@ -40,6 +40,7 @@ import { cn } from "@/lib/utils"
 //   취소 선      #d2d2d2 / #999999  line-field + dark:ash-500
 //   취소 글자    #333333 / #eeeeee  ink-body
 //   삭제 버튼    #ef4444 / #ef4444  destructive (두 모드 동일)
+//   제출 버튼    브랜드 파랑        default
 //   닫기 원      #333333 / #eeeeee  surface-inverse
 //
 // 취소 선만 한 토큰으로 두 모드가 맞지 않아 다크를 따로 짚었다.
@@ -53,6 +54,12 @@ interface ConfirmDialogProps {
   /** 시안에서 해상도별로 줄을 끊는 경우가 있어 노드를 받는다 */
   description: ReactNode
   confirmLabel: string
+  /**
+   * 확인 버튼 색.
+   * 삭제처럼 되돌릴 수 없는 동작은 destructive(빨강), 제출처럼 앞으로 나아가는
+   * 동작은 default(브랜드 파랑)다.
+   */
+  confirmTone?: "destructive" | "default"
   cancelLabel?: string
   /** 모달 전용 라우트처럼 확인 동작이 없는 화면에서는 생략한다 */
   onConfirm?: () => void
@@ -74,6 +81,7 @@ const ConfirmDialog = ({
   title,
   description,
   confirmLabel,
+  confirmTone = "destructive",
   cancelLabel = "취소하기",
   onConfirm,
   open,
@@ -89,7 +97,7 @@ const ConfirmDialog = ({
     <Dialog open={isOpen} onOpenChange={setOpen}>
       <DialogContent className="bg-surface-field w-[calc(100%-1.25rem)] gap-0 rounded-xl px-5 py-6 sm:w-[calc(100%-4rem)] sm:max-w-[508px] sm:p-8 lg:max-w-[640px] lg:px-14 lg:py-19">
         {/* 모바일·태블릿은 모달 위 바깥, PC 는 모달 안쪽 우상단 */}
-        <DialogCloseButton className="bg-surface-inverse text-ink-on-inverse absolute -top-8 right-0 sm:-top-10 lg:top-5 lg:right-5" />
+        <DialogCloseButton className="bg-surface-inverse text-ink-on-inverse absolute -top-10 right-0 lg:top-5 lg:right-5" />
         {/* DialogHeader 원본이 sm 부터 왼쪽 정렬이라 되돌린다 */}
         <DialogHeader className="gap-1.5 text-center sm:text-center">
           <DialogTitle
@@ -120,7 +128,7 @@ const ConfirmDialog = ({
           </Button>
           <Button
             type="button"
-            variant="destructive"
+            variant={confirmTone}
             className="h-11 rounded-lg text-sm font-bold sm:h-13"
             onClick={() => {
               setOpen(false)

@@ -844,7 +844,7 @@ const EvaluationIndex = () => {
             </details>
           </section>
 
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center justify-between gap-2 md:gap-3">
             <Button
               type="button"
               variant="outline"

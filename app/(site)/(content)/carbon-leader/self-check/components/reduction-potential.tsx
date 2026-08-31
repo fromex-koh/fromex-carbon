@@ -139,7 +139,7 @@ const ReductionPotential = () => {
           </section>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 md:flex md:justify-between">
+        <div className="grid grid-cols-2 gap-2 md:flex md:items-center md:justify-between md:gap-3">
           <Link
             href="/carbon-leader/self-check/inventory-emission"
             className="min-w-0"
@@ -148,7 +148,7 @@ const ReductionPotential = () => {
               type="button"
               variant="outline"
               size="lg"
-              className="border-brand-primary text-brand-primary hover:bg-surface-flow h-11 w-full rounded-md text-sm font-bold md:h-13 md:w-44 [&_svg]:size-5"
+              className="border-brand-primary text-brand-primary hover:bg-surface-flow h-11 w-full gap-1 rounded-lg text-sm font-bold md:h-13 md:w-42 [&_svg]:size-5"
             >
               <ArrowLeft aria-hidden="true" />
               이전으로
@@ -159,7 +159,7 @@ const ReductionPotential = () => {
             size="lg"
             disabled={businesses.length === 0}
             onClick={handleNext}
-            className="disabled:bg-fill-disabled disabled:text-ink-on-disabled h-11 w-full min-w-0 rounded-md text-sm font-bold disabled:opacity-100 md:h-13 md:w-44 [&_svg]:size-5"
+            className="disabled:bg-fill-disabled disabled:text-ink-on-disabled h-11 w-full min-w-0 gap-1 rounded-lg text-sm font-bold disabled:opacity-100 md:h-13 md:w-42 [&_svg]:size-5"
           >
             다음으로
             <ArrowRight aria-hidden="true" />

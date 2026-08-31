@@ -1,15 +1,19 @@
 {
-  "version": "v0.0.2",
+  "version": "v0.0.3",
   "assets": [
-    { "name": "app", "version": "v0.0.2", "isCurrent": true },
-    { "name": "components", "version": "v0.0.2", "isCurrent": true },
+    { "name": "app", "version": "v0.0.3", "isCurrent": true },
+    { "name": "components", "version": "v0.0.3", "isCurrent": true },
     { "name": "components/ui", "version": "v0.0.1", "isCurrent": false },
-    { "name": "components/publishing", "version": "v0.0.2", "isCurrent": true },
-    { "name": "constants", "version": "v0.0.2", "isCurrent": true },
-    { "name": "lib", "version": "v0.0.2", "isCurrent": true },
-    { "name": "lib/publishing", "version": "v0.0.2", "isCurrent": true },
-    { "name": "util", "version": "v0.0.2", "isCurrent": true },
-    { "name": "public", "version": "v0.0.2", "isCurrent": true },
+    {
+      "name": "components/publishing",
+      "version": "v0.0.2",
+      "isCurrent": false
+    },
+    { "name": "constants", "version": "v0.0.3", "isCurrent": true },
+    { "name": "lib", "version": "v0.0.2", "isCurrent": false },
+    { "name": "lib/publishing", "version": "v0.0.2", "isCurrent": false },
+    { "name": "util", "version": "v0.0.2", "isCurrent": false },
+    { "name": "public", "version": "v0.0.2", "isCurrent": false },
     { "name": "components.json", "version": "v0.0.1", "isCurrent": false },
     { "name": "package.json", "version": "v0.0.1", "isCurrent": false },
     { "name": "postcss.config.mjs", "version": "v0.0.1", "isCurrent": false },

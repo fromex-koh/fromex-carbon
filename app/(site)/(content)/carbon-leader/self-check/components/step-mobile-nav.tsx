@@ -14,9 +14,7 @@ const StepMobileNav = ({ title, step, total }: StepMobileNavProps) => {
 
   return (
     <nav className="border-border flex items-center justify-between gap-3 border-b px-5 py-4 md:hidden">
-      <h2 className="text-ink-strong text-base font-bold break-keep">
-        {title}
-      </h2>
+      <h2 className="text-ink-strong text-lg font-bold break-keep">{title}</h2>
       <ol
         aria-label={`${total}단계 중 ${step}단계`}
         className="flex shrink-0 items-center"
