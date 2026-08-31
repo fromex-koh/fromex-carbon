@@ -1,109 +1,199 @@
 {
-  "version": "v0.0.2",
+  "version": "v0.0.3",
   "screens": [
+    {
+      "path": "/carbon-leader/application-1/application-form",
+      "version": "v0.0.3",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/application-1/application-form/address-search",
+      "version": "v0.0.3",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/application-1/document-submit",
+      "version": "v0.0.3",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/application-1/final-confirm",
+      "version": "v0.0.3",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/application-1/final-confirm/submit-confirm",
+      "version": "v0.0.3",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/application-1/result",
+      "version": "v0.0.3",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/application-2/application-form/address-search",
+      "version": "v0.0.3",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/application-2/document-submit",
+      "version": "v0.0.3",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/application-2/final-confirm/submit-confirm",
+      "version": "v0.0.3",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/application-2/result",
+      "version": "v0.0.3",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/application-3/application-form/address-search",
+      "version": "v0.0.3",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/application-3/document-submit",
+      "version": "v0.0.3",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/application-3/final-confirm/submit-confirm",
+      "version": "v0.0.3",
+      "isCurrent": true
+    },
     {
       "path": "/carbon-leader/application-3/inventory-emission/scope-guide",
       "version": "v0.0.2",
+      "isCurrent": false
+    },
+    {
+      "path": "/carbon-leader/application-3/result",
+      "version": "v0.0.3",
       "isCurrent": true
     },
     {
       "path": "/carbon-leader/application/final-done",
       "version": "v0.0.2",
-      "isCurrent": true
+      "isCurrent": false
     },
     {
       "path": "/carbon-leader/application/first-done",
       "version": "v0.0.2",
-      "isCurrent": true
+      "isCurrent": false
     },
     {
       "path": "/carbon-leader/application/initial",
       "version": "v0.0.2",
-      "isCurrent": true
+      "isCurrent": false
     },
     {
       "path": "/carbon-leader/application/middle-done",
       "version": "v0.0.2",
-      "isCurrent": true
+      "isCurrent": false
     },
     {
       "path": "/carbon-leader/application/middle-review",
       "version": "v0.0.2",
-      "isCurrent": true
+      "isCurrent": false
     },
     {
       "path": "/carbon-leader/application/self-check-done",
       "version": "v0.0.2",
-      "isCurrent": true
+      "isCurrent": false
     },
     {
       "path": "/carbon-leader/self-check/company-info",
-      "version": "v0.0.2",
+      "version": "v0.0.3",
       "isCurrent": true
     },
     {
       "path": "/carbon-leader/self-check/company-info/industry-code-search",
-      "version": "v0.0.2",
+      "version": "v0.0.3",
       "isCurrent": true
     },
     {
       "path": "/carbon-leader/self-check/company-info/resume",
-      "version": "v0.0.2",
+      "version": "v0.0.3",
       "isCurrent": true
     },
     {
       "path": "/carbon-leader/self-check/evaluation-index",
-      "version": "v0.0.2",
+      "version": "v0.0.3",
       "isCurrent": true
     },
     {
       "path": "/carbon-leader/self-check/evaluation-index/certification-type",
-      "version": "v0.0.2",
+      "version": "v0.0.3",
       "isCurrent": true
     },
     {
       "path": "/carbon-leader/self-check/evaluation-index/emission-source-example",
-      "version": "v0.0.2",
+      "version": "v0.0.3",
       "isCurrent": true
     },
     {
       "path": "/carbon-leader/self-check/evaluation-index/mandatory-training",
-      "version": "v0.0.2",
+      "version": "v0.0.3",
       "isCurrent": true
     },
     {
       "path": "/carbon-leader/self-check/inventory-emission/scope-guide",
-      "version": "v0.0.2",
+      "version": "v0.0.3",
       "isCurrent": true
     },
     {
       "path": "/carbon-leader/self-check/reduction-potential",
-      "version": "v0.0.2",
+      "version": "v0.0.3",
       "isCurrent": true
     },
     {
       "path": "/carbon-leader/self-check/reduction-potential/change-confirm",
-      "version": "v0.0.2",
+      "version": "v0.0.3",
       "isCurrent": true
     },
     {
       "path": "/carbon-leader/self-check/reduction-potential/delete-confirm",
-      "version": "v0.0.2",
+      "version": "v0.0.3",
       "isCurrent": true
     },
     {
       "path": "/carbon-leader/self-check/reduction-target",
-      "version": "v0.0.2",
+      "version": "v0.0.3",
       "isCurrent": true
     },
     {
       "path": "/carbon-leader/self-check/reduction-target/fit",
-      "version": "v0.0.2",
+      "version": "v0.0.3",
       "isCurrent": true
     },
     {
       "path": "/carbon-leader/self-check/reduction-target/unfit",
-      "version": "v0.0.2",
+      "version": "v0.0.3",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/self-check/result",
+      "version": "v0.0.3",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/self-check/result/done",
+      "version": "v0.0.3",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/self-check/result/unfit",
+      "version": "v0.0.3",
+      "isCurrent": true
+    },
+    {
+      "path": "/my-page/profile-edit/address-search",
+      "version": "v0.0.3",
       "isCurrent": true
     }
   ]
