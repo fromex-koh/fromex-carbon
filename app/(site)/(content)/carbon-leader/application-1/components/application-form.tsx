@@ -41,6 +41,7 @@ import {
   type PlanRow,
 } from "@/constants/carbon-leader-application-form"
 import { cn } from "@/lib/utils"
+import { CALENDAR_PROPS } from "@/constants/calendar-dropdown"
 
 // 선도기업 신청 1차 STEP 1(신청서 작성).
 // 카드 6장이 같은 껍데기를 쓰고, 안쪽만 입력 그리드 또는 표로 갈린다.
@@ -349,9 +350,11 @@ const DateField = ({
   invalid?: boolean
 }) => {
   const [date, setDate] = useState<Date>()
+  // 날짜를 고르면 달력을 닫는다. Radix 는 안쪽 클릭으로 닫히지 않는다
+  const [open, setOpen] = useState(false)
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       {/* 달력에서 고른 값을 폼으로 넘긴다 */}
       <input
         type="hidden"
@@ -389,7 +392,12 @@ const DateField = ({
           locale={ko}
           mode="single"
           selected={date}
-          onSelect={setDate}
+          onSelect={(next) => {
+            setDate(next)
+            setOpen(false)
+          }}
+          defaultMonth={date}
+          {...CALENDAR_PROPS}
           initialFocus
         />
       </PopoverContent>

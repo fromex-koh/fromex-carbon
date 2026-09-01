@@ -171,6 +171,8 @@ const DocumentItem = ({
           ) : null}
           <input
             ref={inputRef}
+            id="document-attachment"
+            name="document-attachment"
             type="file"
             multiple
             accept={ACCEPT}
