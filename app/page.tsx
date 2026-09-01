@@ -87,7 +87,7 @@ const IA_ROWS = [
     uiux: "완료",
     desc: "선행 이력이 없어 자가진단만 신청가능",
     cells: [
-      { level: 1, name: "메인 홈", rowSpan: 64, colSpan: 1 },
+      { level: 1, name: "메인 홈", rowSpan: 69, colSpan: 1 },
       { level: 2, name: "탄소중립 선도기업", rowSpan: 57, colSpan: 1 },
       { level: 3, name: "선도기업 신청", rowSpan: 6, colSpan: 1 },
       { level: 4, name: "최초 진입", rowSpan: 1, colSpan: 2 },
@@ -431,7 +431,7 @@ const IA_ROWS = [
     status: "신규",
     reviseDone: true,
     devCheck: false,
-    uiux: "진행중",
+    uiux: "완료",
     desc: "Step 6, 계획 적정성이 '부적정' 인 상태. 선도기업 신청으로 넘어갈 수 없다",
     cells: [{ level: 5, name: "부적정", rowSpan: 1, colSpan: 1 }],
   },
@@ -751,7 +751,7 @@ const IA_ROWS = [
     user: "회원",
     type: "Page",
     status: "신규",
-    revise: true,
+    reviseDone: true,
     devCheck: false,
     uiux: "대기중",
     desc: "Step 3, 감축목표 설정 vs 배출량 실적 비교 결과 제시",
@@ -865,10 +865,11 @@ const IA_ROWS = [
     status: "신규",
     revise: false,
     devCheck: false,
-    uiux: "대기중",
+    note: "[GNB메뉴 - 로그인 시에만 노출](/preview/header?login=true)",
+    uiux: "완료",
     desc: "GNB메뉴 - 로그인 시에만 노출",
     cells: [
-      { level: 2, name: "마이페이지", rowSpan: 7, colSpan: 1 },
+      { level: 2, name: "마이페이지", rowSpan: 12, colSpan: 1 },
       { level: 0, name: "", rowSpan: 1, colSpan: 3 },
     ],
   },
@@ -880,7 +881,7 @@ const IA_ROWS = [
     status: "신규",
     revise: false,
     devCheck: false,
-    uiux: "대기중",
+    uiux: "완료",
     desc: "기관회원에게만 제공. 하위계정 추가/삭제/수정 - 화면",
     cells: [
       { level: 3, name: "하위계정 관리", rowSpan: 2, colSpan: 1 },
@@ -895,7 +896,7 @@ const IA_ROWS = [
     status: "신규",
     revise: false,
     devCheck: false,
-    uiux: "대기중",
+    uiux: "완료",
     desc: "하위계정 등록 팝업",
     cells: [{ level: 4, name: "하위계정 등록", rowSpan: 1, colSpan: 2 }],
   },
@@ -907,15 +908,51 @@ const IA_ROWS = [
     status: "신규",
     revise: false,
     devCheck: false,
-    uiux: "대기중",
-    desc: "기업회원에게만 제공. 개인 정보 수정화면.",
+    uiux: "완료",
+    desc: "기관회원 화면. 기업정보·기업현황·담당자정보에 더해 [비밀번호 변경] 카드가 하나 더 붙는다.",
     cells: [
-      { level: 3, name: "회원정보 수정", rowSpan: 2, colSpan: 1 },
-      { level: 0, name: "", rowSpan: 1, colSpan: 2 },
+      { level: 3, name: "회원정보 수정", rowSpan: 5, colSpan: 1 },
+      { level: 4, name: "기관회원", rowSpan: 1, colSpan: 2 },
     ],
   },
   {
     no: 62,
+    path: "/my-page/profile-edit/company",
+    user: "회원",
+    type: "Page",
+    status: "신규",
+    revise: false,
+    devCheck: false,
+    uiux: "완료",
+    desc: "기업회원 화면. 기관회원 화면에서 [비밀번호 변경] 카드만 빠진다.",
+    cells: [{ level: 4, name: "기업회원", rowSpan: 1, colSpan: 2 }],
+  },
+  {
+    no: 63,
+    path: "/my-page/profile-edit/cancel-confirm",
+    user: "회원",
+    type: "Modal Popup",
+    status: "신규",
+    revise: false,
+    devCheck: false,
+    uiux: "완료",
+    desc: "회원정보 수정 화면에서 [취소] 선택 시 노출. [취소], [확인] 버튼",
+    cells: [{ level: 4, name: "수정 취소 확인", rowSpan: 1, colSpan: 2 }],
+  },
+  {
+    no: 64,
+    path: "/my-page/profile-edit/save-confirm",
+    user: "회원",
+    type: "Modal Popup",
+    status: "신규",
+    revise: false,
+    devCheck: false,
+    uiux: "완료",
+    desc: "회원정보 수정 화면에서 [저장하기] 선택 시 노출. [취소], [저장] 버튼",
+    cells: [{ level: 4, name: "저장 확인", rowSpan: 1, colSpan: 2 }],
+  },
+  {
+    no: 65,
     path: "/my-page/profile-edit/address-search",
     user: "회원",
     type: "Modal Popup",
@@ -927,31 +964,55 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "주소검색", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 63,
+    no: 66,
     path: "/my-page/status",
     user: "회원",
     type: "Page",
     status: "변경",
-    revise: true,
+    reviseDone: true,
     devCheck: false,
-    uiux: "대기중",
-    desc: "로그인 회원만 접근 가능 화면 선도기업 신청 내역 및 선도기업 신청 확인서 발급, 전문가 평가 결과 및 결과 다운로드 - [보안요청 보기] : 버튼 선택시, 보안 요청 팝업 노출.",
+    uiux: "완료",
+    desc: "로그인 회원만 접근 가능 화면 선도기업 신청 내역 및 선도기업 신청 확인서 발급, 전문가 평가 결과 및 결과 다운로드 - [보완요청 보기] : 버튼 선택시, 보완 요청 팝업 노출.",
     cells: [
-      { level: 3, name: "현황조회", rowSpan: 2, colSpan: 1 },
+      { level: 3, name: "현황조회", rowSpan: 4, colSpan: 1 },
       { level: 0, name: "", rowSpan: 1, colSpan: 2 },
     ],
   },
   {
-    no: 64,
-    path: "/my-page/status/security-request",
+    no: 67,
+    path: "/my-page/status/supplement-request",
     user: "회원",
     type: "Modal Popup",
     status: "미표기",
-    revise: true,
+    reviseDone: true,
     devCheck: false,
-    uiux: "대기중",
-    desc: "BO 관리자가 보안요청 시, 입력한 보안요청 내용 문구 노출 - [닫기] 버튼",
-    cells: [{ level: 4, name: "보안요청", rowSpan: 1, colSpan: 2 }],
+    uiux: "완료",
+    desc: "BO 관리자가 보완요청 시, 입력한 보완요청 내용 문구 노출 - [닫기] 버튼",
+    cells: [{ level: 4, name: "보완요청", rowSpan: 1, colSpan: 2 }],
+  },
+  {
+    no: 68,
+    path: "/my-page/status/empty",
+    user: "회원",
+    type: "Page",
+    status: "신규",
+    revise: false,
+    devCheck: false,
+    uiux: "완료",
+    desc: "현황조회에서 전문평가·K-택소노미·탄소감축 세 묶음이 모두 비었을 때. 묶음마다 빈 안내가 뜨고 [더보기] 는 나오지 않는다.",
+    cells: [{ level: 4, name: "내역 없음", rowSpan: 1, colSpan: 2 }],
+  },
+  {
+    no: 69,
+    path: "/my-page/status/delete-confirm",
+    user: "회원",
+    type: "Modal Popup",
+    status: "신규",
+    revise: false,
+    devCheck: false,
+    uiux: "완료",
+    desc: "현황조회 카드의 [⋯] 패널에서 [삭제하기] 선택 시 노출. [취소], [삭제하기] 버튼",
+    cells: [{ level: 4, name: "삭제 확인", rowSpan: 1, colSpan: 2 }],
   },
 ]
 
@@ -1105,6 +1166,37 @@ const parseCommitLinks = (label: string, value: string) => {
     text: match[1],
     href: match[2],
   }))
+}
+
+/**
+ * 비고 메모. "[글](/경로)" 형태가 있으면 그 부분만 링크로 바꾼다.
+ * 표기법은 릴리스 카드의 커밋 링크와 같게 맞췄다.
+ */
+const RemarkNote = ({ note }: { note: string }) => {
+  const parts: React.ReactNode[] = []
+  let cursor = 0
+
+  for (const match of note.matchAll(MARKDOWN_LINK_PATTERN)) {
+    const start = match.index ?? 0
+    if (start > cursor) parts.push(note.slice(cursor, start))
+    parts.push(
+      <Link
+        key={`${match[2]}-${start}`}
+        href={match[2]}
+        className="text-primary dark:text-primary-light rounded hover:underline"
+      >
+        {match[1]}
+      </Link>,
+    )
+    cursor = start + match[0].length
+  }
+  if (cursor < note.length) parts.push(note.slice(cursor))
+
+  return (
+    <span className="text-muted-foreground text-xs break-keep whitespace-normal">
+      {parts}
+    </span>
+  )
 }
 
 const ReleaseNoteDetailValue = ({
@@ -1793,11 +1885,7 @@ const PublishingIndexPage = () => {
                         {row.needData && <RemarkBadge kind="needData" />}
                         {row.undecided && <RemarkBadge kind="undecided" />}
                         {/* 배지로 나타내기 어려운 한 줄 메모. 화면이 없는 이동 링크 등에 쓴다 */}
-                        {row.note && (
-                          <span className="text-muted-foreground text-xs break-keep whitespace-normal">
-                            {row.note}
-                          </span>
-                        )}
+                        {row.note && <RemarkNote note={row.note} />}
                       </span>
                     ) : (
                       <span className="text-muted-foreground text-sm">-</span>
