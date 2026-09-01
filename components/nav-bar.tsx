@@ -261,14 +261,16 @@ const NavBar = () => {
                     <NavigationMenuItem>
                       <NavigationMenuTrigger
                         className={cn(
-                          "cursor-pointer bg-transparent px-2 text-base font-bold",
+                          // 글자 크기는 같은 자리의 회원가입 버튼과 맞춘다(text-sm)
+                          "cursor-pointer bg-transparent px-2 text-sm font-bold",
                           isDark && "text-white",
                         )}
                       >
                         마이페이지
                       </NavigationMenuTrigger>
+                      {/* 다른 GNB 메뉴와 같은 규칙으로 트리거 가운데에 맞춘다 */}
                       <NavigationMenuContent
-                        className={"right-0 left-auto translate-x-0"}
+                        className={"right-auto left-1/2 -translate-x-1/2"}
                       >
                         <div
                           className={cn(
