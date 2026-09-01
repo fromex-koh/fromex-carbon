@@ -2,7 +2,13 @@
 // 결과 파일은 릴리스 커밋에 포함되며, 전달본·로컬 빌드는 git 을 다시 조회하지 않고 이 스냅샷만 읽는다.
 // ⚠️ 직접 실행할 때도 RELEASE_VERSION=vX.Y.Z 가 반드시 필요하다.
 
-import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs"
+import {
+  existsSync,
+  readdirSync,
+  readFileSync,
+  statSync,
+  writeFileSync,
+} from "node:fs"
 import { dirname, join } from "node:path/posix"
 import { execFileSync } from "node:child_process"
 import { format, resolveConfig } from "prettier"
@@ -103,21 +109,88 @@ const toRoutePath = (screenDir) =>
     .filter((segment) => segment !== "" && !segment.startsWith("("))
     .reduce((path, segment) => `${path}/${segment}`, "")
 
-// 화면은 라우트 폴더 하나로 끝나지 않는다. 상위 레이아웃과 공통 컴포넌트가 바뀌어도
-// 그 화면의 결과물은 바뀌므로, 조상 경로의 layout.tsx · components 를 함께 추적한다.
-const collectTrackedPaths = (screenDir) => {
-  const tracked = [screenDir]
+// 화면을 감싸는 조상 layout.tsx 목록. 레이아웃이 바뀌면 그 안의 화면도 함께 바뀐다.
+const collectAncestorLayouts = (screenDir) => {
+  const layouts = []
 
   let cursor = screenDir
   while (cursor !== CONTENT_ROOT && cursor.startsWith(CONTENT_ROOT)) {
     cursor = dirname(cursor)
     const layout = join(cursor, "layout.tsx")
+    if (existsSync(layout)) layouts.push(layout)
+  }
+
+  return layouts
+}
+
+// import 해석에 실패했을 때 물러설 자리. 조상 폴더의 components 를 통째로 잡는다.
+// 넓게 잡아 형제 화면까지 올리지만, 변경을 놓치는 것보다는 낫다.
+const collectFolderPaths = (screenDir) => {
+  const tracked = [screenDir]
+
+  let cursor = screenDir
+  while (cursor !== CONTENT_ROOT && cursor.startsWith(CONTENT_ROOT)) {
+    cursor = dirname(cursor)
     const components = join(cursor, "components")
-    if (existsSync(layout)) tracked.push(layout)
     if (existsSync(components)) tracked.push(components)
   }
 
-  return tracked
+  return tracked.concat(collectAncestorLayouts(screenDir))
+}
+
+// import 한 줄에서 따옴표 안 경로만 뽑는다. `from "x"` 와 부수효과 `import "x"` 를 함께 잡는다.
+const IMPORT_PATTERN = /(?:from|import)\s+"([^"]+)"/g
+
+// 확장자를 생략해 쓰므로 후보를 차례로 확인한다.
+const MODULE_SUFFIXES = ["", ".tsx", ".ts", "/index.tsx", "/index.ts"]
+
+// 저장소 안 파일만 대상이다. 패키지 import 는 버전 추적과 무관해 건너뛴다.
+const resolveImport = (specifier, fromFile) => {
+  let base
+  if (specifier.startsWith("@/")) base = specifier.slice(2)
+  else if (specifier.startsWith(".")) base = join(dirname(fromFile), specifier)
+  else return undefined
+
+  return MODULE_SUFFIXES.map((suffix) => base + suffix).find(
+    (candidate) => existsSync(candidate) && !statSync(candidate).isDirectory(),
+  )
+}
+
+// page.tsx 에서 import 를 따라가며 그 화면이 실제로 쓰는 파일을 모은다.
+const collectImportedFiles = (entryFile) => {
+  const visited = new Set()
+  const queue = [entryFile]
+
+  while (queue.length > 0) {
+    const file = queue.shift()
+    if (visited.has(file) || !existsSync(file)) continue
+    visited.add(file)
+
+    for (const [, specifier] of readFileSync(file, "utf8").matchAll(
+      IMPORT_PATTERN,
+    )) {
+      const resolved = resolveImport(specifier, file)
+      if (resolved !== undefined) queue.push(resolved)
+    }
+  }
+
+  return [...visited]
+}
+
+// 화면은 라우트 폴더 하나로 끝나지 않는다. 상위 레이아웃과 가져다 쓰는 컴포넌트가
+// 바뀌어도 그 화면의 결과물은 바뀌므로 함께 추적한다.
+//
+// 폴더(components)를 통째로 잡던 예전 방식은 두 방향으로 어긋났다.
+// 한 파일만 고쳐도 같은 폴더의 형제 화면이 전부 올라갔고, 폴더 밖에서 공유하는
+// 컴포넌트(신청 2·3차가 함께 쓰는 서류 제출 등)는 오히려 놓쳤다.
+const collectTrackedPaths = (screenDir) => {
+  const imported = collectImportedFiles(join(screenDir, "page.tsx"))
+
+  // page.tsx 하나만 남았다면 해석이 통째로 실패한 것으로 본다.
+  // 화면을 그리는 page.tsx 는 최소한 컴포넌트 하나는 가져다 쓴다.
+  if (imported.length <= 1) return collectFolderPaths(screenDir)
+
+  return imported.concat(collectAncestorLayouts(screenDir))
 }
 
 const screens = collectScreenDirs(CONTENT_ROOT)
