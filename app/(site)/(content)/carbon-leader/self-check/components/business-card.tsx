@@ -33,6 +33,7 @@ import {
   schemaOf,
 } from "@/constants/carbon-leader-reduction-schema"
 import { cn } from "@/lib/utils"
+import { CALENDAR_PROPS } from "@/constants/calendar-dropdown"
 
 // 감축잠재량 산정(STEP 3)에서 [사업 추가] 로 붙는 사업 카드.
 // 시안 기준 ① 기업 정보 입력 · ② 감축방법론 선택 두 구간으로 나뉘고,
@@ -284,6 +285,8 @@ const BusinessCard = ({
   onRemove,
 }: BusinessCardProps) => {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
+  // 날짜를 고르면 달력을 닫는다. Radix 는 안쪽 클릭으로 닫히지 않는다
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false)
   // 방법론을 바꿔 상세 입력이 새로 그려지면 오류 표시를 잠시 끈다.
   const [detailErrorsOff, setDetailErrorsOff] = useState(false)
   useEffect(() => {
@@ -435,7 +438,10 @@ const BusinessCard = ({
                   <p className="text-ink-strong text-base font-bold">
                     운전개시일(선택)
                   </p>
-                  <Popover>
+                  <Popover
+                    open={isCalendarOpen}
+                    onOpenChange={setIsCalendarOpen}
+                  >
                     <PopoverTrigger asChild>
                       <Button
                         type="button"
@@ -462,7 +468,12 @@ const BusinessCard = ({
                         locale={ko}
                         mode="single"
                         selected={business.startedOn}
-                        onSelect={(date) => set("startedOn", date)}
+                        onSelect={(date) => {
+                          set("startedOn", date)
+                          setIsCalendarOpen(false)
+                        }}
+                        defaultMonth={business.startedOn}
+                        {...CALENDAR_PROPS}
                         initialFocus
                       />
                     </PopoverContent>
