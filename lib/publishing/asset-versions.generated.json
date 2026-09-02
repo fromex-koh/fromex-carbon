@@ -1,18 +1,18 @@
 {
-  "version": "v0.0.4",
+  "version": "v0.0.5",
   "assets": [
-    { "name": "app", "version": "v0.0.4", "isCurrent": true },
-    { "name": "components", "version": "v0.0.4", "isCurrent": true },
+    { "name": "app", "version": "v0.0.5", "isCurrent": true },
+    { "name": "components", "version": "v0.0.4", "isCurrent": false },
     { "name": "components/ui", "version": "v0.0.1", "isCurrent": false },
     {
       "name": "components/publishing",
       "version": "v0.0.2",
       "isCurrent": false
     },
-    { "name": "constants", "version": "v0.0.4", "isCurrent": true },
-    { "name": "lib", "version": "v0.0.3", "isCurrent": false },
-    { "name": "lib/publishing", "version": "v0.0.3", "isCurrent": false },
-    { "name": "util", "version": "v0.0.4", "isCurrent": true },
+    { "name": "constants", "version": "v0.0.5", "isCurrent": true },
+    { "name": "lib", "version": "v0.0.4", "isCurrent": false },
+    { "name": "lib/publishing", "version": "v0.0.4", "isCurrent": false },
+    { "name": "util", "version": "v0.0.4", "isCurrent": false },
     { "name": "public", "version": "v0.0.2", "isCurrent": false },
     { "name": "components.json", "version": "v0.0.1", "isCurrent": false },
     { "name": "package.json", "version": "v0.0.1", "isCurrent": false },

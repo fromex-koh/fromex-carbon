@@ -1,10 +1,10 @@
 {
-  "version": "v0.0.4",
+  "version": "v0.0.5",
   "screens": [
     {
       "path": "/carbon-leader/application-1/application-form",
       "version": "v0.0.4",
-      "isCurrent": true
+      "isCurrent": false
     },
     {
       "path": "/carbon-leader/application-1/application-form/address-search",
@@ -14,7 +14,7 @@
     {
       "path": "/carbon-leader/application-1/document-submit",
       "version": "v0.0.4",
-      "isCurrent": true
+      "isCurrent": false
     },
     {
       "path": "/carbon-leader/application-1/final-confirm",
@@ -39,7 +39,7 @@
     {
       "path": "/carbon-leader/application-2/document-submit",
       "version": "v0.0.4",
-      "isCurrent": true
+      "isCurrent": false
     },
     {
       "path": "/carbon-leader/application-2/final-confirm/submit-confirm",
@@ -59,7 +59,7 @@
     {
       "path": "/carbon-leader/application-3/document-submit",
       "version": "v0.0.4",
-      "isCurrent": true
+      "isCurrent": false
     },
     {
       "path": "/carbon-leader/application-3/final-confirm/submit-confirm",
@@ -75,6 +75,31 @@
       "path": "/carbon-leader/application-3/result",
       "version": "v0.0.3",
       "isCurrent": false
+    },
+    {
+      "path": "/carbon-leader/application-3/target-achievement",
+      "version": "v0.0.5",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/application-3/target-achievement/general-unmet",
+      "version": "v0.0.5",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/application-3/target-achievement/target-management",
+      "version": "v0.0.5",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/application-3/target-achievement/target-management-all-unmet",
+      "version": "v0.0.5",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/application-3/target-achievement/target-management-unmet",
+      "version": "v0.0.5",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application/final-done",
@@ -123,8 +148,8 @@
     },
     {
       "path": "/carbon-leader/self-check/evaluation-index",
-      "version": "v0.0.3",
-      "isCurrent": false
+      "version": "v0.0.5",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/self-check/evaluation-index/certification-type",
@@ -149,7 +174,7 @@
     {
       "path": "/carbon-leader/self-check/reduction-potential",
       "version": "v0.0.4",
-      "isCurrent": true
+      "isCurrent": false
     },
     {
       "path": "/carbon-leader/self-check/reduction-potential/change-confirm",
@@ -178,20 +203,24 @@
     },
     {
       "path": "/carbon-leader/self-check/result",
-      "version": "v0.0.3",
-      "isCurrent": false
+      "version": "v0.0.5",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/self-check/result/done",
-      "version": "v0.0.3",
-      "isCurrent": false
+      "version": "v0.0.5",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/self-check/result/unfit",
-      "version": "v0.0.3",
+      "version": "v0.0.5",
+      "isCurrent": true
+    },
+    {
+      "path": "/my-page/profile-edit",
+      "version": "v0.0.4",
       "isCurrent": false
     },
-    { "path": "/my-page/profile-edit", "version": "v0.0.4", "isCurrent": true },
     {
       "path": "/my-page/profile-edit/address-search",
       "version": "v0.0.3",
@@ -200,35 +229,39 @@
     {
       "path": "/my-page/profile-edit/cancel-confirm",
       "version": "v0.0.4",
-      "isCurrent": true
+      "isCurrent": false
     },
     {
       "path": "/my-page/profile-edit/company",
       "version": "v0.0.4",
-      "isCurrent": true
+      "isCurrent": false
     },
     {
       "path": "/my-page/profile-edit/save-confirm",
       "version": "v0.0.4",
-      "isCurrent": true
+      "isCurrent": false
     },
-    { "path": "/my-page/status", "version": "v0.0.4", "isCurrent": true },
+    { "path": "/my-page/status", "version": "v0.0.4", "isCurrent": false },
     {
       "path": "/my-page/status/delete-confirm",
       "version": "v0.0.4",
-      "isCurrent": true
+      "isCurrent": false
     },
-    { "path": "/my-page/status/empty", "version": "v0.0.4", "isCurrent": true },
+    {
+      "path": "/my-page/status/empty",
+      "version": "v0.0.4",
+      "isCurrent": false
+    },
     {
       "path": "/my-page/status/supplement-request",
       "version": "v0.0.4",
-      "isCurrent": true
+      "isCurrent": false
     },
-    { "path": "/my-page/sub-account", "version": "v0.0.4", "isCurrent": true },
+    { "path": "/my-page/sub-account", "version": "v0.0.4", "isCurrent": false },
     {
       "path": "/my-page/sub-account/register",
       "version": "v0.0.4",
-      "isCurrent": true
+      "isCurrent": false
     }
   ]
 }
