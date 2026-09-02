@@ -26,6 +26,7 @@ import {
   EVALUATION_TOTAL_SCORE,
   type Grade,
   type HelpTopic,
+  type CalcField,
   type Indicator,
   type IndicatorType,
 } from "@/constants/carbon-leader-evaluation-index-items"
@@ -46,11 +47,65 @@ const SUMMARY_KEY = "summary"
 
 const ALL_KEYS = [...ALL_INDICATORS.map((item) => item.no), SUMMARY_KEY]
 
+/** 사용자가 직접 채우는 칸. 넘어온 값은 읽기 전용이라 검사 대상이 아니다 */
+const editableFieldsOf = (item: Indicator) =>
+  item.fields?.filter((field) => field.editable) ?? []
+
 /**
- * 유효성 검사 대상. 선택지가 있는 정성 지표만 응답이 필요하다.
+ * 유효성 검사 대상. 선택지가 있는 정성 지표와, 직접 채우는 칸이 있는 계량 지표다.
  * 체크 지표는 하나도 고르지 않아도 E 등급이 나오므로 선택 입력이다.
  */
-const REQUIRED_INDICATORS = ALL_INDICATORS.filter((item) => item.choices)
+const REQUIRED_INDICATORS = ALL_INDICATORS.filter(
+  (item) => item.choices || editableFieldsOf(item).length > 0,
+)
+
+// ─────────────────────────────────────────────────────────────
+// [퍼블리싱 노출용] 아래 계산·등급 판정은 화면 동작을 보여 주려고 만든 것이다.
+// 실제 산정은 서버 몫이므로, API 를 붙일 때 이 블록(isAmountField ~ fieldErrorOf)과
+// 호출부의 calcValue · calcGrade 를 걷어내고 응답값을 그대로 그리면 된다.
+// ─────────────────────────────────────────────────────────────
+
+/** 단위가 원 단위(백만원 등)인 금액 칸인지 */
+const isAmountField = (field: CalcField) => field.unit.endsWith("원")
+
+/** 화면에 보일 때만 천 단위 쉼표를 넣는다. 소수점 뒤는 적은 그대로 둔다 */
+const formatAmount = (raw: string) => {
+  const [whole, ...rest] = raw.split(".")
+  const grouped = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+  return rest.length > 0 ? `${grouped}.${rest.join("")}` : grouped
+}
+
+/** 상태에는 쉼표 없는 값만 담는다. 검사·계산이 쉼표를 만나지 않게 한다 */
+const parseAmount = (raw: string) => raw.replace(/,/g, "")
+
+/**
+ * 기준표 문구로 등급을 고른다. 칸은 A 부터 E 까지 내림차순이라
+ * 각 칸의 하한(문구에 적힌 가장 작은 수)보다 크거나 같은 첫 칸이 그 값의 등급이다.
+ * 마지막 칸은 "… 미만" 이라 하한이 없다.
+ */
+const gradeFromScale = (values: string[], amount: number): Grade | null => {
+  for (const [index, text] of values.entries()) {
+    if (index === values.length - 1) return GRADES[index] ?? null
+    const numbers = [...text.matchAll(/[\d.]+/g)].map((match) =>
+      Number(match[0]),
+    )
+    if (numbers.length === 0) return null
+    if (amount >= Math.min(...numbers)) return GRADES[index] ?? null
+  }
+  return null
+}
+
+/**
+ * 직접 채우는 칸의 검사 규칙. 비었는지 먼저 보고 그다음 숫자인지 본다.
+ * 금액·매출액 칸이라 0 이하는 받지 않는다.
+ */
+const fieldErrorOf = (raw: string) => {
+  const value = raw.trim()
+  if (!value) return "값을 입력해 주세요."
+  if (!/^\d+(\.\d+)?$/.test(value)) return "숫자만 입력해 주세요."
+  if (Number(value) <= 0) return "0 보다 큰 값을 입력해 주세요."
+  return null
+}
 
 const NOTICES = [
   "평가지표별 해당 항목을 선택하면 산정등급과 산출점수가 자동으로 계산됩니다.",
@@ -303,6 +358,45 @@ const IndicatorRow = ({
   onAnsweredChange: (answered: boolean) => void
 }) => {
   // 시안은 예상등급이 고정이지만, 선택지를 고르면 그 등급으로 배지가 바뀐다.
+  const editableFields = editableFieldsOf(item)
+  const [values, setValues] = useState<Record<string, string>>(() =>
+    Object.fromEntries(
+      editableFields.map((field) => [field.label, field.value]),
+    ),
+  )
+  const fieldsFilled = editableFields.every(
+    (field) => !fieldErrorOf(values[field.label] ?? ""),
+  )
+
+  // [퍼블리싱 노출용] formula 대로 화면에서 직접 산출한 값이다. 서버 계산으로 대체될 자리다.
+  // 칸이 비었거나 잘못됐으면 계산하지 않는다.
+  // 비율은 두 칸의 단위가 같아야 성립한다(백만원 ÷ 백만원 → 무차원 × 100 = %).
+  // 나중에 한쪽 단위만 바뀌면 조용히 틀린 값이 나오므로 여기서 막는다.
+  const sameUnit = editableFields.every(
+    (field) => field.unit === editableFields[0]?.unit,
+  )
+  const calcValue =
+    item.calc === "ratio-percent" &&
+    fieldsFilled &&
+    sameUnit &&
+    editableFields.length === 2
+      ? (Number(values[editableFields[0].label]) /
+          Number(values[editableFields[1].label])) *
+        100
+      : null
+  const calcGrade =
+    calcValue === null || !item.scale
+      ? null
+      : gradeFromScale(item.scale.values, calcValue)
+
+  // 계량 지표는 고르는 게 없어 칸이 다 채워졌는지로 응답 여부를 알린다.
+  // markAnswered 가 같은 값이면 상태를 그대로 두므로 반복 호출해도 안전하다.
+  useEffect(() => {
+    if (editableFields.length > 0) onAnsweredChange(fieldsFilled)
+    // onAnsweredChange 는 호출부에서 매번 새로 만들어져 의존성에 넣으면 계속 돈다
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fieldsFilled])
+
   const [choice, setChoice] = useState<Grade | null>(null)
   const [checkedList, setCheckedList] = useState<boolean[]>(() =>
     (item.checks ?? []).map(() => false),
@@ -331,7 +425,8 @@ const IndicatorRow = ({
     null) as Grade | null
 
   // 정성 지표는 고르기 전까지 예상등급 배지를 비워 둔다.
-  const grade = choice ?? checkGrade ?? resultGrade
+  // 계산형은 입력값으로만 등급을 정한다. 칸이 비면 예상등급도 비워 둔다.
+  const grade = choice ?? checkGrade ?? (item.calc ? calcGrade : resultGrade)
   const invalidChoice = showErrors && !!item.choices && !choice
 
   return (
@@ -513,6 +608,10 @@ const IndicatorRow = ({
             <div className="grid gap-3 md:grid-cols-2">
               {item.fields.map((field) => {
                 const id = `indicator-${item.no}-${field.label}`
+                const message = field.editable
+                  ? fieldErrorOf(values[field.label] ?? "")
+                  : null
+                const invalid = showErrors && !!message
                 return (
                   <div key={field.label} className="flex flex-col gap-2.5">
                     <label
@@ -521,23 +620,68 @@ const IndicatorRow = ({
                     >
                       {field.label}
                     </label>
-                    <div className="border-line-field bg-surface-disabled flex h-12 items-center gap-2 rounded-md border px-4">
+                    {/* 넘어온 값은 읽기 전용이고, 직접 채우는 칸만 입력을 연다 */}
+                    <div
+                      className={cn(
+                        "border-line-field flex h-12 items-center gap-2 rounded-md border px-4",
+                        field.editable
+                          ? "bg-surface-field focus-within:ring-ash-600 focus-within:ring-2"
+                          : "bg-surface-disabled",
+                        // 오류 테두리는 다른 화면과 같은 규격이다
+                        invalid &&
+                          "ring-destructive focus-within:ring-destructive ring-2",
+                      )}
+                    >
                       <input
                         id={id}
                         name={id}
-                        readOnly
-                        value={field.value}
-                        className="text-ash-500 min-w-0 flex-1 truncate bg-transparent text-sm font-medium outline-hidden"
+                        readOnly={!field.editable}
+                        data-invalid={invalid ? "true" : undefined}
+                        aria-invalid={invalid || undefined}
+                        {...(field.editable
+                          ? {
+                              inputMode: isAmountField(field)
+                                ? ("decimal" as const)
+                                : undefined,
+                              value: isAmountField(field)
+                                ? formatAmount(values[field.label] ?? "")
+                                : (values[field.label] ?? ""),
+                              onChange: (event) =>
+                                setValues((prev) => ({
+                                  ...prev,
+                                  [field.label]: isAmountField(field)
+                                    ? parseAmount(event.target.value)
+                                    : event.target.value,
+                                })),
+                            }
+                          : { value: field.value })}
+                        className={cn(
+                          "min-w-0 flex-1 truncate bg-transparent text-sm font-medium outline-hidden",
+                          field.editable ? "text-ink-strong" : "text-ash-500",
+                        )}
                       />
-                      <span className="text-ash-500 shrink-0 text-sm font-medium">
+                      <span
+                        className={cn(
+                          "shrink-0 text-sm font-medium",
+                          field.editable ? "text-ink-body" : "text-ash-500",
+                        )}
+                      >
                         {field.unit}
                       </span>
                     </div>
+                    <FieldError show={invalid} message={message ?? ""} />
                   </div>
                 )
               })}
             </div>
-            {item.result ? (
+            {/* 계산형은 입력값을 따라간다. 칸이 비면 계산할 수 없어 줄을 감춘다 */}
+            {item.calc ? (
+              calcValue !== null && calcGrade ? (
+                <p className="bg-brand-progress/20 text-brand-primary rounded-lg p-4 text-center text-sm font-bold break-keep lg:rounded-2xl lg:px-10 lg:py-4 lg:text-base">
+                  {`계산 결과: ${calcValue.toFixed(2)}% → ${calcGrade}등급 해당`}
+                </p>
+              ) : null
+            ) : item.result ? (
               <p className="bg-brand-progress/20 text-brand-primary rounded-lg p-4 text-center text-sm font-bold break-keep lg:rounded-2xl lg:px-10 lg:py-4 lg:text-base">
                 {item.result}
               </p>
@@ -598,7 +742,10 @@ const EvaluationIndex = () => {
     if (!focusTarget) return
     const row = document.getElementById(`indicator-${focusTarget}`)
     // 라디오는 sr-only 라 화면에서는 칩 테두리로 포커스가 드러난다.
-    row?.querySelector<HTMLElement>('input[type="radio"]')?.focus()
+    const target =
+      row?.querySelector<HTMLElement>('input[type="radio"]') ??
+      row?.querySelector<HTMLElement>('input[data-invalid="true"]')
+    target?.focus()
     row?.scrollIntoView({ behavior: "smooth", block: "center" })
     setFocusTarget(null)
   }, [focusTarget])

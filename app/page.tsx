@@ -87,8 +87,8 @@ const IA_ROWS = [
     uiux: "완료",
     desc: "선행 이력이 없어 자가진단만 신청가능",
     cells: [
-      { level: 1, name: "메인 홈", rowSpan: 69, colSpan: 1 },
-      { level: 2, name: "탄소중립 선도기업", rowSpan: 57, colSpan: 1 },
+      { level: 1, name: "메인 홈", rowSpan: 73, colSpan: 1 },
+      { level: 2, name: "탄소중립 선도기업", rowSpan: 61, colSpan: 1 },
       { level: 3, name: "선도기업 신청", rowSpan: 6, colSpan: 1 },
       { level: 4, name: "최초 진입", rowSpan: 1, colSpan: 2 },
     ],
@@ -332,7 +332,7 @@ const IA_ROWS = [
     status: "신규",
     revise: false,
     devCheck: false,
-    uiux: "완료",
+    uiux: "개발 수정완료",
     desc: "Step 5, 평가표 작성 / 점수 및 등급 도출 / 버튼 클릭시 결과 확인 모달 팝업 호출",
     cells: [
       { level: 4, name: "평가지표 작성", rowSpan: 4, colSpan: 1 },
@@ -677,7 +677,7 @@ const IA_ROWS = [
     uiux: "대기중",
     desc: "Step 1, 정보 입력, 기업정보 - 내정보 불러오기, 탄소중립 기준연도현황 - 기존데이터 불러오기 기능",
     cells: [
-      { level: 3, name: "선도기업 신청 3차", rowSpan: 13, colSpan: 1 },
+      { level: 3, name: "선도기업 신청 3차", rowSpan: 17, colSpan: 1 },
       { level: 4, name: "신청서 작성", rowSpan: 2, colSpan: 1 },
       { level: 0, name: "", rowSpan: 1, colSpan: 1 },
     ],
@@ -753,12 +753,72 @@ const IA_ROWS = [
     status: "신규",
     reviseDone: true,
     devCheck: false,
-    uiux: "대기중",
-    desc: "Step 3, 감축목표 설정 vs 배출량 실적 비교 결과 제시",
-    cells: [{ level: 4, name: "목표달성 평가", rowSpan: 1, colSpan: 2 }],
+    uiux: "완료",
+    desc: "Step 3, 감축목표 설정 vs 배출량 실적 비교 결과 제시. 일반기업은 절대배출량 기준으로 먼저 본다. 달성이면 이 기준 하나로 끝난다.",
+    cells: [
+      { level: 4, name: "목표달성 평가", rowSpan: 5, colSpan: 1 },
+      { level: 5, name: "일반기업 · 달성", rowSpan: 1, colSpan: 1 },
+    ],
   },
   {
     no: 51,
+    path: "/carbon-leader/application-3/target-achievement/general-unmet",
+    user: "회원",
+    type: "Page",
+    status: "신규",
+    reviseDone: true,
+    devCheck: false,
+    uiux: "완료",
+    desc: "Step 3, 절대배출량 기준이 미달인 경우. 대체 기준인 원단위·감축량 두 카드가 함께 열린다.",
+    cells: [{ level: 5, name: "일반기업 · 미달성", rowSpan: 1, colSpan: 1 }],
+  },
+  {
+    no: 52,
+    path: "/carbon-leader/application-3/target-achievement/target-management",
+    user: "회원",
+    type: "Page",
+    status: "신규",
+    reviseDone: true,
+    devCheck: false,
+    uiux: "완료",
+    desc: "Step 3, 목표관리업체에 해당하는 경우. 정부 할당 배출허용량 이내로 실적을 달성해 목표관리업체 기준 하나로 끝난다.",
+    cells: [{ level: 5, name: "목표관리업체 · 달성", rowSpan: 1, colSpan: 1 }],
+  },
+  {
+    no: 53,
+    path: "/carbon-leader/application-3/target-achievement/target-management-unmet",
+    user: "회원",
+    type: "Page",
+    status: "신규",
+    reviseDone: true,
+    devCheck: false,
+    uiux: "완료",
+    desc: "Step 3, 목표관리업체 기준이 미달이라 절대배출량 기준이 이어서 열린 경우. 절대배출량은 달성이라 여기서 끝난다.",
+    cells: [
+      {
+        level: 5,
+        name: "목표관리업체 · 절대배출량 달성",
+        rowSpan: 1,
+        colSpan: 1,
+      },
+    ],
+  },
+  {
+    no: 54,
+    path: "/carbon-leader/application-3/target-achievement/target-management-all-unmet",
+    user: "회원",
+    type: "Page",
+    status: "신규",
+    reviseDone: true,
+    devCheck: false,
+    uiux: "완료",
+    desc: "Step 3, 목표관리업체·절대배출량이 모두 미달인 경우. 원단위·감축량 기준까지 네 카드가 모두 열린다.",
+    cells: [
+      { level: 5, name: "목표관리업체 · 전 기준 미달", rowSpan: 1, colSpan: 1 },
+    ],
+  },
+  {
+    no: 55,
     path: "/carbon-leader/application-3/document-submit",
     user: "회원",
     type: "Page",
@@ -770,7 +830,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "서류 제출", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 52,
+    no: 56,
     path: "/carbon-leader/application-3/final-confirm",
     user: "회원",
     type: "Page",
@@ -786,7 +846,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 53,
+    no: 57,
     path: "/carbon-leader/application-3/final-confirm/submit-confirm",
     user: "회원",
     type: "Modal Popup",
@@ -798,7 +858,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "제출 확인 팝업", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 54,
+    no: 58,
     path: "/carbon-leader/application-3/result",
     user: "회원",
     type: "Page",
@@ -813,7 +873,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 55,
+    no: 59,
     path: "/carbon-leader/application-3/result/application-download",
     user: "비회원·회원",
     type: "Link",
@@ -825,7 +885,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "신청서 (다운로드)", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 56,
+    no: 60,
     path: "/carbon-leader/application-3/result/result-certificate",
     user: "비회원·회원",
     type: "Link",
@@ -838,7 +898,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "결과 확인서", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 57,
+    no: 61,
     path: "/carbon-leader/application-history",
     user: "회원",
     type: "Link",
@@ -858,7 +918,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 58,
+    no: 62,
     path: "/my-page",
     user: "회원",
     type: "Button",
@@ -874,7 +934,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 59,
+    no: 63,
     path: "/my-page/sub-account",
     user: "회원",
     type: "Page",
@@ -889,7 +949,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 60,
+    no: 64,
     path: "/my-page/sub-account/register",
     user: "회원",
     type: "Modal Popup",
@@ -901,7 +961,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "하위계정 등록", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 61,
+    no: 65,
     path: "/my-page/profile-edit",
     user: "회원",
     type: "Page",
@@ -916,7 +976,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 62,
+    no: 66,
     path: "/my-page/profile-edit/company",
     user: "회원",
     type: "Page",
@@ -928,7 +988,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "기업회원", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 63,
+    no: 67,
     path: "/my-page/profile-edit/cancel-confirm",
     user: "회원",
     type: "Modal Popup",
@@ -940,7 +1000,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "수정 취소 확인", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 64,
+    no: 68,
     path: "/my-page/profile-edit/save-confirm",
     user: "회원",
     type: "Modal Popup",
@@ -952,7 +1012,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "저장 확인", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 65,
+    no: 69,
     path: "/my-page/profile-edit/address-search",
     user: "회원",
     type: "Modal Popup",
@@ -964,7 +1024,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "주소검색", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 66,
+    no: 70,
     path: "/my-page/status",
     user: "회원",
     type: "Page",
@@ -979,7 +1039,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 67,
+    no: 71,
     path: "/my-page/status/supplement-request",
     user: "회원",
     type: "Modal Popup",
@@ -991,7 +1051,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "보완요청", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 68,
+    no: 72,
     path: "/my-page/status/empty",
     user: "회원",
     type: "Page",
@@ -1003,7 +1063,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "내역 없음", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 69,
+    no: 73,
     path: "/my-page/status/delete-confirm",
     user: "회원",
     type: "Modal Popup",
@@ -1021,6 +1081,7 @@ const UIUX_VARIANT = {
   진행중: "blue",
   수정요청: "destructive",
   보완: "orange",
+  "개발 수정완료": "outline",
   완료: "forest",
   최종완료: "violet",
 } as const
@@ -1083,6 +1144,7 @@ const UIUX_DESC: Record<keyof typeof UIUX_VARIANT, string> = {
   진행중: "퍼블리싱 작업 중인 화면.",
   수정요청: "확인 결과 고칠 부분이 나온 화면.",
   보완: "요청받은 수정을 반영하는 중인 화면.",
+  "개발 수정완료": "개발에서 요청한 수정사항을 모두 반영한 화면.",
   완료: "시안대로 퍼블리싱을 마친 화면.",
   최종완료: "개발·현업 확인까지 끝난 화면.",
 }
@@ -1092,6 +1154,14 @@ const UIUX_KEYS = Object.keys(UIUX_VARIANT) as UiuxKey[]
 
 const getUiuxVariant = (uiux: string) =>
   uiux in UIUX_VARIANT ? UIUX_VARIANT[uiux as UiuxKey] : "outline"
+
+// 채운 배지가 늘어선 칼럼이라, 테두리형에 초록을 입혀 눈에 걸리게 둔다.
+const UIUX_CLASS: Partial<Record<UiuxKey, string>> = {
+  "개발 수정완료": "border-forest bg-forest/10 text-forest font-bold",
+}
+
+const getUiuxClass = (uiux: string) =>
+  uiux in UIUX_CLASS ? UIUX_CLASS[uiux as UiuxKey] : undefined
 
 export const metadata: Metadata = {
   title: "퍼블리싱 인덱스",
@@ -1743,7 +1813,14 @@ const PublishingIndexPage = () => {
                 column: "UIUX",
                 items: UIUX_KEYS.map((key) => ({
                   key,
-                  badge: <Badge variant={UIUX_VARIANT[key]}>{key}</Badge>,
+                  badge: (
+                    <Badge
+                      variant={UIUX_VARIANT[key]}
+                      className={cn("whitespace-nowrap", UIUX_CLASS[key])}
+                    >
+                      {key}
+                    </Badge>
+                  ),
                   desc: UIUX_DESC[key],
                   count: IA_ROWS.filter((row) => row.uiux === key).length,
                 })),
@@ -1892,7 +1969,16 @@ const PublishingIndexPage = () => {
                     )}
                   </TableCell>
                   <TableCell className="border-border border-r align-top">
-                    <Badge variant={getUiuxVariant(row.uiux)}>{row.uiux}</Badge>
+                    {/* 칼럼이 좁아 "수정완료" 가 두 줄로 갈라져서 한 줄로 고정한다 */}
+                    <Badge
+                      variant={getUiuxVariant(row.uiux)}
+                      className={cn(
+                        "whitespace-nowrap",
+                        getUiuxClass(row.uiux),
+                      )}
+                    >
+                      {row.uiux}
+                    </Badge>
                   </TableCell>
                   <TableCell className="align-top">
                     <Badge

@@ -36,6 +36,8 @@ export interface CalcField {
   label: string
   value: string
   unit: string
+  /** 사용자가 직접 채우는 칸. 기본은 자가진단에서 넘어온 값이라 읽기 전용이다 */
+  editable?: boolean
 }
 
 export interface Indicator {
@@ -57,6 +59,12 @@ export interface Indicator {
   /** 계산식 안내 문구 */
   formula?: string
   fields?: CalcField[]
+  /**
+   * [퍼블리싱 노출용] 화면에서 직접 값을 산출하는 방식.
+   * ratio-percent 는 formula 대로 [첫 칸 ÷ 둘째 칸 × 100] 을 계산한다.
+   * 실제 산정은 서버 몫이라, API 를 붙이면 이 키를 걷어낸다.
+   */
+  calc?: "ratio-percent"
   /** 계산 결과 문구 */
   result?: string
 }
@@ -375,13 +383,21 @@ export const EVALUATION_SECTIONS: IndicatorSection[] = [
             ],
             formula:
               "투자비율(%) = 향후 3년간 온실가스 감축 투자계획금액 ÷ 기준년도 매출액 × 100",
+            calc: "ratio-percent",
             fields: [
               {
                 label: "향후 3년간 온실가스 감축 투자계획금액",
-                value: "300",
+                // 사용자가 직접 채우는 칸이라 빈 값에서 시작한다
+                value: "",
                 unit: "백만원",
+                editable: true,
               },
-              { label: "기준년도 매출액", value: "300", unit: "백만원" },
+              {
+                label: "기준년도 매출액",
+                value: "",
+                unit: "백만원",
+                editable: true,
+              },
             ],
             result: "계산 결과: 10.00% → A등급 해당",
             scale: {

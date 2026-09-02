@@ -1,6 +1,107 @@
 {
   "releases": [
     {
+      "version": "v0.0.5",
+      "releasedAt": "2026-09-02",
+      "changes": [
+        {
+          "type": "handoff",
+          "mode": "new",
+          "title": "목표달성 평가 화면 (선도기업 신청 3차 STEP 3)",
+          "details": [
+            {
+              "label": "대상",
+              "value": "app/(site)/(content)/carbon-leader/application-3/components/target-achievement.tsx\napp/(site)/(content)/carbon-leader/application-3/target-achievement/page.tsx\napp/(site)/(content)/carbon-leader/application-3/target-achievement/general-unmet/page.tsx\napp/(site)/(content)/carbon-leader/application-3/target-achievement/target-management/page.tsx\napp/(site)/(content)/carbon-leader/application-3/target-achievement/target-management-unmet/page.tsx\napp/(site)/(content)/carbon-leader/application-3/target-achievement/target-management-all-unmet/page.tsx"
+            },
+            { "label": "적용", "value": "신규 파일 추가" },
+            {
+              "label": "화면",
+              "value": "평가 기본 설정 카드 + 평가 기준 카드 4종(절대배출량·원단위·감축량·목표관리업체)"
+            },
+            {
+              "label": "케이스",
+              "value": "기업 유형과 달성 여부로 열리는 카드가 달라 라우트 5개로 나눴다\n일반기업: 절대배출량 → (미달) 원단위·감축량\n목표관리업체: 목표관리 → (미달) 절대배출량 → (미달) 원단위·감축량"
+            },
+            {
+              "label": "값",
+              "value": "화면에 보이는 값은 계산하지 않고 화면마다 상수에 그대로 적어 두었다\n연계 시 GENERAL_MET 등 케이스 상수를 계산 결과로 갈아 끼우면 된다\n계산식은 참고 화면(carbon-apply-3rd-step3-goal-evaluation)을 따랐다"
+            },
+            {
+              "label": "입력",
+              "value": "마크업 한 벌에 반응형 클래스만 얹어 입력 칸이 칸당 하나다\n해상도별로 나눠 그리지 않으므로 숨은 칸이 함께 제출되지 않는다"
+            },
+            {
+              "label": "검사",
+              "value": "[다음으로] 에서 빈 값·숫자 아님·0 이하를 잡고 첫 오류 칸으로 이동한다\n읽기 전용 칸은 검사에서 빠지되 값은 함께 제출된다"
+            }
+          ]
+        },
+        {
+          "type": "handoff",
+          "mode": "diff",
+          "title": "자가진단 평가지표 2.1.4 입력 가능 전환",
+          "details": [
+            {
+              "label": "대상",
+              "value": "app/(site)/(content)/carbon-leader/self-check/components/evaluation-index.tsx\nconstants/carbon-leader-evaluation-index-items.ts"
+            },
+            {
+              "label": "변경",
+              "value": "읽기 전용이던 투자금액·매출액 칸을 사용자 입력으로 전환\n입력값으로 투자비율(%)을 산출해 아래 등급 기준표의 강조 표시를 움직인다"
+            },
+            {
+              "label": "결과",
+              "value": "값을 넣으면 등급이 실시간으로 갈리고 다른 지표와 같은 규격의 검사가 붙는다"
+            },
+            {
+              "label": "커밋",
+              "value": "[변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/ce8f8aed9163949d1d4067695f7de7b9a2919e5f)"
+            }
+          ]
+        },
+        {
+          "type": "handoff",
+          "mode": "diff",
+          "title": "미달성 표시 색",
+          "details": [
+            { "label": "대상", "value": "app/globals.css" },
+            {
+              "label": "변경",
+              "value": "달성(surface-flow·brand-primary)과 채도·명도를 맞춘 빨강 짝을 추가\nsurface-fail·ink-fail 두 토큰이며 기존 토큰은 건드리지 않았다"
+            },
+            {
+              "label": "결과",
+              "value": "평가 결과 칸이 달성은 파랑, 미달성은 빨강으로 갈린다\n대비는 밝은 화면 4.79:1, 어두운 화면 4.28:1"
+            },
+            {
+              "label": "커밋",
+              "value": "[변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/ea1c19950149667e3e023ba9fd7ce4e335aceaeb)"
+            }
+          ]
+        },
+        {
+          "type": "handoff",
+          "mode": "diff",
+          "title": "퍼블리싱 인덱스 갱신",
+          "details": [
+            { "label": "대상", "value": "app/page.tsx" },
+            {
+              "label": "변경",
+              "value": "목표달성 평가를 케이스 5행으로 나누고 상위 행 병합 수를 맞췄다\nUIUX 열에 \"개발 수정완료\" 뱃지를 추가했다"
+            },
+            {
+              "label": "결과",
+              "value": "화면 73행이 되고 목표달성 평가에서 케이스별 화면으로 바로 이동한다"
+            },
+            {
+              "label": "커밋",
+              "value": "[변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/60677afa7cc105d344f583604f015d07dcd0599a)"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "version": "v0.0.4",
       "releasedAt": "2026-09-01",
       "changes": [
