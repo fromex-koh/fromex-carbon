@@ -1,8 +1,11 @@
 "use client"
 
+import { useMemo, useState } from "react"
+
 import { ArrowLeft, ArrowRight } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
   Select,
@@ -18,7 +21,6 @@ import { SELF_CHECK_STEPS } from "@/constants/carbon-leader-self-check-steps"
 import {
   BASE_YEAR_EMISSION,
   EXPECTED_EFFECT_ROWS,
-  EXPECTED_EFFECT_TOTAL,
   EXPECTED_REDUCTION,
   PLAN_VERDICT,
   REDUCTION_RATES,
@@ -35,6 +37,17 @@ const NOTICES = [
 ]
 
 const YEAR_HEADS = ["1차 이행년도", "2차 이행년도", "3차 이행년도(최종)"]
+
+/** 감축사업 기대효과 칸 이름. 사업 번호와 연도 자리로 만든다 */
+const effectName = (no: number, index: number) => `effect-${no}-${index}`
+
+/** 표에 세우는 숫자. 콤마를 뺀 뒤 더하고 소수 둘째 자리로 맞춘다 */
+const toAmount = (text: string) => Number(text.replace(/,/g, "")) || 0
+const formatAmount = (value: number) =>
+  value.toLocaleString("ko-KR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
 
 /** 라벨·입력·힌트 한 벌. 간격이 서로 달라 두 겹으로 쌓는다. */
 const Field = ({
@@ -76,18 +89,37 @@ const ReadOnlyBox = ({
   id,
   value,
   unit,
+  placeholder,
+  className,
+  boxClassName,
 }: {
   id: string
   value: string
   unit?: string
+  /** 값이 아직 없을 때 옅게 비춰 줄 글자 */
+  placeholder?: string
+  /** 표 안에서는 글자만 다르게 둘 때 쓴다 */
+  className?: string
+  /** 좁은 칸에서 좌우 여백을 줄일 때 쓴다 */
+  boxClassName?: string
 }) => (
-  <div className="border-line-field bg-surface-disabled flex h-12 items-center gap-2 rounded-md border px-4">
+  <div
+    className={cn(
+      "border-line-field bg-surface-disabled flex h-12 items-center gap-2 rounded-md border px-4",
+      boxClassName,
+    )}
+  >
     <input
       id={id}
       name={id}
       readOnly
+      tabIndex={-1}
+      placeholder={placeholder}
       value={value}
-      className="text-ash-500 min-w-0 flex-1 truncate bg-transparent text-sm font-medium outline-hidden"
+      className={cn(
+        "text-ash-500 min-w-0 flex-1 bg-transparent text-sm font-medium outline-hidden",
+        className,
+      )}
     />
     {unit ? (
       <span className="text-ash-500 shrink-0 text-sm font-medium">{unit}</span>
@@ -103,6 +135,32 @@ const ReductionTarget = ({
 }) => {
   // 감축율을 바꿔도 아래 값은 따라 바뀌지 않는다. 연동은 개발에서 붙인다.
   const preset = PLAN_VERDICT[verdict]
+
+  // 감축사업 기대효과 표의 입력값. 처음에는 비어 있고 사용자가 채운다.
+  const [effect, setEffect] = useState<Record<string, string>>({})
+
+  const putEffect = (name: string, value: string) =>
+    setEffect((prev) => ({ ...prev, [name]: value }))
+
+  // 합계는 칸을 고칠 때마다 열별로 다시 더한다.
+  // 그 열이 통째로 비어 있으면 계산된 0 과 헷갈리지 않게 빈 칸으로 둔다.
+  const effectTotals = useMemo(
+    () =>
+      YEAR_HEADS.map((_, index) => {
+        const filled = EXPECTED_EFFECT_ROWS.some((row) =>
+          (effect[effectName(row.no, index)] ?? "").trim(),
+        )
+        if (!filled) return ""
+        return formatAmount(
+          EXPECTED_EFFECT_ROWS.reduce(
+            (sum, row) =>
+              sum + toAmount(effect[effectName(row.no, index)] ?? ""),
+            0,
+          ),
+        )
+      }),
+    [effect],
+  )
 
   return (
     <div className="flex w-full max-w-[1344px] flex-col md:gap-10 md:px-7 md:py-10 lg:px-8">
@@ -140,78 +198,30 @@ const ReductionTarget = ({
               (단위: tCO₂eq)
             </p>
 
-            {/* 모바일은 표 대신 사업마다 카드를 쌓는다. 번호 열은 두지 않는다. */}
-            <div className="flex flex-col gap-2 md:hidden">
-              {EXPECTED_EFFECT_ROWS.map((row) => (
-                <div
-                  key={row.no}
-                  className="border-line-field border-t-ink-strong border-t border-b"
-                >
-                  <p className="bg-surface-disabled text-ink-body border-line-field border-b px-3 py-2 text-center text-xs font-bold">
-                    사업
-                  </p>
-                  <p className="bg-surface-field text-ink-body border-line-field border-b px-3 py-5 text-center text-xs break-keep">
-                    {row.name}
-                  </p>
-                  <div className="bg-surface-disabled border-line-field grid grid-cols-3 border-b">
-                    {YEAR_HEADS.map((head, index) => (
-                      <span
-                        key={head}
-                        className={cn(
-                          "text-ink-body border-line-field flex h-12 items-center justify-center px-2 text-center text-xs font-bold break-keep",
-                          index < 2 && "border-r",
-                        )}
-                      >
-                        {head}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="bg-surface-field grid grid-cols-3">
-                    {row.years.map((value, index) => (
-                      <span
-                        key={YEAR_HEADS[index]}
-                        className={cn(
-                          "text-ink-body border-line-field px-2 py-2 text-center text-xs",
-                          index < 2 && "border-r",
-                        )}
-                      >
-                        {value}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ))}
-              <div className="bg-surface-flow border-line-field grid grid-cols-4 items-center border-t border-b">
-                <span className="text-ink-body px-2 py-5 text-center text-xs font-bold">
-                  합계
-                </span>
-                {EXPECTED_EFFECT_TOTAL.map((value, index) => (
-                  <span
-                    key={YEAR_HEADS[index]}
-                    className={cn(
-                      "text-brand-primary px-2 py-5 text-center text-xs font-bold",
-                    )}
-                  >
-                    {value}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* 768 이상은 5열 표. 칸마다 선이 있어 border-collapse 로 격자를 만든다. */}
-            <div className="border-line-field border-t-ink-strong border-t border-b max-md:hidden">
-              <table className="w-full table-fixed border-collapse">
-                <thead>
+            {/*
+              표 한 벌로 모든 해상도를 그린다.
+              768 이상은 5열 표, 그 아래는 tr 을 격자로 바꿔 사업마다 카드로 쌓는다.
+              카드용 마크업을 따로 두면 입력이 두 벌이 되어 같은 name 이 겹친다.
+            */}
+            <div className="border-line-field border-t-ink-strong border-t border-b max-md:border-0">
+              <table className="w-full table-fixed border-collapse max-md:block">
+                <thead className="max-md:hidden">
                   <tr className="bg-surface-disabled">
                     <th
                       scope="col"
-                      className="text-ink-body border-line-field w-[6%] border-r border-b px-2 py-4 text-center text-sm font-bold whitespace-nowrap lg:text-base"
+                      /*
+                        table-fixed 는 첫 줄에 적은 폭만 보고 min-w 는 무시한다.
+                        6% 만 두면 좁은 화면에서 열이 글자보다 좁아져 번호가 칸을 넘치므로
+                        1024 아래에서는 비율을 올려 네 자리까지 담는다.
+                      */
+                      className="text-ink-body border-line-field w-[6%] border-r border-b px-2 py-4 text-center text-sm font-bold whitespace-nowrap max-lg:w-[10%] lg:text-base"
                     >
                       번호
                     </th>
                     <th
                       scope="col"
-                      className="text-ink-body border-line-field w-[48%] border-r border-b px-4 py-4 text-center text-sm font-bold lg:w-[36%] lg:text-base"
+                      // 번호 열을 넓힌 만큼 여기서 덜어 연도 열 폭을 지킨다. 이름은 두 줄로 감긴다
+                      className="text-ink-body border-line-field w-[48%] border-r border-b px-4 py-4 text-center text-sm font-bold max-lg:w-[42%] lg:w-[36%] lg:text-base"
                     >
                       사업
                     </th>
@@ -221,7 +231,7 @@ const ReductionTarget = ({
                         scope="col"
                         className={cn(
                           "text-ink-body border-line-field border-b px-2 py-4 text-center text-sm font-bold break-keep lg:text-base",
-                          index < 2 && "border-r",
+                          index < YEAR_HEADS.length - 1 && "border-r",
                         )}
                       >
                         {head}
@@ -229,43 +239,89 @@ const ReductionTarget = ({
                     ))}
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="max-md:block">
                   {EXPECTED_EFFECT_ROWS.map((row) => (
-                    <tr key={row.no} className="bg-surface-field">
-                      <td className="text-ink-body border-line-field border-r border-b px-2 py-6 text-center text-sm lg:text-base lg:font-medium">
+                    <tr
+                      key={row.no}
+                      className="bg-surface-field max-md:border-line-field max-md:border-t-ink-strong max-md:mb-2 max-md:grid max-md:grid-cols-3 max-md:border-t max-md:border-b"
+                    >
+                      {/* 모바일 카드 머리. 표에서는 열이 아니라 감춘다 */}
+                      <td className="bg-surface-disabled text-ink-body border-line-field border-b px-3 py-2 text-center text-xs font-bold max-md:col-span-3 md:hidden">
+                        사업
+                      </td>
+                      <td className="text-ink-body border-line-field border-r border-b px-2 py-6 text-center text-sm whitespace-nowrap max-md:hidden lg:text-base lg:font-medium">
                         {row.no}
                       </td>
-                      <td className="text-ink-body border-line-field border-r border-b px-4 py-6 text-center text-sm break-keep lg:text-base lg:font-medium">
+                      <td className="text-ink-body border-line-field border-b text-center break-keep max-md:col-span-3 max-md:px-3 max-md:py-5 max-md:text-xs md:border-r md:px-4 md:py-6 md:text-sm lg:text-base lg:font-medium">
                         {row.name}
                       </td>
-                      {row.years.map((value, index) => (
+                      {/* 모바일 카드의 연도 머리. 표에서는 thead 가 대신한다 */}
+                      {YEAR_HEADS.map((head, index) => (
+                        <td
+                          key={`head-${head}`}
+                          className={cn(
+                            // 카드일 때 이 줄 높이는 52 다. 테두리가 높이 안에 들어가므로 한 칸 더 준다
+                            "bg-surface-disabled text-ink-body border-line-field flex h-12.25 items-center justify-center border-b px-2 text-center text-xs font-bold break-keep md:hidden",
+                            index < YEAR_HEADS.length - 1 && "border-r",
+                          )}
+                        >
+                          {head}
+                        </td>
+                      ))}
+                      {YEAR_HEADS.map((_, index) => (
                         <td
                           key={YEAR_HEADS[index]}
                           className={cn(
-                            "text-ink-body border-line-field border-b px-2 py-6 text-center text-sm lg:text-base lg:font-medium",
-                            index < 2 && "border-r",
+                            "border-line-field px-3 py-4 max-md:border-0 max-md:px-1 max-md:py-2 md:border-b md:max-lg:px-1",
+                            index < YEAR_HEADS.length - 1 && "md:border-r",
+                            index === 0 && "max-md:pl-2",
+                            index === YEAR_HEADS.length - 1 && "max-md:pr-2",
                           )}
                         >
-                          {value}
+                          <Input
+                            name={effectName(row.no, index)}
+                            inputMode="decimal"
+                            placeholder="0"
+                            aria-label={`${row.name} ${YEAR_HEADS[index]}`}
+                            value={effect[effectName(row.no, index)] ?? ""}
+                            onChange={(event) =>
+                              putEffect(
+                                effectName(row.no, index),
+                                event.target.value,
+                              )
+                            }
+                            // 1024 아래는 칸이 좁다. 99,999.00 까지 잘리지 않게 글자와 여백을 줄인다
+                            className="border-line-field bg-surface-field text-ink-strong placeholder:text-ink-placeholder max-lg:px-2 max-lg:text-xs"
+                          />
                         </td>
                       ))}
                     </tr>
                   ))}
-                  <tr className="bg-surface-flow">
+                  <tr className="bg-surface-flow max-md:border-line-field max-md:border-t-ink-strong max-md:grid max-md:grid-cols-3 max-md:border-t max-md:border-b">
                     <td
                       colSpan={2}
-                      className="text-ink-body px-4 py-6 text-center text-base font-bold"
+                      // 모바일에서는 사업 카드처럼 「합계」를 머리 줄로 뺀다
+                      className="text-ink-body border-line-field text-center font-bold max-md:col-span-3 max-md:border-b max-md:px-3 max-md:py-2 max-md:text-xs md:px-4 md:py-6 md:text-base"
                     >
                       합계
                     </td>
-                    {EXPECTED_EFFECT_TOTAL.map((value, index) => (
+                    {effectTotals.map((value, index) => (
                       <td
                         key={YEAR_HEADS[index]}
                         className={cn(
-                          "text-brand-primary px-2 py-6 text-center text-base font-bold",
+                          "px-3 py-4 max-md:px-1 max-md:py-2 md:max-lg:px-1",
+                          index === 0 && "max-md:pl-2",
+                          index === YEAR_HEADS.length - 1 && "max-md:pr-2",
                         )}
                       >
-                        {value}
+                        <ReadOnlyBox
+                          id={`effect-total-${index}`}
+                          value={value}
+                          placeholder="0"
+                          className="font-bold max-lg:text-xs"
+                          // 합계는 세 줄을 더한 값이라 한 자리 더 길어질 수 있다
+                          boxClassName="max-lg:px-2 max-md:px-1.5"
+                        />
                       </td>
                     ))}
                   </tr>

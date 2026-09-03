@@ -14,21 +14,12 @@ import {
 import { Stepper } from "@/components/ui/stepper"
 import BaseInfo from "@/app/(site)/(content)/carbon-leader/self-check/components/base-info"
 import StepMobileNav from "@/app/(site)/(content)/carbon-leader/self-check/components/step-mobile-nav"
+import { APPLICATION_THIRD_STEPS } from "@/constants/carbon-leader-application-form"
 import { cn } from "@/lib/utils"
 
 // 선도기업 신청 3차 STEP 3(목표달성 평가).
 // 평가 기본 설정 카드 하나에 이어 평가 기준 카드 4장이 같은 껍데기를 쓴다.
 // 기준 카드는 안쪽이 [번호 붙은 표 블록] 여럿 + 마지막 요약 줄로 갈린다.
-
-/** 3차 신청은 자가진단과 달리 6단계다. 지금 화면은 세 번째다 */
-const STEPS = [
-  "3차신청",
-  "인벤토리 배출량",
-  "목표달성평가",
-  "서류제출",
-  "최종확인",
-  "제출완료",
-]
 
 /** 감축목표율 선택지. 4개 평가 기준에 공통으로 적용되는 값이다 */
 const TARGET_RATES = ["4%", "6%", "8%", "10%"]
@@ -1193,7 +1184,11 @@ const TargetAchievement = ({ name = "general-met" }: { name?: TargetCase }) => {
   return (
     <div className="flex w-full max-w-316 flex-col max-md:gap-0 max-md:pb-20 md:gap-10 md:px-7 md:pt-12 md:pb-28 lg:px-8 lg:pt-14 lg:pb-42">
       {/* 360 상단 이름은 카드 이름이 아니라 단계 이름이다 */}
-      <StepMobileNav title="목표달성 평가" step={3} total={STEPS.length} />
+      <StepMobileNav
+        title="목표달성 평가"
+        step={3}
+        total={APPLICATION_THIRD_STEPS.length}
+      />
 
       <div className="flex flex-col gap-8 max-md:hidden lg:flex-row lg:items-start lg:justify-between lg:gap-8">
         <h2 className="text-ink-strong text-lg font-bold whitespace-nowrap md:text-3xl lg:text-4xl">
@@ -1201,7 +1196,7 @@ const TargetAchievement = ({ name = "general-met" }: { name?: TargetCase }) => {
         </h2>
         {/* Stepper 내부 ol 의 줄바꿈·폭을 밖에서 제어한다. 지우면 스테퍼가 접힌다. */}
         <div className="[&_ol]:flex-nowrap sm:w-full sm:[&_ol]:w-full sm:[&_ol>li]:flex-1 sm:[&_ol>li>div:nth-child(1)]:flex-1 sm:[&_ol>li>div:nth-child(3)]:flex-1 lg:w-152">
-          <Stepper items={STEPS} activeIndex={2} size={13} />
+          <Stepper items={APPLICATION_THIRD_STEPS} activeIndex={2} size={13} />
         </div>
       </div>
 

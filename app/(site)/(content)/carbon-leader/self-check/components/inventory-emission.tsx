@@ -236,6 +236,7 @@ const sumOf = (codes: string[], year: string, values: DetailValues) =>
   codes.reduce((total, code) => total + (Number(values[code]?.[year]) || 0), 0)
 
 /** [다음으로] 가 향하는 화면 */
+const PREV_HREF = "/carbon-leader/self-check/company-info"
 const NEXT_HREF = "/carbon-leader/self-check/reduction-potential"
 
 /** 표에 세울 숫자. 0 이면 그냥 0 으로 둔다 */
@@ -273,7 +274,8 @@ const ItemInput = ({
           className={cn(
             // 공통 트리거는 값에 line-clamp-1 과 flex 를 함께 걸어 둬 말줄임이 먹지 않는다.
             // block 으로 되돌리고 truncate 를 줘 칸을 넘는 보기를 … 로 줄인다.
-            "border-line-field bg-surface-field h-13 min-w-0 flex-1 rounded-md px-4 text-sm max-md:w-full max-md:flex-none",
+            // button 기본값이 가운데 정렬이라 옆 입력 칸처럼 왼쪽으로 맞춘다
+            "border-line-field bg-surface-field h-13 min-w-0 flex-1 rounded-md px-4 text-left text-sm max-md:w-full max-md:flex-none",
             "*:data-[slot=select-value]:block *:data-[slot=select-value]:min-w-0 *:data-[slot=select-value]:flex-1 *:data-[slot=select-value]:truncate",
             // 초점 표시는 옆 입력 칸(FIELD_CELL)과 같은 ash-600 두 겹 고리로 맞춘다.
             // 공통 트리거는 ring/50 에 테두리까지 바꾸므로 둘 다 덮어쓴다.
@@ -628,8 +630,17 @@ const DetailDialog = ({
 const InventoryEmission = ({
   /** 연계 시 신청 회차에서 내려오는 산정 대상 연도 */
   years = YEARS,
+  /** 상단 스테퍼 단계 이름. 3차 신청은 6단계 이름이 달라 밖에서 넘긴다 */
+  steps = SELF_CHECK_STEPS,
+  /** [이전으로] 가 갈 곳. 흐름마다 앞 화면이 다르다 */
+  prevHref = PREV_HREF,
+  /** [다음으로] 가 갈 곳. 흐름마다 뒤 화면이 다르다 */
+  nextHref = NEXT_HREF,
 }: {
   years?: string[]
+  steps?: string[]
+  prevHref?: string
+  nextHref?: string
 }) => {
   const [picked, setPicked] = useState<string[]>([])
   const [closed, setClosed] = useState<string[]>([])
@@ -753,7 +764,7 @@ const InventoryEmission = ({
       <StepMobileNav
         title="인벤토리 배출량 산정"
         step={2}
-        total={SELF_CHECK_STEPS.length}
+        total={steps.length}
       />
 
       <div className="flex flex-col gap-8 max-md:hidden lg:flex-row lg:items-center lg:justify-between">
@@ -762,7 +773,7 @@ const InventoryEmission = ({
         </h2>
         {/* Stepper 내부 ol 의 줄바꿈·폭을 밖에서 제어한다. 지우면 스테퍼가 접힌다. */}
         <div className="[&_ol]:flex-nowrap sm:w-full sm:[&_ol]:w-full sm:[&_ol>li]:flex-1 sm:[&_ol>li>div:nth-child(1)]:flex-1 sm:[&_ol>li>div:nth-child(3)]:flex-1 lg:w-182">
-          <Stepper items={SELF_CHECK_STEPS} activeIndex={1} size={13} />
+          <Stepper items={steps} activeIndex={1} size={13} />
         </div>
       </div>
 
@@ -1131,10 +1142,7 @@ const InventoryEmission = ({
         ) : null}
 
         <div className="mt-4 grid grid-cols-2 gap-2 md:flex md:items-center md:justify-between md:gap-3">
-          <Link
-            href="/carbon-leader/self-check/company-info"
-            className="min-w-0"
-          >
+          <Link href={prevHref} className="min-w-0">
             <Button
               type="button"
               variant="outline"
@@ -1145,7 +1153,7 @@ const InventoryEmission = ({
               이전으로
             </Button>
           </Link>
-          <Link href={NEXT_HREF} className="min-w-0" onClick={handleNext}>
+          <Link href={nextHref} className="min-w-0" onClick={handleNext}>
             <Button
               type="button"
               size="lg"

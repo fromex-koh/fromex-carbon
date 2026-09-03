@@ -152,3 +152,31 @@ export const FINAL_COMPLETED: StepCardData[] = [
     hideAction: true,
   },
 ]
+
+/**
+ * 선도기업 신청 기준 미달 안내 모달에 세울 조건 줄.
+ * [퍼블리싱 노출용] 서버가 회원별로 내려줄 자리를 목업으로 채워 두었다.
+ * 자가진단을 아직 쓰는 중이라 작성완료가 미충족인 경우다.
+ */
+export interface EligibilityConditionData {
+  label: string
+  value: string
+  met: boolean
+  tone?: "default" | "pass" | "fail"
+}
+
+export const INITIAL_BLOCK_CONDITIONS: EligibilityConditionData[] = [
+  {
+    label: "자가진단 작성완료",
+    value: "미완료",
+    met: false,
+    tone: "fail",
+  },
+  { label: "탄소중립 목표설정", value: "적정", met: true },
+  {
+    label: "평가지표 등급 (B등급 이상)",
+    value: "BBB",
+    met: true,
+    tone: "pass",
+  },
+]

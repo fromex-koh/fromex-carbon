@@ -12,7 +12,7 @@ import { useDialogAutoOpen } from "@/util/use-dialog-auto-open"
 
 // 자가진단 STEP 1(기업 정보 입력)의 "이어서 작성 안내" 팝업.
 // 현재년도 자가진단 수행 내역이 이미 있을 때 재진입하면 뜬다.
-// 삭제·변경 확인 모달과 달리 닫기(X) 버튼이 없고 [확인] 한 개만 있다.
+// 닫기(X) 버튼은 없고 [새로 작성하기] · [이어서 작성하기] 둘 중 하나를 고르게 한다.
 //
 // 시안 수치(px). html font-size 가 17px 이라 rem 유틸리티는 1.0625 배로 계산되므로,
 // 아래 값은 가장 가까운 Tailwind 스케일로 넣었다.
@@ -40,7 +40,10 @@ import { useDialogAutoOpen } from "@/util/use-dialog-auto-open"
 interface ResumeNoticeDialogProps {
   /** 상태 칸에 들어가는 값. 시안 예시는 "선도기업 신청 연계" */
   status?: string
+  /** [이어서 작성하기] — 기존 작성 내용을 그대로 두고 이어서 쓴다 */
   onConfirm?: () => void
+  /** [새로 작성하기] — 기존 내용을 버리고 처음부터 다시 쓴다 */
+  onRestart?: () => void
   open?: boolean
   onOpenChange?: (open: boolean) => void
   /** 모달 전용 라우트로 바로 들어왔을 때 열어 준다 */
@@ -50,6 +53,7 @@ interface ResumeNoticeDialogProps {
 const ResumeNoticeDialog = ({
   status = "선도기업 신청 연계",
   onConfirm,
+  onRestart,
   open,
   onOpenChange,
   defaultOpen,
@@ -83,16 +87,32 @@ const ResumeNoticeDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="pt-5 sm:pt-8 lg:pt-9">
+        <div className="grid grid-cols-2 gap-2 pt-5 sm:gap-2.5 sm:pt-8 lg:pt-9">
+          {/*
+            outline 원본은 선도 초점 고리도 파랑이다.
+            팝업이 열리면 이 버튼에 초점이 가므로 초점 고리까지 회색으로 덮어야
+            파랑이 비치지 않는다. 회색은 입력 칸과 같은 ash-600 을 쓴다.
+          */}
           <Button
             type="button"
-            className="h-11 w-full rounded-lg text-sm font-bold sm:h-13"
+            variant="outline"
+            className="ring-line-field dark:ring-ash-500 text-ink-body focus-visible:ring-ash-600 h-11 rounded-lg bg-transparent text-sm font-bold focus-visible:ring-2 sm:h-13"
+            onClick={() => {
+              setOpen(false)
+              onRestart?.()
+            }}
+          >
+            새로 작성하기
+          </Button>
+          <Button
+            type="button"
+            className="h-11 rounded-lg text-sm font-bold sm:h-13"
             onClick={() => {
               setOpen(false)
               onConfirm?.()
             }}
           >
-            확인
+            이어서 작성하기
           </Button>
         </div>
       </DialogContent>
