@@ -1,6 +1,12 @@
 "use client"
 
-import { createContext, useEffect, useRef, useState } from "react"
+import {
+  createContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react"
 import { format } from "date-fns"
 import { ko } from "date-fns/locale"
 import {
@@ -31,15 +37,18 @@ import AddressSearchDialog from "@/components/address-search-dialog"
 import BaseInfo from "@/app/(site)/(content)/carbon-leader/self-check/components/base-info"
 import StepMobileNav from "@/app/(site)/(content)/carbon-leader/self-check/components/step-mobile-nav"
 import {
+  ADOPTION_COLUMNS,
+  ADOPTION_ROW_COUNT,
   APPLICATION_STEPS,
   BASE_YEAR_COLUMNS,
   BASE_YEAR_ROWS,
   INVESTMENT_COLUMNS,
-  INVESTMENT_ROW_COUNT,
+  INVESTMENT_ROWS,
   REDUCTION_PLAN_COLUMNS,
   REDUCTION_PLAN_ROWS,
   type PlanRow,
 } from "@/constants/carbon-leader-application-form"
+import { navBarHeight } from "@/lib/const"
 import { cn } from "@/lib/utils"
 import { CALENDAR_PROPS } from "@/constants/calendar-dropdown"
 
@@ -47,7 +56,16 @@ import { CALENDAR_PROPS } from "@/constants/calendar-dropdown"
 // 카드 6장이 같은 껍데기를 쓰고, 안쪽만 입력 그리드 또는 표로 갈린다.
 // 표시 값은 전부 고정 문구다. constants/carbon-leader-application-form 참고.
 
-const NOTICES = ["기업 기본정보, 기준연도 현황, 감축계획을 입력해 주세요."]
+// 2차는 「중간 및 최종점검 신청서」 양식이라 기준연도 현황·감축계획 카드가 빠지고,
+// 1차에서 받은 투자계획을 읽기 전용으로 되짚은 뒤 감축기술 도입현황을 새로 받는다.
+// 3차는 카드 구성이 2차와 같지만 스테퍼가 6단계라 화면을 따로 뒀다.
+// application-3/components/application-form 참고.
+const NOTICES_BY_ROUND: Record<number, string[]> = {
+  1: ["기업 기본정보, 기준연도 현황, 감축계획을 입력해 주세요."],
+  2: [
+    "기업 기본정보를 확인하고, 탄소중립 투자계획 및 감축기술 도입현황을 입력해 주세요.",
+  ],
+}
 
 const INDUSTRIES = ["제조업", "건설업", "운수업", "도매 및 소매업"]
 
@@ -71,7 +89,6 @@ const REQUIRED_FIELDS: Record<string, string> = {
   "manager-name": "담당자명",
   "manager-department": "부서 / 직책",
   "manager-tel": "전화번호",
-  "manager-fax": "팩스번호",
   "manager-email": "전자우편",
   "manager-phone": "연락처",
 }
@@ -410,12 +427,15 @@ const UnitField = ({
   id,
   placeholder,
   suffix,
+  value,
   readOnly,
   invalid,
 }: {
   id: string
   placeholder: string
   suffix: string
+  /** 서버에서 내려온 값. 없으면 자리표시만 보인다 */
+  value?: string
   readOnly?: boolean
   invalid?: boolean
 }) => (
@@ -433,7 +453,9 @@ const UnitField = ({
       // 숫자 칸이라 브라우저가 채울 값이 없다
       autoComplete="off"
       placeholder={placeholder}
-      className={BARE}
+      {...(value === undefined ? {} : { value })}
+      // 읽기 전용 칸은 시안이 값과 단위를 같은 회색으로 흐려 둔다
+      className={cn(BARE, readOnly && "text-ash-500")}
     />
     {suffix ? (
       // 읽기 전용 칸은 시안이 값과 단위를 같은 회색으로 흐려 둔다
@@ -571,52 +593,88 @@ const WideRow = ({
   </div>
 )
 
-const ApplicationForm = () => {
-  // 행 목록. 값은 화면에서만 쓰는 행 키다(입력 id 와 React key 를 겸한다).
-  const [rows, setRows] = useState<number[]>(() =>
-    Array.from({ length: INVESTMENT_ROW_COUNT }, (_, index) => index + 1),
+const ApplicationForm = ({
+  round = 1,
+}: {
+  /** 신청 회차. 2차는 카드 구성이 달라진다 */
+  round?: number
+}) => {
+  const isSecond = round === 2
+
+  // (6) 표에 세울 줄. 감축잠재량 산정에서 넘어오는 목록이라 화면에서 늘리거나 줄이지 않는다.
+  const rows = INVESTMENT_ROWS
+
+  // (7) 감축기술 도입현황. 2차에서만 쓰고 사용자가 줄을 늘린다.
+  const [techRows, setTechRows] = useState<number[]>(() =>
+    Array.from({ length: ADOPTION_ROW_COUNT }, (_, index) => index + 1),
   )
-  const nextRowKey = useRef(INVESTMENT_ROW_COUNT + 1)
+  const nextTechKey = useRef(ADOPTION_ROW_COUNT + 1)
 
   /*
-   * 행이 늘거나 줄면 표 높이가 바뀐다.
+   * 줄이 늘거나 줄면 표 높이가 바뀐다.
    * [행 추가하기] 버튼을 기준점으로 삼아 바뀐 높이만큼 창을 따라 움직여,
-   * 사용자가 보던 자리(새 줄과 버튼)가 그대로 화면에 남게 한다.
-   * 표 상자에 overflow-hidden 이 걸려 있어 scrollIntoView 는 그 상자만 움직이므로 쓰지 않는다.
+   * 사용자가 보던 자리(버튼과 그 위의 줄)가 그대로 화면에 남게 한다.
+   * 새 줄이 헤더 뒤로 들어갈 만큼 크면 그만큼 덜 내려가 윗선까지 보이게 한다.
+   * 표 상자에 overflow-hidden 이 걸려 있어 scrollIntoView 는 그 상자 안을 움직이므로 쓰지 않는다.
+   * 그리기 전에 옮겨야 화면이 두 번 튀지 않아 useLayoutEffect 를 쓴다.
    */
-  const addButtonRef = useRef<HTMLButtonElement>(null)
+  const addRowButtonRef = useRef<HTMLButtonElement>(null)
   const buttonTopBefore = useRef<number | null>(null)
+  /** 방금 늘린 줄. 헤더에 가리지 않게 윗선을 확인할 때 쓴다 */
+  const followRowKey = useRef<number | null>(null)
   const [rowsTick, setRowsTick] = useState(0)
 
   const markRowsChange = () => {
     buttonTopBefore.current =
-      addButtonRef.current?.getBoundingClientRect().top ?? null
+      addRowButtonRef.current?.getBoundingClientRect().top ?? null
     setRowsTick((tick) => tick + 1)
   }
 
-  useEffect(() => {
+  const addTechRow = () => {
+    const key = nextTechKey.current++
+    followRowKey.current = key
+    markRowsChange()
+    setTechRows((prev) => [...prev, key])
+  }
+
+  /** 줄은 항상 하나는 남는다. 마지막 한 줄이면 새 키로 갈아 끼워 값만 비운다 */
+  const removeTechRow = (key: number) => {
+    const fresh = nextTechKey.current++
+    markRowsChange()
+    setTechRows((prev) =>
+      prev.length > 1 ? prev.filter((row) => row !== key) : [fresh],
+    )
+  }
+
+  useLayoutEffect(() => {
     if (!rowsTick) return
+    const button = addRowButtonRef.current
     const before = buttonTopBefore.current
-    const button = addButtonRef.current
+    const rowKey = followRowKey.current
     buttonTopBefore.current = null
-    if (before === null || !button) return
+    followRowKey.current = null
+    if (!button || before === null) return
     // 기준점이 화면 밖이면 사용자가 표를 보고 있지 않다는 뜻이라 건드리지 않는다.
     if (before < 0 || before > window.innerHeight) return
 
-    const delta = button.getBoundingClientRect().top - before
+    let delta = button.getBoundingClientRect().top - before
+
+    const row =
+      rowKey === null
+        ? null
+        : formRef.current?.querySelector<HTMLElement>(
+            `[data-row-key="${rowKey}"]`,
+          )
+    if (row) {
+      // 옮긴 뒤 새 줄 윗선이 고정 헤더 아래로 들어가면 그만큼 덜 내려간다
+      const topGap = navBarHeight + 16
+      const rowTop = row.getBoundingClientRect().top - delta
+      if (rowTop < topGap) delta -= topGap - rowTop
+    }
+
     if (delta !== 0) window.scrollBy({ top: delta })
   }, [rowsTick])
 
-  const addRow = () => {
-    markRowsChange()
-    setRows((prev) => [...prev, nextRowKey.current++])
-  }
-
-  /**
-   * 행은 항상 한 줄은 남는다.
-   * 두 줄 이상이면 그 줄을 지우고, 마지막 한 줄이면 새 키로 갈아 끼워
-   * 입력 가능한 시작일·종료일만 비운다(나머지 칸은 읽기 전용이라 그대로다).
-   */
   // [다음으로] 를 누른 뒤부터 오류 문구를 보여 준다. 다른 자가진단 화면과 같은 방식이다.
   // 회원정보를 받아 (1) 기업정보 칸을 채우는 자리
   const [isLoadingProfile, loadProfile] = useLoadingButton()
@@ -642,29 +700,47 @@ const ApplicationForm = () => {
       if (!filled) next[name] = requiredMessage(label)
     })
 
-    // (4)(5) 표: 문구가 칸마다 붙어서 검사도 칸 단위로 한다
-    TABLE_GROUPS.forEach((group) => {
-      group.rows.forEach((row) => {
-        group.columns.forEach((column) => {
-          const name = `${group.id}-${row.label}-${column}`
-          if (!valueOf(name)) next[name] = requiredMessage(row.label)
+    // (4)(5) 표: 문구가 칸마다 붙어서 검사도 칸 단위로 한다. 2차에는 이 카드가 없다
+    if (!isSecond) {
+      TABLE_GROUPS.forEach((group) => {
+        group.rows.forEach((row) => {
+          group.columns.forEach((column) => {
+            const name = `${group.id}-${row.label}-${column}`
+            if (!valueOf(name)) next[name] = requiredMessage(row.label)
+          })
         })
       })
-    })
 
-    Object.entries(WIDE_FIELDS).forEach(([name, label]) => {
-      if (!valueOf(name)) next[name] = requiredMessage(label)
-    })
+      Object.entries(WIDE_FIELDS).forEach(([name, label]) => {
+        if (!valueOf(name)) next[name] = requiredMessage(label)
+      })
 
-    // (6) 표: 입력 가능한 시작일·종료일만 본다
-    rows.forEach((rowKey) => {
-      const filled = ["start", "end"].every((edge) =>
-        valueOf(`investment-${rowKey}-${edge}`),
-      )
-      if (!filled) {
-        next[`investment-${rowKey}-period`] = requiredMessage("사업기간")
-      }
-    })
+      // (6) 표: 입력 가능한 시작일·종료일만 본다. 2차는 통째로 읽기 전용이라 뺀다
+      rows.forEach((row) => {
+        const filled = ["start", "end"].every((edge) =>
+          valueOf(`investment-${row.code}-${edge}`),
+        )
+        if (!filled) {
+          next[`investment-${row.code}-period`] = requiredMessage("사업기간")
+        }
+      })
+    }
+
+    // (7) 감축기술 도입현황: 2차에만 있고 도입시기까지 한 줄로 묶어 본다
+    if (isSecond) {
+      techRows.forEach((rowKey) => {
+        ADOPTION_COLUMNS.forEach((column) => {
+          const name = `adoption-${rowKey}-${column.key}`
+          // 이름표는 "투자금 (천원)" 꼴이라 문구에서는 괄호 단위를 뗀다
+          if (!valueOf(name)) {
+            next[name] = requiredMessage(column.label.replace(/\s*\(.*$/, ""))
+          }
+        })
+        if (!valueOf(`adoption-${rowKey}-adopted-at`)) {
+          next[`adoption-${rowKey}-adopted-at`] = requiredMessage("도입시기")
+        }
+      })
+    }
 
     return next
   }
@@ -690,27 +766,18 @@ const ApplicationForm = () => {
     if (hasTried) setErrors(collectErrors())
   }
 
-  const removeRow = (key: number) => {
-    markRowsChange()
-    setRows((prev) =>
-      prev.length > 1
-        ? prev.filter((row) => row !== key)
-        : [nextRowKey.current++],
-    )
-  }
-
   return (
     <div className="flex w-full max-w-316 flex-col md:gap-8 md:px-7 md:pt-12 md:pb-28 lg:gap-10 lg:px-8 lg:pt-14 lg:pb-42">
       {/* 360 시안의 상단 이름은 카드 이름이 아니라 단계 이름이다 */}
       <StepMobileNav
-        title="1차 신청"
+        title={`${round}차 신청`}
         step={1}
         total={APPLICATION_STEPS.length}
       />
 
       <div className="flex flex-col gap-8 max-md:hidden lg:flex-row lg:items-start lg:justify-between lg:gap-8">
         <h2 className="text-ink-strong text-lg font-bold whitespace-nowrap md:text-3xl lg:text-4xl">
-          탄소중립 선도기업 신청 1차
+          탄소중립 선도기업 신청 {round}차
         </h2>
         {/* Stepper 내부 ol 의 줄바꿈·폭을 밖에서 제어한다. 지우면 스테퍼가 접힌다. */}
         <div className="[&_ol]:flex-nowrap sm:w-full sm:[&_ol]:w-full sm:[&_ol>li]:flex-1 sm:[&_ol>li>div:nth-child(1)]:flex-1 sm:[&_ol>li>div:nth-child(3)]:flex-1 lg:w-104">
@@ -718,7 +785,7 @@ const ApplicationForm = () => {
         </div>
       </div>
 
-      <BaseInfo items={NOTICES} />
+      <BaseInfo items={NOTICES_BY_ROUND[round] ?? NOTICES_BY_ROUND[1]} />
 
       <FieldErrorContext.Provider value={errors}>
         <form
@@ -942,7 +1009,7 @@ const ApplicationForm = () => {
                   className={FIELD}
                 />
               </Field>
-              <Field label="팩스번호" htmlFor="manager-fax">
+              <Field label="팩스번호" hint="(선택)" htmlFor="manager-fax">
                 <input
                   id="manager-fax"
                   name="manager-fax"
@@ -972,64 +1039,75 @@ const ApplicationForm = () => {
             </div>
           </Card>
 
-          {/* (4) 탄소중립 기준연도 현황 */}
-          <Card
-            id="base-year-status"
-            title="탄소중립 기준연도 현황"
-            description="2023~2025년 매출액 및 온실가스 배출량 현황을 입력합니다."
-            cta={
-              <HeaderButton
-                brand
-                icon={<Download aria-hidden="true" />}
-                loading={isLoadingSelfCheck}
-                onClick={loadSelfCheckData}
-                // 문구가 짧아져도 768 이상에서 버튼이 줄어들지 않게 바닥을 깐다
-                className="md:min-w-50"
+          {/* (4)(5) 는 1차 양식에만 있다. 2차는 점검 신청서 양식이라 빠진다 */}
+          {!isSecond ? (
+            <>
+              {/* (4) 탄소중립 기준연도 현황 */}
+              <Card
+                id="base-year-status"
+                title="탄소중립 기준연도 현황"
+                description="2023~2025년 매출액 및 온실가스 배출량 현황을 입력합니다."
+                cta={
+                  <HeaderButton
+                    brand
+                    icon={<Download aria-hidden="true" />}
+                    loading={isLoadingSelfCheck}
+                    onClick={loadSelfCheckData}
+                    // 문구가 짧아져도 768 이상에서 버튼이 줄어들지 않게 바닥을 깐다
+                    className="md:min-w-50"
+                  >
+                    자가진단 데이터 불러오기
+                  </HeaderButton>
+                }
               >
-                자가진단 데이터 불러오기
-              </HeaderButton>
-            }
-          >
-            <PlanTable
-              id="base-year"
-              columns={BASE_YEAR_COLUMNS}
-              rows={BASE_YEAR_ROWS}
-              extra={
-                <>
-                  <WideRow
-                    id="base-year-standard"
-                    label="탄소중립 기준연도"
-                    suffix="년"
-                  />
-                  <WideRow
-                    id="base-year-average"
-                    label="기준연도 온실가스 평균배출량"
-                    unit="(tCO₂eq)"
-                    suffix="3개년 평균"
-                  />
-                </>
-              }
-            />
-          </Card>
+                <PlanTable
+                  id="base-year"
+                  columns={BASE_YEAR_COLUMNS}
+                  rows={BASE_YEAR_ROWS}
+                  extra={
+                    <>
+                      <WideRow
+                        id="base-year-standard"
+                        label="탄소중립 기준연도"
+                        suffix="년"
+                      />
+                      <WideRow
+                        id="base-year-average"
+                        label="기준연도 온실가스 평균배출량"
+                        unit="(tCO₂eq)"
+                        suffix="3개년 평균"
+                      />
+                    </>
+                  }
+                />
+              </Card>
 
-          {/* (5) 탄소감축계획 */}
-          <Card
-            id="reduction-plan"
-            title="탄소감축계획"
-            description="2026~2028년 연도별 탄소감축 투자계획 및 목표를 입력합니다."
-          >
-            <PlanTable
-              id="reduction-plan"
-              columns={REDUCTION_PLAN_COLUMNS}
-              rows={REDUCTION_PLAN_ROWS}
-            />
-          </Card>
+              {/* (5) 탄소감축계획 */}
+              <Card
+                id="reduction-plan"
+                title="탄소감축계획"
+                description="2026~2028년 연도별 탄소감축 투자계획 및 목표를 입력합니다."
+              >
+                <PlanTable
+                  id="reduction-plan"
+                  columns={REDUCTION_PLAN_COLUMNS}
+                  rows={REDUCTION_PLAN_ROWS}
+                />
+              </Card>
+            </>
+          ) : null}
 
           {/* (6) 향후 3년간 탄소중립 투자계획 */}
           <Card
             id="investment-plan"
-            title="향후 3년간 탄소중립 투자계획"
-            description="감축기술별 투자계획 및 기대 온실가스 감축량을 입력합니다. 행 추가 버튼으로 항목을 자유롭게 추가할 수 있습니다."
+            title={
+              isSecond ? "탄소중립 투자계획" : "향후 3년간 탄소중립 투자계획"
+            }
+            description={
+              isSecond
+                ? "1차 신청 시 작성한 탄소중립 투자계획과 동일한 정보가 노출됩니다. 이 항목은 수정할 수 없습니다."
+                : "감축잠재량 산정에서 넘어온 감축기술별 투자계획입니다. 사업기간만 입력합니다."
+            }
           >
             <div className={cn("flex flex-col", TABLE_BOX)}>
               {/* 표 헤더는 PC 시안에만 있다 */}
@@ -1046,15 +1124,13 @@ const ApplicationForm = () => {
                   <span className="flex-1 py-2.5 text-center font-medium">
                     온실가스감축량 <span className="font-normal">(tCO₂eq)</span>
                   </span>
-                  {/* 삭제 버튼 자리 */}
-                  <span className="w-21 shrink-0" />
                 </div>
               </div>
 
               <div className="divide-line-card flex flex-col divide-y md:p-6 lg:p-8 xl:gap-2.5 xl:divide-y-0">
-                {rows.map((rowKey, index) => (
+                {rows.map((row, index) => (
                   <div
-                    key={rowKey}
+                    key={row.code}
                     // 오류 문구가 붙어도 칸 윗선이 흔들리지 않도록 위 기준으로 세운다
                     className="flex flex-col gap-4 py-6 first:pt-0 last:pb-0 xl:flex-row xl:items-start xl:gap-8 xl:py-0"
                   >
@@ -1068,17 +1144,24 @@ const ApplicationForm = () => {
                         <Field
                           key={column.key}
                           label={column.label}
-                          htmlFor={`investment-${rowKey}-${column.key}`}
-                          className="xl:min-w-0 xl:flex-1 xl:gap-0 xl:[&>label]:sr-only"
+                          htmlFor={`investment-${row.code}-${column.key}`}
+                          className="xl:min-w-0 xl:flex-1 xl:[&>label]:sr-only"
                         >
                           {/* 감축잠재량 산정에서 넘어오는 값이라 읽기 전용이다 */}
                           <input
-                            id={`investment-${rowKey}-${column.key}`}
-                            name={`investment-${rowKey}-${column.key}`}
+                            id={`investment-${row.code}-${column.key}`}
+                            name={`investment-${row.code}-${column.key}`}
                             readOnly
                             autoComplete="off"
                             placeholder={column.placeholder}
-                            className={cn(FIELD, "bg-surface-disabled")}
+                            value={
+                              column.key === "tech" ? row.tech : row.facility
+                            }
+                            // 읽기 전용 칸은 시안이 값을 회색으로 흐려 둔다
+                            className={cn(
+                              FIELD,
+                              "bg-surface-disabled text-ash-500",
+                            )}
                           />
                         </Field>
                       ))}
@@ -1086,78 +1169,201 @@ const ApplicationForm = () => {
                       {/* 오류 문구가 두 칸 아래에 놓이도록 세로로 묶는다 */}
                       <div className="flex flex-col gap-2.5 md:col-span-2 xl:min-w-0 xl:flex-2">
                         <label
-                          htmlFor={`investment-${rowKey}-start`}
+                          htmlFor={`investment-${row.code}-start`}
                           className="text-ink-strong text-base font-bold break-keep xl:sr-only"
                         >
                           사업기간
                         </label>
-                        {/* 768 시안은 시작일·종료일이 한 줄에 반씩, 360 만 위아래로 쌓인다 */}
-                        <div className="flex flex-col gap-2.5 md:flex-row">
-                          <FieldErrorContext.Consumer>
-                            {(errors) =>
-                              ["start", "end"].map((edge) => (
-                                <div key={edge} className="min-w-0 flex-1">
-                                  <DateField
-                                    id={`investment-${rowKey}-${edge}`}
-                                    placeholder={
-                                      edge === "start" ? "시작일" : "종료일"
-                                    }
-                                    invalid={
-                                      !!errors[`investment-${rowKey}-period`]
-                                    }
-                                  />
-                                </div>
-                              ))
-                            }
-                          </FieldErrorContext.Consumer>
-                        </div>
-                        <RowError name={`investment-${rowKey}-period`} />
+                        {isSecond ? (
+                          // 2차는 1차에 적어 둔 기간을 그대로 되짚기만 한다
+                          <input
+                            id={`investment-${row.code}-start`}
+                            name={`investment-${row.code}-period`}
+                            readOnly
+                            autoComplete="off"
+                            value={row.period}
+                            className={cn(
+                              FIELD,
+                              "bg-surface-disabled text-ash-500",
+                            )}
+                          />
+                        ) : (
+                          <>
+                            {/* 768 시안은 시작일·종료일이 한 줄에 반씩, 360 만 위아래로 쌓인다 */}
+                            <div className="flex flex-col gap-2.5 md:flex-row">
+                              <FieldErrorContext.Consumer>
+                                {(errors) =>
+                                  ["start", "end"].map((edge) => (
+                                    <div key={edge} className="min-w-0 flex-1">
+                                      <DateField
+                                        id={`investment-${row.code}-${edge}`}
+                                        placeholder={
+                                          edge === "start" ? "시작일" : "종료일"
+                                        }
+                                        invalid={
+                                          !!errors[
+                                            `investment-${row.code}-period`
+                                          ]
+                                        }
+                                      />
+                                    </div>
+                                  ))
+                                }
+                              </FieldErrorContext.Consumer>
+                            </div>
+                            <RowError name={`investment-${row.code}-period`} />
+                          </>
+                        )}
                       </div>
 
                       {INVESTMENT_COLUMNS.slice(2).map((column) => (
                         <Field
                           key={column.key}
                           label={column.label}
-                          htmlFor={`investment-${rowKey}-${column.key}`}
-                          className="xl:min-w-0 xl:flex-1 xl:gap-0 xl:[&>label]:sr-only"
+                          htmlFor={`investment-${row.code}-${column.key}`}
+                          className="xl:min-w-0 xl:flex-1 xl:[&>label]:sr-only"
                         >
                           <UnitField
-                            id={`investment-${rowKey}-${column.key}`}
+                            id={`investment-${row.code}-${column.key}`}
                             placeholder={column.placeholder}
                             suffix={column.suffix ?? ""}
+                            value={
+                              column.key === "amount"
+                                ? row.amount
+                                : row.reduction
+                            }
                             readOnly
                           />
                         </Field>
                       ))}
-
-                      <button
-                        type="button"
-                        aria-label={`${index + 1}번 행 삭제`}
-                        onClick={() => removeRow(rowKey)}
-                        className={cn(
-                          SIDE_BUTTON,
-                          "w-full md:col-span-2 xl:w-21",
-                        )}
-                      >
-                        삭제
-                      </button>
                     </div>
                   </div>
                 ))}
-
-                <button
-                  ref={addButtonRef}
-                  type="button"
-                  onClick={addRow}
-                  // 시안 PC_add_BTN: default 는 #d7e0f3 면 · 테두리 없음,
-                  // hover 는 #ecf0f8 면 + 브랜드색 1px 테두리다. 글자색은 그대로 둔다.
-                  className="bg-surface-action text-brand-primary hover:bg-surface-flow hover:border-brand-primary focus-visible:ring-ash-600 flex h-14 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-transparent text-base font-bold transition-colors outline-hidden focus-visible:ring-2 mt-6 md:h-16 [&_svg]:size-5"
-                >
-                  <CirclePlus aria-hidden="true" />행 추가하기
-                </button>
               </div>
             </div>
           </Card>
+
+          {/* (7) 감축기술 도입현황 — 2차 점검 신청서에만 있는 카드 */}
+          {isSecond ? (
+            <Card
+              id="adoption-status"
+              title="감축기술 도입현황"
+              description="투자계획에 따라 실제로 도입한 감축기술을 입력합니다. 행 추가 버튼으로 항목을 자유롭게 추가할 수 있습니다."
+            >
+              <div className={cn("flex flex-col", TABLE_BOX)}>
+                {/* 표 헤더는 PC 시안에만 있다 */}
+                <div className="bg-surface-disabled text-ink-muted hidden gap-8 px-8 text-xs font-bold xl:flex">
+                  <span className="w-10 shrink-0 py-2.5 text-center">No.</span>
+                  <div className="flex flex-1 gap-2.5">
+                    <span className="flex-1 py-2.5 text-center">감축기술</span>
+                    <span className="flex-1 py-2.5 text-center">
+                      감축설비명
+                    </span>
+                    <span className="flex-1 py-2.5 text-center">도입시기</span>
+                    {/* 시안은 이름이 500, 괄호 안 단위가 400 이다 */}
+                    <span className="flex-1 py-2.5 text-center font-medium">
+                      투자금 <span className="font-normal">(천원)</span>
+                    </span>
+                    {/* 삭제 버튼 자리 */}
+                    <span className="w-21 shrink-0" />
+                  </div>
+                </div>
+
+                <div className="divide-line-card flex flex-col divide-y md:p-6 lg:p-8 xl:gap-2.5 xl:divide-y-0">
+                  {techRows.map((rowKey, index) => (
+                    <div
+                      key={rowKey}
+                      // 줄을 늘린 뒤 창을 따라 옮길 때 이 줄을 찾는다
+                      data-row-key={rowKey}
+                      // 오류 문구가 붙어도 칸 윗선이 흔들리지 않도록 위 기준으로 세운다
+                      className="flex flex-col gap-4 py-6 first:pt-0 last:pb-0 xl:flex-row xl:items-start xl:gap-8 xl:py-0"
+                    >
+                      {/* 번호는 입력 한 칸 높이(48) 안에서 가운데를 잡는다 */}
+                      <span className="bg-surface-disabled text-ink-strong flex size-8 shrink-0 items-center justify-center rounded-full text-base font-bold xl:h-12 xl:w-10 xl:rounded-none xl:bg-transparent xl:font-normal">
+                        {index + 1}
+                      </span>
+
+                      <div className="grid gap-4 md:grid-cols-2 md:gap-x-2.5 xl:flex xl:flex-1 xl:items-start xl:gap-2.5">
+                        {ADOPTION_COLUMNS.slice(0, 2).map((column) => (
+                          <Field
+                            key={column.key}
+                            label={column.label}
+                            htmlFor={`adoption-${rowKey}-${column.key}`}
+                            className="xl:min-w-0 xl:flex-1 xl:[&>label]:sr-only"
+                          >
+                            <input
+                              id={`adoption-${rowKey}-${column.key}`}
+                              name={`adoption-${rowKey}-${column.key}`}
+                              autoComplete="off"
+                              placeholder={column.placeholder}
+                              className={cn(
+                                FIELD,
+                                errors[`adoption-${rowKey}-${column.key}`] &&
+                                  "ring-destructive ring-2",
+                              )}
+                            />
+                          </Field>
+                        ))}
+
+                        <Field
+                          label="도입시기"
+                          htmlFor={`adoption-${rowKey}-adopted-at`}
+                          className="xl:min-w-0 xl:flex-1 xl:[&>label]:sr-only"
+                        >
+                          <DateField
+                            id={`adoption-${rowKey}-adopted-at`}
+                            placeholder="도입일"
+                            invalid={!!errors[`adoption-${rowKey}-adopted-at`]}
+                          />
+                        </Field>
+
+                        {ADOPTION_COLUMNS.slice(2).map((column) => (
+                          <Field
+                            key={column.key}
+                            label={column.label}
+                            htmlFor={`adoption-${rowKey}-${column.key}`}
+                            className="xl:min-w-0 xl:flex-1 xl:[&>label]:sr-only"
+                          >
+                            <UnitField
+                              id={`adoption-${rowKey}-${column.key}`}
+                              placeholder={column.placeholder}
+                              suffix={column.suffix ?? ""}
+                              invalid={
+                                !!errors[`adoption-${rowKey}-${column.key}`]
+                              }
+                            />
+                          </Field>
+                        ))}
+
+                        <button
+                          type="button"
+                          aria-label={`${index + 1}번 행 삭제`}
+                          onClick={() => removeTechRow(rowKey)}
+                          className={cn(
+                            SIDE_BUTTON,
+                            "w-full md:col-span-2 xl:w-21",
+                          )}
+                        >
+                          삭제
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+
+                  <button
+                    ref={addRowButtonRef}
+                    type="button"
+                    onClick={addTechRow}
+                    // 시안 PC_add_BTN: default 는 #d7e0f3 면 · 테두리 없음,
+                    // hover 는 #ecf0f8 면 + 브랜드색 1px 테두리다. 글자색은 그대로 둔다.
+                    className="bg-surface-action text-brand-primary hover:bg-surface-flow hover:border-brand-primary focus-visible:ring-ash-600 mt-6 flex h-14 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-transparent text-base font-bold transition-colors outline-hidden focus-visible:ring-2 md:h-16 [&_svg]:size-5"
+                  >
+                    <CirclePlus aria-hidden="true" />행 추가하기
+                  </button>
+                </div>
+              </div>
+            </Card>
+          ) : null}
 
           <div className="flex items-center justify-between gap-2 md:gap-3">
             <Button
