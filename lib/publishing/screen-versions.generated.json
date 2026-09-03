@@ -1,5 +1,5 @@
 {
-  "version": "v0.0.5",
+  "version": "v0.0.6",
   "screens": [
     {
       "path": "/carbon-leader/application-1/application-form",
@@ -68,8 +68,8 @@
     },
     {
       "path": "/carbon-leader/application-3/inventory-emission/scope-guide",
-      "version": "v0.0.2",
-      "isCurrent": false
+      "version": "v0.0.6",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-3/result",
@@ -79,27 +79,27 @@
     {
       "path": "/carbon-leader/application-3/target-achievement",
       "version": "v0.0.5",
-      "isCurrent": true
+      "isCurrent": false
     },
     {
       "path": "/carbon-leader/application-3/target-achievement/general-unmet",
       "version": "v0.0.5",
-      "isCurrent": true
+      "isCurrent": false
     },
     {
       "path": "/carbon-leader/application-3/target-achievement/target-management",
       "version": "v0.0.5",
-      "isCurrent": true
+      "isCurrent": false
     },
     {
       "path": "/carbon-leader/application-3/target-achievement/target-management-all-unmet",
       "version": "v0.0.5",
-      "isCurrent": true
+      "isCurrent": false
     },
     {
       "path": "/carbon-leader/application-3/target-achievement/target-management-unmet",
       "version": "v0.0.5",
-      "isCurrent": true
+      "isCurrent": false
     },
     {
       "path": "/carbon-leader/application/final-done",
@@ -149,7 +149,7 @@
     {
       "path": "/carbon-leader/self-check/evaluation-index",
       "version": "v0.0.5",
-      "isCurrent": true
+      "isCurrent": false
     },
     {
       "path": "/carbon-leader/self-check/evaluation-index/certification-type",
@@ -167,9 +167,24 @@
       "isCurrent": false
     },
     {
+      "path": "/carbon-leader/self-check/inventory-emission",
+      "version": "v0.0.6",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/self-check/inventory-emission/detail-input",
+      "version": "v0.0.6",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/self-check/inventory-emission/item-select",
+      "version": "v0.0.6",
+      "isCurrent": true
+    },
+    {
       "path": "/carbon-leader/self-check/inventory-emission/scope-guide",
-      "version": "v0.0.2",
-      "isCurrent": false
+      "version": "v0.0.6",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/self-check/reduction-potential",
@@ -204,17 +219,17 @@
     {
       "path": "/carbon-leader/self-check/result",
       "version": "v0.0.5",
-      "isCurrent": true
+      "isCurrent": false
     },
     {
       "path": "/carbon-leader/self-check/result/done",
       "version": "v0.0.5",
-      "isCurrent": true
+      "isCurrent": false
     },
     {
       "path": "/carbon-leader/self-check/result/unfit",
       "version": "v0.0.5",
-      "isCurrent": true
+      "isCurrent": false
     },
     {
       "path": "/my-page/profile-edit",
