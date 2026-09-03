@@ -1,10 +1,10 @@
 {
-  "version": "v0.0.6",
+  "version": "v0.0.7",
   "screens": [
     {
       "path": "/carbon-leader/application-1/application-form",
-      "version": "v0.0.4",
-      "isCurrent": false
+      "version": "v0.0.7",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-1/application-form/address-search",
@@ -13,13 +13,13 @@
     },
     {
       "path": "/carbon-leader/application-1/document-submit",
-      "version": "v0.0.4",
-      "isCurrent": false
+      "version": "v0.0.7",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-1/final-confirm",
-      "version": "v0.0.3",
-      "isCurrent": false
+      "version": "v0.0.7",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-1/final-confirm/submit-confirm",
@@ -28,8 +28,13 @@
     },
     {
       "path": "/carbon-leader/application-1/result",
-      "version": "v0.0.3",
-      "isCurrent": false
+      "version": "v0.0.7",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/application-2/application-form",
+      "version": "v0.0.7",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-2/application-form/address-search",
@@ -38,8 +43,13 @@
     },
     {
       "path": "/carbon-leader/application-2/document-submit",
-      "version": "v0.0.4",
-      "isCurrent": false
+      "version": "v0.0.7",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/application-2/final-confirm",
+      "version": "v0.0.7",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-2/final-confirm/submit-confirm",
@@ -48,8 +58,13 @@
     },
     {
       "path": "/carbon-leader/application-2/result",
-      "version": "v0.0.3",
-      "isCurrent": false
+      "version": "v0.0.7",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/application-3/application-form",
+      "version": "v0.0.7",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-3/application-form/address-search",
@@ -58,8 +73,13 @@
     },
     {
       "path": "/carbon-leader/application-3/document-submit",
-      "version": "v0.0.4",
-      "isCurrent": false
+      "version": "v0.0.7",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/application-3/final-confirm",
+      "version": "v0.0.7",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-3/final-confirm/submit-confirm",
@@ -67,74 +87,94 @@
       "isCurrent": false
     },
     {
-      "path": "/carbon-leader/application-3/inventory-emission/scope-guide",
-      "version": "v0.0.6",
+      "path": "/carbon-leader/application-3/inventory-emission",
+      "version": "v0.0.7",
       "isCurrent": true
     },
     {
-      "path": "/carbon-leader/application-3/result",
-      "version": "v0.0.3",
+      "path": "/carbon-leader/application-3/inventory-emission/detail-input",
+      "version": "v0.0.7",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/application-3/inventory-emission/item-select",
+      "version": "v0.0.7",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/application-3/inventory-emission/scope-guide",
+      "version": "v0.0.6",
       "isCurrent": false
+    },
+    {
+      "path": "/carbon-leader/application-3/result",
+      "version": "v0.0.7",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-3/target-achievement",
-      "version": "v0.0.5",
-      "isCurrent": false
+      "version": "v0.0.7",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-3/target-achievement/general-unmet",
-      "version": "v0.0.5",
-      "isCurrent": false
+      "version": "v0.0.7",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-3/target-achievement/target-management",
-      "version": "v0.0.5",
-      "isCurrent": false
+      "version": "v0.0.7",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-3/target-achievement/target-management-all-unmet",
-      "version": "v0.0.5",
-      "isCurrent": false
+      "version": "v0.0.7",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-3/target-achievement/target-management-unmet",
-      "version": "v0.0.5",
-      "isCurrent": false
+      "version": "v0.0.7",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application/final-done",
-      "version": "v0.0.2",
-      "isCurrent": false
+      "version": "v0.0.7",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application/first-done",
-      "version": "v0.0.2",
-      "isCurrent": false
+      "version": "v0.0.7",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application/initial",
-      "version": "v0.0.2",
-      "isCurrent": false
+      "version": "v0.0.7",
+      "isCurrent": true
+    },
+    {
+      "path": "/carbon-leader/application/initial/not-eligible",
+      "version": "v0.0.7",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application/middle-done",
-      "version": "v0.0.2",
-      "isCurrent": false
+      "version": "v0.0.7",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application/middle-review",
-      "version": "v0.0.2",
-      "isCurrent": false
+      "version": "v0.0.7",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application/self-check-done",
-      "version": "v0.0.2",
-      "isCurrent": false
+      "version": "v0.0.7",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/self-check/company-info",
-      "version": "v0.0.3",
-      "isCurrent": false
+      "version": "v0.0.7",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/self-check/company-info/industry-code-search",
@@ -143,8 +183,8 @@
     },
     {
       "path": "/carbon-leader/self-check/company-info/resume",
-      "version": "v0.0.3",
-      "isCurrent": false
+      "version": "v0.0.7",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/self-check/evaluation-index",
@@ -168,23 +208,23 @@
     },
     {
       "path": "/carbon-leader/self-check/inventory-emission",
-      "version": "v0.0.6",
+      "version": "v0.0.7",
       "isCurrent": true
     },
     {
       "path": "/carbon-leader/self-check/inventory-emission/detail-input",
-      "version": "v0.0.6",
+      "version": "v0.0.7",
       "isCurrent": true
     },
     {
       "path": "/carbon-leader/self-check/inventory-emission/item-select",
       "version": "v0.0.6",
-      "isCurrent": true
+      "isCurrent": false
     },
     {
       "path": "/carbon-leader/self-check/inventory-emission/scope-guide",
       "version": "v0.0.6",
-      "isCurrent": true
+      "isCurrent": false
     },
     {
       "path": "/carbon-leader/self-check/reduction-potential",
@@ -203,18 +243,18 @@
     },
     {
       "path": "/carbon-leader/self-check/reduction-target",
-      "version": "v0.0.3",
-      "isCurrent": false
+      "version": "v0.0.7",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/self-check/reduction-target/fit",
-      "version": "v0.0.3",
-      "isCurrent": false
+      "version": "v0.0.7",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/self-check/reduction-target/unfit",
-      "version": "v0.0.3",
-      "isCurrent": false
+      "version": "v0.0.7",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/self-check/result",
