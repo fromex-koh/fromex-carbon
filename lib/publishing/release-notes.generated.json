@@ -1,6 +1,100 @@
 {
   "releases": [
     {
+      "version": "v0.0.6",
+      "releasedAt": "2026-09-03",
+      "changes": [
+        {
+          "type": "handoff",
+          "mode": "new",
+          "title": "인벤토리 배출량 산정 화면",
+          "details": [
+            {
+              "label": "대상",
+              "value": "app/(site)/(content)/carbon-leader/self-check/inventory-emission/page.tsx\napp/(site)/(content)/carbon-leader/self-check/inventory-emission/item-select/page.tsx\napp/(site)/(content)/carbon-leader/self-check/inventory-emission/detail-input/page.tsx\napp/(site)/(content)/carbon-leader/self-check/components/inventory-emission.tsx\napp/(site)/(content)/carbon-leader/self-check/components/inventory-item-dialog.tsx\nconstants/carbon-leader-inventory-items.ts"
+            },
+            {
+              "label": "화면",
+              "value": "PC·태블릿·모바일 시안에 맞춰 표·카드·간격을 반영\n사용량 단위를 칸 아래에서 빼고 묶음 이름에 「사용량 입력 (L)」 형태로 통일\n상세입력 버튼에 하위 항목 개수를 함께 표시\n자동 산출 칸을 읽기 전용 입력으로 바꿔 값이 없을 때 자리표시 0 만 보이도록 정리\n목록 선택 칸의 긴 보기를 말줄임 처리하고 초점 표시를 입력 칸과 통일"
+            },
+            {
+              "label": "팝업 라우트",
+              "value": "항목 선택(IA 11)·상세 입력(IA 13) 을 모달 전용 화면으로 분리\n라우트로 바로 들어오면 본문 없이 모달만 열린 상태로 보여 준다\n상세 입력은 마디 코드 하나로 하위 항목을 세워, 다른 마디도 코드만 바꿔 볼 수 있다"
+            },
+            {
+              "label": "상세입력 팝업",
+              "value": "태블릿·모바일 시안에 맞춰 정리하고 태블릿 가로 스크롤 제거\n닫기 버튼을 PC 는 카드 안, 태블릿 이하는 카드 위로 배치\n표 머리 줄을 굴림 상자 밖으로 빼 지나가는 줄이 비치던 틈 해소"
+            },
+            {
+              "label": "유효성 검사",
+              "value": "사용량 빈값 검사 추가 — 빈 칸 표시·개수 문구·첫 칸으로 이동\n상세입력 팝업에도 같은 빈값 검사를 적용\n묶음을 접었다 펴도 입력값이 남도록 사용량 입력을 상태로 관리"
+            },
+            {
+              "label": "어두운 화면",
+              "value": "카드 테두리·표 구분선을 시안대로 밝게 조정\nScope 배지 글자와 인벤토리 선택 줄의 면·선 색을 시안에 맞춤"
+            },
+            { "label": "적용", "value": "신규 파일 추가" }
+          ]
+        },
+        {
+          "type": "handoff",
+          "mode": "diff",
+          "title": "Scope 설명 팝업 어두운 화면 대응",
+          "details": [
+            {
+              "label": "대상",
+              "value": "app/(site)/(content)/carbon-leader/components/scope-guide-dialog.tsx"
+            },
+            {
+              "label": "변경",
+              "value": "어두운 화면에서 테두리·글자·아이콘을 한 단계 밝은 회색으로 조정"
+            },
+            {
+              "label": "결과",
+              "value": "어두운 배경에 묻히지 않고 시안과 같은 대비를 유지한다"
+            },
+            {
+              "label": "커밋",
+              "value": "[변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/8109839369025e64926eedbc2b4803816cbd64c4)"
+            }
+          ]
+        },
+        {
+          "type": "handoff",
+          "mode": "diff",
+          "title": "담긴 항목 표시용 색상 토큰 추가",
+          "details": [
+            { "label": "대상", "value": "app/globals.css" },
+            {
+              "label": "변경",
+              "value": "이미 담긴 항목을 초록으로 가르는 surface·line·ink-kept 세 토큰을 밝은 화면·어두운 화면에 모두 추가"
+            },
+            {
+              "label": "결과",
+              "value": "인벤토리 선택 팝업이 새로 고른 항목과 이미 담긴 항목을 색으로 구분한다"
+            },
+            {
+              "label": "커밋",
+              "value": "[변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/33056414f1a634a872a36e55f9f86a7e71904a28)"
+            }
+          ]
+        },
+        {
+          "type": "handoff",
+          "mode": "overwrite",
+          "title": "퍼블리싱 인덱스",
+          "details": [
+            { "label": "대상", "value": "app/page.tsx" },
+            {
+              "label": "변경",
+              "value": "인벤토리 배출량 산정·항목 선택·상세 입력 세 화면의 UIUX 를 완료로 표시"
+            },
+            { "label": "적용", "value": "지정한 파일만 교체" }
+          ]
+        }
+      ]
+    },
+    {
       "version": "v0.0.5",
       "releasedAt": "2026-09-02",
       "changes": [

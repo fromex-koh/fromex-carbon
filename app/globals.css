@@ -129,6 +129,9 @@
   /* 달성(surface-flow · brand-primary)과 같은 톤의 미달성 짝 */
   --color-surface-fail: hsl(var(--surface-fail));
   --color-ink-fail: hsl(var(--ink-fail));
+  --color-surface-kept: hsl(var(--surface-kept));
+  --color-line-kept: hsl(var(--line-kept));
+  --color-ink-kept: hsl(var(--ink-kept));
   --color-surface-action: hsl(var(--surface-action));
   --color-surface-chip: hsl(var(--surface-chip));
   --color-ink-hint: hsl(var(--ink-hint));
@@ -258,6 +261,12 @@
     --red-61: 12 76% 61%;
     --red-69: 10 81% 69%;
     --red-92-2: 0 85% 92.2%;
+    --green-96-s35: 122 35% 96%;
+    --green-86-s35: 122 35% 86%;
+    --green-30-s35: 122 35% 30%;
+    --green-10-s40: 122 40% 10%;
+    --green-26-s25: 122 25% 26%;
+    --green-62-s45: 122 45% 62%;
     --red-96-s40: 0 40% 96%;
     --red-48-s30: 0 30% 48%;
     --red-62-s55: 0 55% 62%;
@@ -378,6 +387,9 @@
     --surface-flow: var(--blue-95);
     --surface-fail: var(--red-96-s40);
     --ink-fail: var(--red-48-s30);
+    --surface-kept: var(--green-96-s35);
+    --line-kept: var(--green-86-s35);
+    --ink-kept: var(--green-30-s35);
     --surface-action: var(--blue-89-8);
     --surface-chip: var(--gray-97-25);
     --ink-hint: var(--gray-53-3);
@@ -491,6 +503,9 @@
     --surface-flow: var(--blue-95);
     --surface-fail: var(--red-96-s40);
     --ink-fail: var(--red-48-s30);
+    --surface-kept: var(--green-96-s35);
+    --line-kept: var(--green-86-s35);
+    --ink-kept: var(--green-30-s35);
     --surface-action: var(--blue-89-8);
     --surface-chip: var(--gray-97-25);
     --ink-hint: var(--gray-53-3);
@@ -602,6 +617,9 @@
     --surface-flow: var(--slate-16);
     --surface-fail: var(--slate-16);
     --ink-fail: var(--red-62-s55);
+    --surface-kept: var(--green-10-s40);
+    --line-kept: var(--green-26-s25);
+    --ink-kept: var(--green-62-s45);
     --surface-action: var(--blue-9-6);
     --surface-chip: var(--gray-97-25);
     --ink-hint: var(--gray-53-3);
