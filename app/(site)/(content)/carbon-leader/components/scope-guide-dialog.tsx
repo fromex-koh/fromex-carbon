@@ -8,6 +8,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog"
 
 const SCOPES = [
@@ -26,11 +27,19 @@ const SCOPES = [
   },
 ]
 
-const ScopeGuideDialog = ({ defaultOpen }: { defaultOpen?: boolean }) => {
+const ScopeGuideDialog = ({
+  defaultOpen,
+  trigger,
+}: {
+  defaultOpen?: boolean
+  /** 없으면 팝업 단독 라우트처럼 다이얼로그만 뜬다 */
+  trigger?: React.ReactNode
+}) => {
   const [open, setOpen] = useDialogAutoOpen(defaultOpen)
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
+      {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
       <DialogContent className="w-[calc(100%-1.25rem)] max-w-[340px] gap-0 rounded-xl px-5 pt-6 pb-10 sm:w-[calc(100%-4rem)] sm:max-w-[640px] sm:p-8 sm:pb-12 lg:p-15">
         <DialogCloseButton className="absolute -top-10 right-0 lg:top-5 lg:right-5" />
 
