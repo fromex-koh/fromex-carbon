@@ -12,8 +12,13 @@ import {
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
 import {
-  FUEL_OPTIONS,
+  computeKey,
+  fuelOptionsOf,
+  fuelSpecOf,
+  rowKey,
+  type FuelLookup,
   type MethodologySchema,
+  type ResultValues,
   type SchemaRow,
 } from "@/constants/carbon-leader-reduction-schema"
 
@@ -32,7 +37,8 @@ const basisCellKey = (key: string) => `src:${key}`
 const cellDomId = (prefix: string, key: string, scope = "") =>
   `${prefix}-${key.replaceAll(":", "-")}${scope}`
 
-// ③ 상세 입력 · ④ 결과. 표 구성은 시안(case1~4), 계산은 기획 사이트를 따른다.
+// ③ 상세 입력 · ④ 결과. 표 구성은 시안(case1~4)을 따른다.
+// ④ 의 값은 여기서 만들지 않는다 — lib/reduction-calc.ts 가 돌려주는 results 만 그린다.
 
 // 시안 라이트/다크 대조: 표 배경 #fff/#111 · 테두리 #eee/#222 · 헤더 #f3f3f3/#222
 // 헤더 글자와 placeholder 는 두 모드의 값이 서로 달라 dark: 로 한 번 더 지정한다.
@@ -212,21 +218,38 @@ const ResultTable = ({
 }
 
 /** ④ 표의 구분 칸. 단위는 라벨 아래에 옅게 붙인다. */
-const ResultLabel = ({ label, unit }: { label?: string; unit?: string }) => (
+const ResultLabel = ({
+  label,
+  unit,
+  inline,
+}: {
+  label?: string
+  unit?: string
+  /** 단위를 이름 옆에 붙인다. 비우면 이름 아래 줄에 둔다(④ 결과표) */
+  inline?: boolean
+}) => (
   <span className={labelClass}>
     {label}
     {unit ? (
-      <span className="text-ash-500 block text-xs font-normal">({unit})</span>
+      <span
+        className={cn(
+          "text-ash-500 text-xs font-normal",
+          inline ? "ml-1" : "block",
+        )}
+      >
+        ({unit})
+      </span>
     ) : null}
   </span>
 )
 
 /** 결과 항목을 "N차년도 ○○" 으로 갈라 연차별 표로 세운다. */
+/** "N차년도 이름" 항목들을 이름별 한 줄로 묶고, 연차 자리마다 결과 키를 둔다 */
 const pivotByYear = (items: SchemaRow[]) => {
   const rows: {
     label: string
     unit?: string
-    values: (string | undefined)[]
+    keys: (string | undefined)[]
   }[] = []
   for (const item of items) {
     const matched = (item.label || "").match(/^([1-3])차년도\s*(.+)$/)
@@ -235,13 +258,17 @@ const pivotByYear = (items: SchemaRow[]) => {
     const row = rows.find((entry) => entry.label === name) ?? {
       label: name,
       unit: item.unit,
-      values: [undefined, undefined, undefined] as (string | undefined)[],
+      keys: [undefined, undefined, undefined] as (string | undefined)[],
     }
     if (!rows.includes(row)) rows.push(row)
-    row.values[Number(year) - 1] = item.sample
+    row.keys[Number(year) - 1] = rowKey(item)
   }
   return rows
 }
+
+/** ④ 칸 표기. 값이 없으면 산출 전(—), 있으면 콤마·소수를 정리해 보여준다. 카드 접힘 요약도 쓴다 */
+export const formatResult = (value: number | undefined) =>
+  value === undefined || !Number.isFinite(value) ? "—" : formatCell(value)
 
 interface DetailProps {
   schema: MethodologySchema
@@ -256,6 +283,10 @@ interface DetailProps {
    * 규칙으로 앞에 사업 id 를 붙여 문서 안에서 유일하게 만든다.
    */
   fieldPrefix: string
+  /** ④ 에 그릴 값. lib/reduction-calc.ts 의 computeResults 결과. 비우면 전부 산출 전(—) */
+  results?: ResultValues
+  /** ④ 아래 안내 문구. lib/reduction-calc.ts 의 resultHintOf 가 기본정보로 만든다 */
+  hint: string
   onCellChange: (cellRef: string, value: string) => void
 }
 
@@ -268,17 +299,52 @@ const BusinessDetail = ({
   cells,
   showErrors = false,
   fieldPrefix,
+  results = {},
+  hint,
   onCellChange,
 }: DetailProps) => {
-  // 값은 계산하지 않고 시안 수치를 그대로 보여준다.
-  const yearRows = pivotByYear(schema.resultItems)
+  // 폐열회수·전기차는 시안과 같이 값 한 칸만 쓴다.
+  const isSingle = !!schema.singleColumn
+
+  /**
+   * 그 쪽에서 고른 연료. 드롭다운 값이 없으면 스키마의 초기 선택을 쓴다.
+   * 스팀·태양열처럼 연료표에 없는 고정 표기는 연료로 치지 않는다.
+   */
+  const fuelOf = (side: "Before" | "After") => {
+    const row = schema.dropdowns.find((item) => !item.hidden)
+    if (!row) return undefined
+    const ref =
+      side === "Before" || isSingle ? row.cellRefBefore : row.cellRefAfter
+    const fallback = (
+      (side === "Before" || isSingle ? row.beforeValue : row.afterValue) || ""
+    ).trim()
+    const name = (ref ? cells[fuelCellKey(ref)] : "") || fallback
+    const spec = name ? fuelSpecOf(name, row.fuelSet) : undefined
+    return spec ? { name, spec } : undefined
+  }
+
+  // 라벨·단위의 {fuel} · {fuelUnit} 은 개선전에서 고른 연료를 따른다.
+  const beforeFuel = fuelOf("Before")
+  const resolveText = (text?: string) =>
+    (text || "")
+      .replace(/\{fuel\}/g, beforeFuel?.name ?? "연료")
+      .replace(/\{fuelUnit\}/g, beforeFuel?.spec.unit ?? "-")
+
+  const lookupValue = (side: "Before" | "After", what: FuelLookup) => {
+    const found = fuelOf(side)
+    return found ? formatCell(found.spec[what]) : ""
+  }
+
+  // ④ 는 results 의 값만 읽는다. 값을 만드는 건 lib/reduction-calc.ts 몫이다.
+  const yearRows = pivotByYear(schema.resultItems).map((row) => ({
+    label: resolveText(row.label),
+    unit: resolveText(row.unit),
+    values: row.keys.map((key) => formatResult(key ? results[key] : undefined)),
+  }))
   // 경제성 지표는 시안처럼 한계비용 한 건만 보여준다.
   const marginal = schema.resultItems.find((item) =>
     (item.label || "").includes("한계비용"),
   )
-  const fuels = FUEL_OPTIONS
-  // 폐열회수는 시안과 같이 '값 입력' 한 칸만 쓴다.
-  const isSingle = !!schema.singleColumn
   const columnsClass = isSingle
     ? "md:grid-cols-[1fr_1fr]"
     : "md:grid-cols-[1fr_1fr_1fr]"
@@ -287,14 +353,34 @@ const BusinessDetail = ({
   // id 에서 갈라 주는 꼬리표다. 한 번만 그리는 표에서는 비워 둔다.
   const renderCell = (row: SchemaRow, side: "Before" | "After", scope = "") => {
     const ref = side === "Before" ? row.cellRefBefore : row.cellRefAfter
-    // 시안에서 개선전이 비어 있는 행은 칸 자체를 두지 않는다.
-    if (!ref || (row.afterOnly && side === "Before")) return <div />
-    // 시안에 값이 적힌 칸은 읽기 전용으로 그 값을 그대로 보여준다.
+    // 기획 사이트에서 비어 있는 칸(회색 빈 셀)은 칸 자체를 두지 않는다.
+    if (
+      !ref ||
+      (row.afterOnly && side === "Before") ||
+      (row.beforeOnly && side === "After")
+    )
+      return <div />
+    // 읽기 전용 칸의 값. 시안 수치 → 고정값 → 연료표 → 개선전 반영 → 연동 칸 순서다.
     const sample = side === "Before" ? row.sampleBefore : row.sampleAfter
-    const isReadOnly = !!sample
-    const unit = (row.unit || "").trim()
+    const fixed = side === "Before" ? row.fixedValueBefore : row.fixedValueAfter
+    const look = side === "Before" ? row.lookupBefore : row.lookupAfter
+    const linked = side === "Before" ? row.readOnlyBefore : row.readOnlyAfter
+    const initial = side === "Before" ? row.defaultBefore : row.defaultAfter
+    const mirrored = row.mirrorAfter && side === "After"
+    const readOnlyValue = sample
+      ? sample
+      : fixed
+        ? fixed
+        : look
+          ? lookupValue(side, look) || "—"
+          : mirrored
+            ? (cells[row.cellRefBefore ?? ""] ?? row.defaultBefore ?? "")
+            : linked
+              ? (cells[ref] ?? initial ?? "")
+              : undefined
+    const isReadOnly = readOnlyValue !== undefined
     const invalid =
-      showErrors && !isReadOnly && !String(cells[ref] ?? "").trim()
+      showErrors && !isReadOnly && !String(cells[ref] ?? initial ?? "").trim()
     return (
       <div className="flex flex-col gap-1">
         <ColumnLabel side={side} single={isSingle} />
@@ -303,7 +389,7 @@ const BusinessDetail = ({
             id={cellDomId(fieldPrefix, ref, scope)}
             isValid={!invalid}
             data-invalid={invalid || undefined}
-            value={isReadOnly ? sample : (cells[ref] ?? "")}
+            value={isReadOnly ? readOnlyValue : (cells[ref] ?? initial ?? "")}
             inputMode="decimal"
             placeholder={
               (side === "Before"
@@ -315,16 +401,10 @@ const BusinessDetail = ({
             className={cn(
               isReadOnly ? readOnlyCellClass : numCellClass,
               "w-full",
-              unit && "pr-16",
               // 오류일 때는 기본정보 칸처럼 빨간 링만 보이게 테두리를 감춘다.
               invalid && "border-0",
             )}
           />
-          {unit ? (
-            <span className="text-ink-body pointer-events-none absolute inset-y-0 right-4 flex items-center text-sm">
-              {unit}
-            </span>
-          ) : null}
         </div>
         <FieldError show={invalid} message="값을 입력해 주세요." />
       </div>
@@ -337,8 +417,11 @@ const BusinessDetail = ({
       (side === "Before" ? row.beforeValue : row.afterValue) || ""
     ).trim()
     if (!ref) return <div />
-    // 연료표에 없는 값(스팀·태양열 등)은 시안처럼 읽기 전용 상자로 보여준다.
-    if (fallback && !fuels.includes(fallback))
+    const fuels = fuelOptionsOf(row.fuelSet)
+    const locked = side === "Before" ? row.readOnlyBefore : row.readOnlyAfter
+    // 연료표에 없는 값(스팀·태양열)과 고를 수 없는 칸(목제펠릿·바이오가스)은
+    // 기획 사이트처럼 '값 (고정)' 읽기 전용 상자로 보여준다.
+    if (fallback && (locked || !fuels.includes(fallback)))
       return (
         <div className="flex flex-col gap-1">
           <ColumnLabel side={side} single={isSingle} />
@@ -348,13 +431,15 @@ const BusinessDetail = ({
         </div>
       )
     const key = fuelCellKey(ref)
-    const invalid = showErrors && !String(cells[key] ?? "").trim()
+    // 기획 사이트의 초기 선택(경유 · LNG …)은 고르기 전에도 채워져 있다.
+    const selected = cells[key] ?? (fuels.includes(fallback) ? fallback : "")
+    const invalid = showErrors && !selected.trim()
     return (
       <div className="flex flex-col gap-1">
         <ColumnLabel side={side} single={isSingle} />
         <Select
           name={cellDomId(fieldPrefix, key)}
-          value={cells[key] ?? ""}
+          value={selected}
           onValueChange={(next) => onCellChange(key, next)}
         >
           <SelectTrigger
@@ -362,6 +447,8 @@ const BusinessDetail = ({
             className={cn(
               cellClass,
               "w-full min-w-0 data-[size=default]:h-13 [&>span[data-slot=select-value]]:block [&>span[data-slot=select-value]]:min-w-0 [&>span[data-slot=select-value]]:truncate",
+              // 초점 표시도 ② select · 다른 화면 select 와 같은 규격으로 맞춘다
+              "focus-visible:border-line-field focus-visible:ring-ash-600 focus-visible:ring-2",
               // 오류 표시는 ② 감축방법론 select 와 같은 규격을 쓴다.
               invalid && "border-ink-error border-2",
             )}
@@ -388,12 +475,12 @@ const BusinessDetail = ({
   ]
 
   const renderBasis = (row: SchemaRow, scope = "") => {
-    const invalidOf = (key: string) =>
-      showErrors && !String(cells[key] ?? "").trim()
+    const invalidOf = (key: string, fallback?: number) =>
+      showErrors && !String(cells[key] ?? fallback ?? "").trim()
     if (row.rowType === "lifetime") {
       // 시안의 제품수명은 위아래 화살표로 조절하는 숫자 입력이다.
       const step = (delta: number) => {
-        const current = Number(cells[LIFETIME_KEY] || row.fixedValue || 0)
+        const current = Number(cells[LIFETIME_KEY] ?? row.fixedValue ?? 0)
         const next = Math.min(50, Math.max(1, current + delta))
         onCellChange(LIFETIME_KEY, String(next))
       }
@@ -405,9 +492,11 @@ const BusinessDetail = ({
               type="number"
               min={1}
               max={50}
-              isValid={!invalidOf(LIFETIME_KEY)}
-              data-invalid={invalidOf(LIFETIME_KEY) || undefined}
-              value={cells[LIFETIME_KEY] ?? ""}
+              isValid={!invalidOf(LIFETIME_KEY, row.fixedValue)}
+              data-invalid={
+                invalidOf(LIFETIME_KEY, row.fixedValue) || undefined
+              }
+              value={cells[LIFETIME_KEY] ?? String(row.fixedValue ?? "")}
               placeholder={String(row.fixedValue ?? 0)}
               onChange={(event) =>
                 onCellChange(LIFETIME_KEY, event.target.value)
@@ -439,7 +528,7 @@ const BusinessDetail = ({
             </div>
           </div>
           <FieldError
-            show={invalidOf(LIFETIME_KEY)}
+            show={invalidOf(LIFETIME_KEY, row.fixedValue)}
             message="제품수명을 입력해 주세요."
           />
         </div>
@@ -450,14 +539,21 @@ const BusinessDetail = ({
     if (row.rowType === "steam-ef" && row.cellRef)
       return (
         <div className="flex flex-col gap-1">
-          {/* 모바일 시안은 [계수 + 단위] 아래에 근거 입력이 한 줄 더 놓인다 */}
-          <div className="flex flex-col gap-2.5 md:flex-row md:items-center md:gap-2">
-            <div className="flex min-w-0 items-center gap-2 md:contents">
+          {/* 시안대로 계수 아래에 근거 입력이 한 줄 더 놓인다(나란히 두면 근거 칸이
+              좁아 안내 문구가 잘린다). 단위는 ③ 과 같이 구분 칸의 이름 옆에 붙는다 */}
+          <div className="flex flex-col gap-2.5 md:gap-2">
+            <div className="flex min-w-0 items-center gap-2">
               <Input
-                id={cellDomId(fieldPrefix, row.cellRef as string, scope)}
-                isValid={!invalidOf(row.cellRef as string)}
-                data-invalid={invalidOf(row.cellRef as string) || undefined}
-                value={cells[row.cellRef] ?? ""}
+                /*
+                  ③ 배출계수 칸과 같은 셀을 쓰지만 id 는 갈라야 한다.
+                  같은 id 가 둘이면 문서에서 하나로 지목되지 않는다(브라우저 경고).
+                */
+                id={cellDomId(fieldPrefix, `basis-${row.cellRef}`, scope)}
+                isValid={!invalidOf(row.cellRef as string, row.fixedValue)}
+                data-invalid={
+                  invalidOf(row.cellRef as string, row.fixedValue) || undefined
+                }
+                value={cells[row.cellRef] ?? String(row.fixedValue ?? "")}
                 inputMode="decimal"
                 placeholder={String(row.fixedValue ?? 0)}
                 onChange={(event) =>
@@ -468,7 +564,6 @@ const BusinessDetail = ({
                   "min-w-0 flex-1 md:w-20 md:flex-none",
                 )}
               />
-              <span className="text-ink-body shrink-0 text-sm">{row.unit}</span>
             </div>
             <Input
               id={cellDomId(fieldPrefix, basisCellKey(row.key || ""), scope)}
@@ -481,13 +576,13 @@ const BusinessDetail = ({
               }
               className={cn(
                 cellClass,
-                "w-full min-w-0 text-xs md:flex-1 md:text-sm",
+                "w-full min-w-0 text-xs md:text-sm lg:text-[11px] xl:text-sm",
               )}
             />
           </div>
           <FieldError
             show={
-              invalidOf(row.cellRef as string) ||
+              invalidOf(row.cellRef as string, row.fixedValue) ||
               invalidOf(basisCellKey(row.key || ""))
             }
             message="배출계수와 근거를 입력해 주세요."
@@ -508,7 +603,11 @@ const BusinessDetail = ({
           onChange={(event) =>
             onCellChange(basisCellKey(row.key || ""), event.target.value)
           }
-          className={cn(cellClass, "w-full text-xs md:text-sm")}
+          // 1024~1279 는 표가 두 칸으로 갈려 출처 칸이 좁다. 그 구간만 글자를 줄인다
+          className={cn(
+            cellClass,
+            "w-full text-xs md:text-sm lg:text-[11px] xl:text-sm",
+          )}
         />
         <FieldError
           show={invalidOf(basisCellKey(row.key || ""))}
@@ -518,10 +617,11 @@ const BusinessDetail = ({
     )
   }
 
-  // 폐열회수 시안은 입력 항목과 근거 항목을 좌우 두 표에 반씩 나눠 담는다.
   const visible = (rows: SchemaRow[]) => rows.filter((row) => !row.hidden)
-  // 폐열회수는 같은 항목을 태블릿용 한 표와 PC용 두 표로 각각 그린다.
-  // 둘 다 DOM 에 남고 CSS 로만 감추므로, 입력 칸 id 가 겹치지 않게 벌을 나눈다.
+  // 한 칸 표 방법론도 다른 표와 같이 근거 항목은 '데이터 근거' 표로 따로 뺀다.
+  // 값 열 이름이 따로 있는 전기차는 그 표를 옆에, 폐열회수는 아래에 둔다.
+  const singleBasisApart = isSingle
+  const singleLabel = schema.singleColumnLabel ?? "값 입력"
   const buildSingleRows = (scope: string) =>
     isSingle
       ? [
@@ -533,30 +633,34 @@ const BusinessDetail = ({
           ...visible(schema.inputRows).map((row) => ({
             key: `in-${row.key}`,
             label: row.label,
+            unit: resolveText(row.unit).trim() || undefined,
             control: renderCell(row, "Before", scope),
           })),
-          ...visible(basisRows).map((row) => ({
-            key: `bs-${row.key}`,
-            label: row.label,
-            control: renderBasis(row, scope),
-          })),
+          ...(singleBasisApart
+            ? []
+            : visible(basisRows).map((row) => ({
+                key: `bs-${row.key}`,
+                label: row.label,
+                unit: row.rowType === "steam-ef" ? row.unit : undefined,
+                control: renderBasis(row, scope),
+              }))),
         ]
       : []
-  const compactRows = buildSingleRows("-compact")
-  const wideRows = buildSingleRows("-wide")
-  const singleColumnGroups = [
-    wideRows.slice(0, Math.ceil(wideRows.length / 2)),
-    wideRows.slice(Math.ceil(wideRows.length / 2)),
-  ]
+  const singleRows = buildSingleRows("")
 
   // '구분 / 값 입력' 표 한 벌. 시안은 태블릿 이하 한 표, PC 두 표다.
   const renderSingleTable = (
-    group: { key: string; label?: string; control: React.ReactNode }[],
+    group: {
+      key: string
+      label?: string
+      unit?: string
+      control: React.ReactNode
+    }[],
   ) => (
     <div className={boxClass}>
       <div className={cn(headClass, "grid-cols-[1fr_2.4fr]")} role="row">
         <span>구분</span>
-        <span className="text-center">값 입력</span>
+        <span className="text-center">{singleLabel}</span>
       </div>
       <div className="flex flex-col gap-3 md:gap-2.5 md:px-6 md:py-4 lg:px-8 lg:py-8">
         {group.map((row) => (
@@ -564,10 +668,38 @@ const BusinessDetail = ({
             key={row.key}
             className={cn(rowClass, "md:grid-cols-[1fr_2.4fr]")}
           >
-            <span className={labelClass}>{row.label}</span>
+            <ResultLabel label={row.label} unit={row.unit} inline />
             {row.control}
           </div>
         ))}
+      </div>
+    </div>
+  )
+
+  // 데이터 근거 표. 두 칸 표 옆, 전기차 한 칸 표 옆에 같은 모양으로 놓인다.
+  const renderBasisTable = () => (
+    <div className="flex flex-col gap-3">
+      <p className="text-ink-strong text-base font-bold">데이터 근거</p>
+      <div className={boxClass}>
+        <div className={cn(headClass, "grid-cols-[1fr_2fr]")} role="row">
+          <span>구분</span>
+          <span className="text-center">데이터 출처</span>
+        </div>
+        <div className="flex flex-col gap-3 md:gap-2.5 md:px-6 md:py-4 lg:px-8 lg:py-8">
+          {visible(basisRows).map((row) => (
+            <div
+              key={row.key}
+              className="grid items-center gap-2 md:grid-cols-[1fr_2fr]"
+            >
+              <ResultLabel
+                label={row.label}
+                unit={row.rowType === "steam-ef" ? row.unit : undefined}
+                inline
+              />
+              {renderBasis(row)}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )
@@ -586,19 +718,15 @@ const BusinessDetail = ({
         </div>
 
         {isSingle ? (
-          /* 폐열회수는 시안대로 '구분 / 값 입력' 표 두 개에 항목을 나눠 담는다. */
-          <div className="flex flex-col gap-3">
-            <p className="text-ink-strong text-base font-bold">
-              {schema.sheetName}
-            </p>
-            {/* 태블릿 이하는 한 표에 모든 항목 */}
-            <div className="lg:hidden">{renderSingleTable(compactRows)}</div>
-            {/* PC 는 좌우 두 표로 나눈다 */}
-            <div className="hidden items-start gap-6 lg:grid lg:grid-cols-2">
-              {singleColumnGroups.map((group, index) => (
-                <div key={index}>{renderSingleTable(group)}</div>
-              ))}
+          /* 한 칸 표(폐열회수 · 전기차)도 값 입력 표와 데이터 근거 표를 나란히 둔다. */
+          <div className="grid items-start gap-4 lg:grid-cols-2 lg:gap-6">
+            <div className="flex flex-col gap-3">
+              <p className="text-ink-strong text-base font-bold">
+                {schema.sheetName}
+              </p>
+              {renderSingleTable(singleRows)}
             </div>
+            {renderBasisTable()}
           </div>
         ) : (
           <div className="grid items-start gap-4 lg:grid-cols-2 lg:gap-6">
@@ -626,7 +754,12 @@ const BusinessDetail = ({
                   ))}
                   {visible(schema.inputRows).map((row) => (
                     <div key={row.key} className={cn(rowClass, columnsClass)}>
-                      <span className={labelClass}>{row.label}</span>
+                      {/* 단위는 입력 칸이 아니라 구분 칸의 이름 옆에 붙는다 */}
+                      <ResultLabel
+                        label={row.label}
+                        unit={resolveText(row.unit).trim() || undefined}
+                        inline
+                      />
                       {renderCell(row, "Before")}
                       {renderCell(row, "After")}
                     </div>
@@ -635,30 +768,7 @@ const BusinessDetail = ({
               </div>
             </div>
 
-            {/* 데이터 근거 */}
-            <div className="flex flex-col gap-3">
-              <p className="text-ink-strong text-base font-bold">데이터 근거</p>
-              <div className={boxClass}>
-                <div
-                  className={cn(headClass, "grid-cols-[1fr_2fr]")}
-                  role="row"
-                >
-                  <span>구분</span>
-                  <span className="text-center">데이터 출처</span>
-                </div>
-                <div className="flex flex-col gap-3 md:gap-2.5 md:px-6 md:py-4 lg:px-8 lg:py-8">
-                  {visible(basisRows).map((row) => (
-                    <div
-                      key={row.key}
-                      className="grid items-center gap-2 md:grid-cols-[1fr_2fr]"
-                    >
-                      <span className={labelClass}>{row.label}</span>
-                      {renderBasis(row)}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            {renderBasisTable()}
           </div>
         )}
       </div>
@@ -682,9 +792,12 @@ const BusinessDetail = ({
             cols="md:grid-cols-[1.84fr_1fr_1fr]"
             heads={[{ label: "개선전" }, { label: "개선후", accent: true }]}
             rows={schema.computeRows.map((row) => ({
-              label: row.label,
-              unit: row.unit,
-              values: [row.sampleBefore, row.sampleAfter],
+              label: resolveText(row.label),
+              unit: resolveText(row.unit),
+              values: [
+                formatResult(results[computeKey(row, "before")]),
+                formatResult(results[computeKey(row, "after")]),
+              ],
             }))}
           />
 
@@ -696,21 +809,22 @@ const BusinessDetail = ({
               rows={yearRows}
             />
 
-            <div className="flex flex-col gap-4">
+            {/* 시안: 경제성 지표 상자와 아래 안내 문구 사이는 6 이다 */}
+            <div className="flex flex-col gap-1.5">
               {marginal ? (
                 <div className="bg-surface-flow flex flex-col items-center gap-2 rounded-md px-6 py-5">
                   <p className="text-ink-strong text-base font-bold">
                     경제성 지표
                   </p>
-                  {/* 모바일은 뱃지 아래 줄에 값이 놓인다(시안) */}
-                  <div className="flex flex-col items-center gap-3 md:flex-row">
-                    {/* 시안의 한계비용 뱃지는 라이트·다크 모두 #f8f8f8 + #333 이다. */}
-                    <span className="bg-surface-chip text-ink-chip inline-flex h-6 items-center rounded-full px-4 text-xs font-bold lg:h-7">
+                  {/* 모바일은 뱃지 아래 줄에 값이 놓인다(시안). 768 부터 한 줄, 뱃지와 값 사이 14 */}
+                  <div className="flex flex-col items-center gap-3 md:flex-row md:gap-3.5">
+                    {/* 시안의 한계비용 뱃지는 라이트·다크 모두 #f8f8f8 + #333 · 높이 28 이다 */}
+                    <span className="bg-surface-chip text-ink-chip inline-flex h-6 items-center rounded-full px-4 text-xs font-bold lg:h-6.5">
                       한계비용
                     </span>
                     <div className="flex items-baseline gap-2">
                       <span className="text-brand-primary text-xl font-bold md:text-2xl">
-                        {marginal.sample || "-"}
+                        {formatResult(results[rowKey(marginal)])}
                       </span>
                       <span className="text-ink-muted text-xs">
                         {marginal.unit}
@@ -720,10 +834,9 @@ const BusinessDetail = ({
                 </div>
               ) : null}
 
-              {/* 안내 문구는 경제성 지표 아래에 붙는다. */}
-              {/* 시안: 모바일·태블릿 12/400 · PC 13/500 */}
-              <p className="text-ink-hint text-xs font-normal break-keep lg:font-medium">
-                {schema.sampleHint}
+              {/* 안내 문구는 경제성 지표 아래에 붙는다. 시안은 13/500(Medium) 한 벌이다 */}
+              <p className="text-ink-hint text-xs font-medium break-keep">
+                {hint}
               </p>
             </div>
           </div>
