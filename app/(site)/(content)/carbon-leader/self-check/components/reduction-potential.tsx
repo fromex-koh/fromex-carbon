@@ -127,15 +127,15 @@ const ReductionPotential = () => {
               ))
             )}
 
-            <Button
+            {/* 신청서 작성 화면의 [행 추가하기] 와 같은 규격(면 surface-action · hover 는 surface-flow + 브랜드색 테두리) */}
+            <button
               type="button"
-              variant="ghost"
               onClick={handleAddBusiness}
-              className="bg-surface-action text-brand-primary hover:bg-surface-action/80 h-14 w-full rounded-md text-base font-bold md:h-16 [&_svg]:size-5"
+              className="bg-surface-action text-brand-primary hover:bg-surface-flow hover:border-brand-primary focus-visible:ring-ash-600 flex h-14 w-full cursor-pointer items-center justify-center gap-1.5 rounded-md border border-transparent text-base font-bold transition-colors outline-hidden focus-visible:ring-2 md:h-16 [&_svg]:size-5"
             >
               <CirclePlus aria-hidden="true" />
               사업 추가
-            </Button>
+            </button>
           </section>
         </div>
 

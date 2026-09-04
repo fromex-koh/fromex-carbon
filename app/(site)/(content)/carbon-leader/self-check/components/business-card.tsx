@@ -4,10 +4,18 @@ import { useEffect, useState } from "react"
 
 import { format } from "date-fns"
 import { ko } from "date-fns/locale"
-import { CalendarSearch, Check, ChevronDown, ChevronUp, X } from "lucide-react"
+import {
+  Calendar as CalendarIcon,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  X,
+} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import BusinessDetail from "@/app/(site)/(content)/carbon-leader/self-check/components/business-detail"
+import BusinessDetail, {
+  formatResult,
+} from "@/app/(site)/(content)/carbon-leader/self-check/components/business-detail"
 import ConfirmDialog from "@/app/(site)/(content)/carbon-leader/self-check/components/confirm-dialog"
 import { Calendar } from "@/components/ui/calendar"
 import { Input } from "@/components/ui/input"
@@ -29,10 +37,13 @@ import {
   REDUCTION_METHODOLOGIES,
 } from "@/constants/carbon-leader-reduction-methodologies"
 import {
-  FUEL_OPTIONS,
+  fuelOptionsOf,
+  reductionKeyOf,
   schemaOf,
+  type ResultValues,
 } from "@/constants/carbon-leader-reduction-schema"
 import { cn } from "@/lib/utils"
+import { computeResults, resultHintOf } from "@/lib/reduction-calc"
 import { CALENDAR_PROPS } from "@/constants/calendar-dropdown"
 
 // 감축잠재량 산정(STEP 3)에서 [사업 추가] 로 붙는 사업 카드.
@@ -74,15 +85,17 @@ export const missingDetailCells = (business: Business): string[] => {
   const schema = schemaOf(business.methodology)
   if (!schema) return []
   const keys: string[] = []
+  const single = !!schema.singleColumn
   for (const row of schema.dropdowns.filter((item) => !item.hidden)) {
+    const fuels = fuelOptionsOf(row.fuelSet)
     for (const [ref, fallback] of [
       [row.cellRefBefore, row.beforeValue],
-      [row.cellRefAfter, row.afterValue],
+      [single ? undefined : row.cellRefAfter, row.afterValue],
     ] as const) {
       if (!ref) continue
-      const fixed = (fallback || "").trim()
-      // 스팀처럼 연료표에 없는 고정 표기는 입력 대상이 아니다.
-      if (fixed && !FUEL_OPTIONS.includes(fixed)) continue
+      // 스팀처럼 연료표에 없는 고정 표기는 입력 대상이 아니고,
+      // 연료표에 있는 초기 선택은 고르기 전에도 채워진 것으로 본다.
+      if ((fallback || "").trim()) continue
       keys.push(`dd:${ref}`)
     }
   }
@@ -91,18 +104,37 @@ export const missingDetailCells = (business: Business): string[] => {
       const ref = side === "Before" ? row.cellRefBefore : row.cellRefAfter
       if (!ref) continue
       if (row.afterOnly && side === "Before") continue
-      // 시안 값이 박힌 칸은 읽기 전용이라 검사하지 않는다.
-      if (side === "Before" ? row.sampleBefore : row.sampleAfter) continue
+      if (row.beforeOnly && side === "After") continue
+      // 읽기 전용 칸(시안 값 · 고정값 · 연료표 · 개선전 반영 · 연동)은 검사하지 않는다.
+      const readOnly =
+        side === "Before"
+          ? row.sampleBefore ||
+            row.fixedValueBefore ||
+            row.lookupBefore ||
+            row.readOnlyBefore
+          : row.sampleAfter ||
+            row.fixedValueAfter ||
+            row.lookupAfter ||
+            row.readOnlyAfter ||
+            row.mirrorAfter
+      if (readOnly) continue
+      // 초기값이 있는 칸은 비워도 그 값이 들어간 것으로 본다.
+      if (side === "Before" ? row.defaultBefore : row.defaultAfter) continue
       keys.push(ref)
     }
   }
-  // 데이터 근거: 출처 입력 · 스팀 배출계수 · 제품수명
+  // 데이터 근거: 출처 입력 · 스팀 배출계수 · 제품수명(초기값이 있으면 채워진 것으로 본다)
   for (const row of schema.basisRows.filter((item) => !item.hidden)) {
     if (row.rowType === "lifetime") {
-      keys.push("life")
+      if (row.fixedValue === undefined) keys.push("life")
       continue
     }
-    if (row.rowType === "steam-ef" && row.cellRef) keys.push(row.cellRef)
+    if (
+      row.rowType === "steam-ef" &&
+      row.cellRef &&
+      row.fixedValue === undefined
+    )
+      keys.push(row.cellRef)
     keys.push(`src:${row.key ?? ""}`)
   }
   return keys.filter((key) => !String(business.cells[key] ?? "").trim())
@@ -125,6 +157,12 @@ const FieldError = ({ show, message }: { show: boolean; message: string }) =>
     </p>
   ) : null
 
+/**
+ * 목록 맨 위에 항상 두는 안내 항목의 값. 기획 사이트의 placeholder 옵션처럼
+ * 값을 고른 뒤에도 목록에 남지만, 고를 수는 없다(disabled).
+ */
+const PLACEHOLDER_OPTION = "__placeholder__"
+
 const methodologiesOf = (category: string): readonly string[] =>
   REDUCTION_METHODOLOGIES.find((group) => group.value === category)
     ?.methodologies ?? []
@@ -137,6 +175,9 @@ const fieldClass =
 const selectClass = cn(
   fieldClass,
   "w-full min-w-0 data-[size=default]:h-13 [&>span[data-slot=select-value]]:block [&>span[data-slot=select-value]]:min-w-0 [&>span[data-slot=select-value]]:truncate",
+  // 초점 표시는 다른 화면 select(인벤토리 배출량 산정 등)와 같은 규격이다.
+  // 공통 트리거가 ring/50 에 테두리 색까지 바꾸므로 둘 다 덮어쓴다.
+  "focus-visible:border-line-field focus-visible:ring-ash-600 focus-visible:ring-2",
 )
 
 // 비활성 상태는 시안의 읽기 전용 칸과 같은 색을 쓴다(원본의 opacity-50 은 덮는다).
@@ -185,19 +226,18 @@ const ReadOnlyBox = ({ value }: { value: string }) => (
   </p>
 )
 
-// 접힘 요약의 감축량. 계산하지 않고 시안 수치를 그대로 보여준다.
-const YEARLY = [
-  { year: "1차년도", value: "19.1" },
-  { year: "2차년도", value: "32.7" },
-  { year: "3차년도", value: "32.7" },
-]
+/** 접힘 요약에 세우는 연차. 값은 ④ 와 같은 results 에서 읽는다 */
+const YEARS = [1, 2, 3] as const
 
 const CollapsedSummary = ({
   business,
   showErrors,
+  results,
 }: {
   business: Business
   showErrors: boolean
+  /** ④ 와 같은 값 묶음(lib/reduction-calc.ts). 없으면 산출 전(—) */
+  results: ResultValues
 }) => {
   // 접힌 상태에서도 미입력 항목은 시안처럼 문구를 남긴다.
   const errorOf = (key: keyof Business) =>
@@ -245,15 +285,15 @@ const CollapsedSummary = ({
         {/* 시안은 연차 사이에 얇은 세로 구분선을 둔다. */}
         {/* 모바일은 가로 구분선으로 나뉜 세로 목록, PC·태블릿은 세로 구분선의 가로 목록 */}
         <dl className="bg-surface-flow divide-line-field border-ash-200 flex flex-col divide-y rounded-2xl border p-6 md:flex-row md:flex-wrap md:divide-x md:divide-y-0">
-          {YEARLY.map((item) => (
+          {YEARS.map((year) => (
             <div
-              key={item.year}
+              key={year}
               className="flex items-center justify-between gap-2.5 py-4 max-md:first:pt-0 max-md:last:pb-0 md:justify-start md:px-3 md:py-1 md:first:pl-0 md:last:pr-0 lg:px-4"
             >
-              <dt className="text-ink-strong text-base">{item.year}</dt>
+              <dt className="text-ink-strong text-base">{year}차년도</dt>
               <dd className="flex items-baseline gap-1">
                 <span className="text-brand-primary text-lg font-bold lg:text-xl">
-                  {item.value}
+                  {formatResult(results[reductionKeyOf(year)])}
                 </span>
                 <span className="text-brand-step text-base">tCO₂eq</span>
               </dd>
@@ -301,6 +341,26 @@ const BusinessCard = ({
     else onChange(next)
   }
   const field = (id: string) => `business-${business.id}-${id}`
+
+  // ④ 의 값. 계산은 lib/reduction-calc.ts 가 하고 카드는 재료(③ 입력 · 기본정보)만 넘긴다.
+  // 제품수명은 데이터 근거 칸 값이 없으면 스키마의 초기값을 쓴다.
+  const schema = schemaOf(business.methodology)
+  const lifetimeRow = schema?.basisRows.find(
+    (row) => row.rowType === "lifetime",
+  )
+  const basics = {
+    investment: business.investment,
+    startedOn: business.startedOn,
+    lifetime:
+      Number(business.cells.life ?? lifetimeRow?.fixedValue) || undefined,
+  }
+  const results = schema
+    ? computeResults(schema, business.cells, basics, {
+        complete: missingDetailCells(business).length === 0,
+      })
+    : {}
+  // ④ 아래 안내 문구도 같은 재료로 만든다(기획 사이트 공통 형식)
+  const hint = resultHintOf(basics)
   const errorOf = (key: keyof Business) =>
     showErrors && !String(business[key] ?? "").trim()
       ? (REQUIRED.find((item) => item.key === key)?.message ?? "")
@@ -345,7 +405,11 @@ const BusinessCard = ({
       </div>
 
       {!business.isOpen && (
-        <CollapsedSummary business={business} showErrors={showErrors} />
+        <CollapsedSummary
+          business={business}
+          showErrors={showErrors}
+          results={results}
+        />
       )}
 
       {business.isOpen && (
@@ -450,7 +514,8 @@ const BusinessCard = ({
                           fieldClass,
                           // Button 은 평상시에도 ring 을 두른다. 입력·셀렉트에는 없는
                           // 표시라 꺼 두고, 호버·포커스 링은 fieldClass 것을 그대로 쓴다.
-                          "w-full justify-between border px-3 ring-0",
+                          // Button 원본이 svg 를 size-4 로 잡아 두어, 다른 날짜 칸과 같은 20 으로 키운다
+                          "w-full justify-between border px-3 ring-0 [&_svg]:size-5",
                           // 값이 있으면 입력·셀렉트와 같은 굵기·색, 없으면 자리표시 색
                           business.startedOn
                             ? "text-ink-strong font-semibold"
@@ -460,7 +525,11 @@ const BusinessCard = ({
                         {business.startedOn
                           ? format(business.startedOn, DATE_FORMAT)
                           : "2024-06-01"}
-                        <CalendarSearch aria-hidden="true" />
+                        {/* 신청서 작성·내정보 수정의 날짜 칸과 같은 아이콘·크기·색 */}
+                        <CalendarIcon
+                          aria-hidden="true"
+                          className="text-ink-bullet size-5 shrink-0"
+                        />
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
@@ -537,12 +606,13 @@ const BusinessCard = ({
                   data-invalid={!!errorOf("category") || undefined}
                   value={business.category}
                   onValueChange={(value) =>
-                    // 카테고리를 고르면 첫 방법론이 자동 선택된다(기획).
+                    // 항목을 고르면 방법론은 비워 두고, 방법론을 고를 때까지
+                    // 상세정보 자리에는 안내(빈 상태)만 보여준다.
                     changeMethodology(
                       {
                         ...business,
                         category: value,
-                        methodology: methodologiesOf(value)[0] ?? "",
+                        methodology: "",
                         cells: {},
                       },
                       business.category,
@@ -557,9 +627,12 @@ const BusinessCard = ({
                       errorOf("category") && "border-ink-error border-2",
                     )}
                   >
-                    <SelectValue placeholder="항목(카테고리) 선택" />
+                    <SelectValue placeholder="항목 선택" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value={PLACEHOLDER_OPTION} disabled>
+                      항목 선택
+                    </SelectItem>
                     {REDUCTION_METHODOLOGIES.map((group) => (
                       <SelectItem key={group.value} value={group.value}>
                         {group.label}
@@ -600,6 +673,9 @@ const BusinessCard = ({
                     <SelectValue placeholder="방법론 선택" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value={PLACEHOLDER_OPTION} disabled>
+                      방법론 선택
+                    </SelectItem>
                     {methodologiesOf(business.category).map((item) => (
                       <SelectItem key={item} value={item}>
                         {item}
@@ -617,14 +693,16 @@ const BusinessCard = ({
 
           {/* 방법론을 고르기 전에는 상세정보 대신 안내만 보여준다.
               이 안내 위에는 시안대로 구분선을 두지 않는다. */}
-          {schemaOf(business.methodology) ? (
+          {schema ? (
             <>
               <hr className="border-line-card border-t" />
               <BusinessDetail
-                schema={schemaOf(business.methodology)!}
+                schema={schema}
                 cells={business.cells}
                 fieldPrefix={field("detail")}
                 showErrors={showErrors && !detailErrorsOff}
+                results={results}
+                hint={hint}
                 onCellChange={(cellRef, value) =>
                   onChange({
                     ...business,
