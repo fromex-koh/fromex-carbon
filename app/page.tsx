@@ -272,7 +272,7 @@ const IA_ROWS = [
     status: "신규",
     revise: false,
     devCheck: false,
-    uiux: "개발 수정요청",
+    uiux: "개발 수정완료",
     desc: "Step 3, 기준연도 배출량 확인, 정보 입력 / 계산결과 도출",
     cells: [
       { level: 4, name: "감축잠재량 산정", rowSpan: 3, colSpan: 1 },
