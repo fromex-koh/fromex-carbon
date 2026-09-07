@@ -10,4 +10,21 @@
 - 결과: 패널을 연 채 창을 넓혀도 스크롤이 잠긴 채 남지 않고, 360 에서도 두 칸이 화면 안에 모두 들어온다
 - 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/9b0332cab4830086aca6b97b9b1c59d511dc3483)
 
+### 2·3차 신청서 탄소중립 투자계획 입력 전환
+- 대상: app/(site)/(content)/carbon-leader/application-1/components/application-form.tsx
+  - app/(site)/(content)/carbon-leader/application-3/components/application-form.tsx
+- 변경: 읽기 전용으로 되짚기만 하던 감축기술·감축설비명·사업기간·투자금·온실가스감축량을 모두 입력 칸으로 바꿨다(사업기간은 시작일·종료일 달력 두 칸)
+  - 빈 줄 하나에 안내 문구만 있는 상태로 시작하고, 줄마다 [삭제]·표 아래 [행 추가하기] 를 감축기술 도입현황 표와 같은 규격으로 되살렸다
+  - 한 줄당 다섯 항목을 모두 검사한다. 사업기간은 시작일·종료일을 한 줄로 묶어 문구 하나만 붙인다
+  - 2차는 1차와 같은 컴포넌트를 쓰므로 1차 화면(감축잠재량 산정에서 넘어온 읽기 전용 표)은 그대로 둔다
+- 결과: 2·3차 신청서에서 투자계획을 직접 입력하고 항목을 늘리거나 지울 수 있다
+- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/113bf49f9c1c500e39443a20b33e1dccc6ce2762)
+
+## [덮어쓰기]
+
+### 퍼블리싱 인덱스
+- 대상: app/page.tsx
+- 변경: 2·3차 신청서 작성 화면의 UIUX 상태를 '완료'에서 '개발 수정완료'로 변경
+- 적용: 지정한 파일만 교체
+
 릴리스 성공 후 내용은 자동으로 비워집니다.
