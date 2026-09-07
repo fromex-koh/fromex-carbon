@@ -37,7 +37,7 @@ export interface PlanRow {
 export const BASE_YEAR_COLUMNS = ["1년차도", "2년차도", "3년차도"]
 
 export const BASE_YEAR_ROWS: PlanRow[] = [
-  { label: "총매출액", unit: "(백만원)", suffix: "원" },
+  { label: "총매출액", unit: "(백만원)", suffix: "백만원" },
   { label: "온실가스배출량", unit: "(tCO₂eq)", suffix: "tCO₂eq" },
 ]
 
@@ -45,7 +45,7 @@ export const BASE_YEAR_ROWS: PlanRow[] = [
 export const REDUCTION_PLAN_COLUMNS = ["2026년", "2027년", "2028년"]
 
 export const REDUCTION_PLAN_ROWS: PlanRow[] = [
-  { label: "탄소감축투자 계획금액", unit: "(백만원)", suffix: "원" },
+  { label: "탄소감축투자 계획금액", unit: "(백만원)", suffix: "백만원" },
   // 시안은 이 줄만 칸 오른쪽 단위가 없다. 단위는 이름표 괄호에만 적힌다.
   { label: "탄소중립 목표", unit: "(기준연도 대비감축, %)", suffix: "" },
 ]
@@ -66,7 +66,7 @@ export const INVESTMENT_COLUMNS: InvestmentColumn[] = [
     key: "amount",
     label: "투자금 (백만원)",
     placeholder: "0",
-    suffix: "원",
+    suffix: "백만원",
   },
   {
     key: "reduction",
@@ -140,7 +140,7 @@ export const ADOPTION_COLUMNS: InvestmentColumn[] = [
     key: "amount",
     label: "투자금 (백만원)",
     placeholder: "0",
-    suffix: "원",
+    suffix: "백만원",
   },
 ]
 
