@@ -585,7 +585,7 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     needDataDone: true,
-    uiux: "완료",
+    uiux: "개발 수정완료",
     desc: "Step 1, 정보 입력(회원정보 및 자가진단 정보 일부 연동) - 탄소중립 기준연도 현황 (자가진단 데이터 불러오기)",
     cells: [
       { level: 3, name: "선도기업 신청 2차", rowSpan: 8, colSpan: 1 },
@@ -694,7 +694,7 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     needDataDone: true,
-    uiux: "완료",
+    uiux: "개발 수정완료",
     desc: "Step 1, 정보 입력, 기업정보 - 내정보 불러오기, 탄소중립 기준연도현황 - 기존데이터 불러오기 기능",
     cells: [
       { level: 3, name: "선도기업 신청 3차", rowSpan: 17, colSpan: 1 },
