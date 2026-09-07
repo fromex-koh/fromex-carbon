@@ -1,43 +1,31 @@
 # 다음 릴리스 변경사항
 
+<!--
+일반 변경사항은 불릿(-)으로 작성하세요.
+아래 예시는 형식 안내용 주석이며 실제 릴리즈 내용으로 수집되지 않습니다.
+프론트엔드 전달 항목은 ## 구분자, ### 작업명, - 라벨: 내용 순서로 작성하세요.
+한 라벨에 여러 줄을 넣으려면 다음 줄을 들여쓴 - 로 이어서 쓰세요(아래 대상 참고).
+
 ## [Diff 확인]
 
-### 전체 메뉴 패널 스크롤 잠금·가로 반응형 보정
-- 대상: components/nav-bar.tsx
-- 변경: 패널이 열릴 때 body 에 직접 넣던 스크롤 잠금을, 패널이 보이는 구간(1080 이하)에서만 도는 클래스로 바꿨다
-  - 1080 을 넘는 순간 열림 상태도 함께 닫아, 창을 다시 좁혔을 때 패널이 그대로 나오지 않게 했다
-  - 본문 두 칸을 글자 폭 대신 비율(왼쪽 2/5·상한 있음)로 나누고, 메뉴 글자가 접히도록 해 좁은 화면에서 오른쪽 하위 메뉴가 잘리지 않게 했다
-- 결과: 패널을 연 채 창을 넓혀도 스크롤이 잠긴 채 남지 않고, 360 에서도 두 칸이 화면 안에 모두 들어온다
-- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/9b0332cab4830086aca6b97b9b1c59d511dc3483)
+### 퍼블리싱 인덱스 표 헤더 고정
+- 대상: app/page.tsx
+- 변경: 버전 업데이트·인계 자산 표 헤더에 sticky 적용
+- 결과: 표를 스크롤해도 헤더가 영역 상단에 남는다
+- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/{commit-hash})
 
-### 2·3차 신청서 탄소중립 투자계획 입력 전환
-- 대상: app/(site)/(content)/carbon-leader/application-1/components/application-form.tsx
-  - app/(site)/(content)/carbon-leader/application-3/components/application-form.tsx
-- 변경: 읽기 전용으로 되짚기만 하던 감축기술·감축설비명·사업기간·투자금·온실가스감축량을 모두 입력 칸으로 바꿨다(사업기간은 시작일·종료일 달력 두 칸)
-  - 빈 줄 하나에 안내 문구만 있는 상태로 시작하고, 줄마다 [삭제]·표 아래 [행 추가하기] 를 감축기술 도입현황 표와 같은 규격으로 되살렸다
-  - 한 줄당 다섯 항목을 모두 검사한다. 사업기간은 시작일·종료일을 한 줄로 묶어 문구 하나만 붙인다
-  - 2차는 1차와 같은 컴포넌트를 쓰므로 1차 화면(감축잠재량 산정에서 넘어온 읽기 전용 표)은 그대로 둔다
-- 결과: 2·3차 신청서에서 투자계획을 직접 입력하고 항목을 늘리거나 지울 수 있다
-- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/113bf49f9c1c500e39443a20b33e1dccc6ce2762)
+## [신규 추가]
 
-### 신청 금액 단위 천원 → 백만원 통일
-- 대상: constants/carbon-leader-application-form.ts
-  - constants/carbon-leader-final-confirm.ts
-  - app/(site)/(content)/carbon-leader/application-1/components/application-form.tsx
-  - app/(site)/(content)/carbon-leader/application-3/components/application-form.tsx
-  - app/(site)/(content)/carbon-leader/application-2/components/final-confirm.tsx
-  - app/(site)/(content)/carbon-leader/application-3/components/final-confirm.tsx
-- 변경: 항목 이름표와 표 헤더의 (천원) 을 (백만원) 으로 바꿨다 — 총매출액 · 탄소감축투자 계획금액 · 투자계획 투자금 · 감축기술 도입현황 투자금
-  - 화면에 놓여 있던 금액도 같은 기준으로 환산했다(투자계획 120,000 → 120, 총매출액 15,000,000 → 15,000, 계획금액 500,000 → 500 등)
-  - 입력 칸 오른쪽 단위는 시안대로 '원' 을 그대로 둔다
-- 결과: 1·2·3차 신청서 작성과 최종확인 여섯 화면의 금액 표기와 값이 백만원 기준으로 맞는다
-- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/665f4c168a2b014140aeead6b978c6a0a1cd8e8d)
+### 릴리스 메타데이터 생성기
+- 대상: scripts/compute-asset-versions.mjs
+  - scripts/git-info.mjs
+- 적용: 신규 파일 추가
 
 ## [덮어쓰기]
 
-### 퍼블리싱 인덱스
-- 대상: app/page.tsx
-- 변경: 1·2·3차 신청서 작성과 최종확인 여섯 화면의 UIUX 상태를 '개발 수정완료'로 변경
+### GNB 메뉴 상수
+- 대상: lib/const.ts
 - 적용: 지정한 파일만 교체
 
 릴리스 성공 후 내용은 자동으로 비워집니다.
+-->

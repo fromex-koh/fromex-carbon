@@ -1,10 +1,10 @@
 {
-  "version": "v0.0.8",
+  "version": "v0.0.9",
   "screens": [
     {
       "path": "/carbon-leader/application-1/application-form",
-      "version": "v0.0.7",
-      "isCurrent": false
+      "version": "v0.0.9",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-1/application-form/address-search",
@@ -13,13 +13,13 @@
     },
     {
       "path": "/carbon-leader/application-1/document-submit",
-      "version": "v0.0.7",
-      "isCurrent": false
+      "version": "v0.0.9",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-1/final-confirm",
-      "version": "v0.0.7",
-      "isCurrent": false
+      "version": "v0.0.9",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-1/final-confirm/submit-confirm",
@@ -28,13 +28,13 @@
     },
     {
       "path": "/carbon-leader/application-1/result",
-      "version": "v0.0.7",
-      "isCurrent": false
+      "version": "v0.0.9",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-2/application-form",
-      "version": "v0.0.7",
-      "isCurrent": false
+      "version": "v0.0.9",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-2/application-form/address-search",
@@ -43,13 +43,13 @@
     },
     {
       "path": "/carbon-leader/application-2/document-submit",
-      "version": "v0.0.7",
-      "isCurrent": false
+      "version": "v0.0.9",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-2/final-confirm",
-      "version": "v0.0.7",
-      "isCurrent": false
+      "version": "v0.0.9",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-2/final-confirm/submit-confirm",
@@ -58,13 +58,13 @@
     },
     {
       "path": "/carbon-leader/application-2/result",
-      "version": "v0.0.7",
-      "isCurrent": false
+      "version": "v0.0.9",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-3/application-form",
-      "version": "v0.0.7",
-      "isCurrent": false
+      "version": "v0.0.9",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-3/application-form/address-search",
@@ -73,13 +73,13 @@
     },
     {
       "path": "/carbon-leader/application-3/document-submit",
-      "version": "v0.0.7",
-      "isCurrent": false
+      "version": "v0.0.9",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-3/final-confirm",
-      "version": "v0.0.7",
-      "isCurrent": false
+      "version": "v0.0.9",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-3/final-confirm/submit-confirm",
@@ -88,8 +88,8 @@
     },
     {
       "path": "/carbon-leader/application-3/inventory-emission",
-      "version": "v0.0.7",
-      "isCurrent": false
+      "version": "v0.0.9",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-3/inventory-emission/detail-input",
@@ -108,33 +108,33 @@
     },
     {
       "path": "/carbon-leader/application-3/result",
-      "version": "v0.0.7",
-      "isCurrent": false
+      "version": "v0.0.9",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-3/target-achievement",
-      "version": "v0.0.7",
-      "isCurrent": false
+      "version": "v0.0.9",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-3/target-achievement/general-unmet",
-      "version": "v0.0.7",
-      "isCurrent": false
+      "version": "v0.0.9",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-3/target-achievement/target-management",
-      "version": "v0.0.7",
-      "isCurrent": false
+      "version": "v0.0.9",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-3/target-achievement/target-management-all-unmet",
-      "version": "v0.0.7",
-      "isCurrent": false
+      "version": "v0.0.9",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application-3/target-achievement/target-management-unmet",
-      "version": "v0.0.7",
-      "isCurrent": false
+      "version": "v0.0.9",
+      "isCurrent": true
     },
     {
       "path": "/carbon-leader/application/final-done",
@@ -229,7 +229,7 @@
     {
       "path": "/carbon-leader/self-check/reduction-potential",
       "version": "v0.0.8",
-      "isCurrent": true
+      "isCurrent": false
     },
     {
       "path": "/carbon-leader/self-check/reduction-potential/change-confirm",
