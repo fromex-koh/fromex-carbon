@@ -792,7 +792,7 @@ const ApplicationForm = ({
       techRows.forEach((rowKey) => {
         ADOPTION_COLUMNS.forEach((column) => {
           const name = `adoption-${rowKey}-${column.key}`
-          // 이름표는 "투자금 (천원)" 꼴이라 문구에서는 괄호 단위를 뗀다
+          // 이름표는 "투자금 (백만원)" 꼴이라 문구에서는 괄호 단위를 뗀다
           if (!valueOf(name)) {
             next[name] = requiredMessage(column.label.replace(/\s*\(.*$/, ""))
           }
@@ -1180,7 +1180,7 @@ const ApplicationForm = ({
                   <span className="flex-2 py-2.5 text-center">사업기간</span>
                   {/* 시안은 이름이 500, 괄호 안 단위가 400 이다 */}
                   <span className="flex-1 py-2.5 text-center font-medium">
-                    투자금 <span className="font-normal">(천원)</span>
+                    투자금 <span className="font-normal">(백만원)</span>
                   </span>
                   <span className="flex-1 py-2.5 text-center font-medium">
                     온실가스감축량 <span className="font-normal">(tCO₂eq)</span>
@@ -1349,7 +1349,7 @@ const ApplicationForm = ({
                     <span className="flex-1 py-2.5 text-center">도입시기</span>
                     {/* 시안은 이름이 500, 괄호 안 단위가 400 이다 */}
                     <span className="flex-1 py-2.5 text-center font-medium">
-                      투자금 <span className="font-normal">(천원)</span>
+                      투자금 <span className="font-normal">(백만원)</span>
                     </span>
                     {/* 삭제 버튼 자리 */}
                     <span className="w-21 shrink-0" />
