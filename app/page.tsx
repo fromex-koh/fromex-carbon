@@ -517,7 +517,7 @@ const IA_ROWS = [
     status: "신규",
     revise: false,
     devCheck: false,
-    uiux: "완료",
+    uiux: "개발 수정완료",
     desc: "Step 3, 최종확인 화면, 수정하기, 제출하기 버튼",
     cells: [
       { level: 4, name: "최종 확인", rowSpan: 2, colSpan: 1 },
@@ -626,7 +626,7 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     needDataDone: true,
-    uiux: "완료",
+    uiux: "개발 수정완료",
     desc: "Step 3, 최종확인 화면, 수정하기, 제출하기 버튼",
     cells: [
       { level: 4, name: "최종 확인", rowSpan: 2, colSpan: 1 },
@@ -858,7 +858,7 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     needDataDone: true,
-    uiux: "완료",
+    uiux: "개발 수정완료",
     desc: "Step 5, 최종확인 화면, 수정하기, 제출하기 버튼",
     cells: [
       { level: 4, name: "최종 확인", rowSpan: 2, colSpan: 1 },
