@@ -13,6 +13,8 @@ import {
   ArrowLeft,
   ArrowRight,
   Calendar,
+  ChevronLeft,
+  ChevronRight,
   CirclePlus,
   Download,
   LoaderCircle,
@@ -356,6 +358,9 @@ const Field = ({
   </FieldErrorContext.Consumer>
 )
 
+/** 도입시기 칸의 월 목록 */
+const MONTHS = Array.from({ length: 12 }, (_, index) => index + 1)
+
 /** 달력에서 고르는 날짜 칸. 겉모습은 일반 입력 칸과 같다. */
 const DateField = ({
   id,
@@ -417,6 +422,103 @@ const DateField = ({
           {...CALENDAR_PROPS}
           initialFocus
         />
+      </PopoverContent>
+    </Popover>
+  )
+}
+
+/** 도입시기처럼 연·월만 받는 칸. 날짜 달력 대신 연도 이동 + 12개월 목록을 쓴다. */
+const MonthField = ({
+  id,
+  placeholder,
+  invalid,
+}: {
+  id: string
+  placeholder: string
+  invalid?: boolean
+}) => {
+  const [picked, setPicked] = useState<{ year: number; month: number }>()
+  const [open, setOpen] = useState(false)
+  const [year, setYear] = useState(() => new Date().getFullYear())
+  const text = picked
+    ? `${picked.year}-${String(picked.month).padStart(2, "0")}`
+    : ""
+
+  return (
+    <Popover
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next)
+        // 다시 열면 고른 해부터 보여 준다
+        if (next) setYear(picked?.year ?? new Date().getFullYear())
+      }}
+    >
+      {/* 고른 값을 폼으로 넘긴다 */}
+      <input type="hidden" name={id} value={text} />
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          id={id}
+          className={cn(
+            FIELD_BOX,
+            "w-full min-w-0 cursor-pointer text-left xl:px-3 2xl:px-4",
+            invalid && "ring-destructive ring-2",
+          )}
+        >
+          <span
+            className={cn(
+              "min-w-0 flex-1 truncate text-sm font-medium",
+              text ? "text-ink-strong" : "text-ink-bullet",
+            )}
+          >
+            {text || placeholder}
+          </span>
+          <Calendar
+            aria-hidden="true"
+            className="text-ink-bullet size-5 shrink-0"
+          />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-3" align="start">
+        <div className="flex items-center justify-between gap-4">
+          <button
+            type="button"
+            aria-label="이전 해"
+            onClick={() => setYear((current) => current - 1)}
+            className="hover:bg-accent focus-visible:ring-ash-600 flex size-8 cursor-pointer items-center justify-center rounded-md outline-hidden focus-visible:ring-2"
+          >
+            <ChevronLeft aria-hidden="true" className="size-4" />
+          </button>
+          <span className="text-ink-strong text-sm font-medium">{year}년</span>
+          <button
+            type="button"
+            aria-label="다음 해"
+            onClick={() => setYear((current) => current + 1)}
+            className="hover:bg-accent focus-visible:ring-ash-600 flex size-8 cursor-pointer items-center justify-center rounded-md outline-hidden focus-visible:ring-2"
+          >
+            <ChevronRight aria-hidden="true" className="size-4" />
+          </button>
+        </div>
+        <div className="mt-2 grid grid-cols-3 gap-1">
+          {MONTHS.map((month) => (
+            <button
+              key={month}
+              type="button"
+              onClick={() => {
+                setPicked({ year, month })
+                setOpen(false)
+              }}
+              className={cn(
+                "text-ink-strong hover:bg-accent focus-visible:ring-ash-600 h-9 w-16 cursor-pointer rounded-md text-sm font-medium transition-colors outline-hidden focus-visible:ring-2",
+                picked?.year === year &&
+                  picked?.month === month &&
+                  "bg-primary text-primary-foreground hover:bg-primary",
+              )}
+            >
+              {month}월
+            </button>
+          ))}
+        </div>
       </PopoverContent>
     </Popover>
   )
@@ -1310,9 +1412,9 @@ const ApplicationForm = ({
                           htmlFor={`adoption-${rowKey}-adopted-at`}
                           className="xl:min-w-0 xl:flex-1 xl:[&>label]:sr-only"
                         >
-                          <DateField
+                          <MonthField
                             id={`adoption-${rowKey}-adopted-at`}
-                            placeholder="도입일"
+                            placeholder="도입연월"
                             invalid={!!errors[`adoption-${rowKey}-adopted-at`]}
                           />
                         </Field>
