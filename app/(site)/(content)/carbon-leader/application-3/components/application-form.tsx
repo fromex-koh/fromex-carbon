@@ -40,7 +40,7 @@ import {
   ADOPTION_ROW_COUNT,
   APPLICATION_THIRD_STEPS,
   INVESTMENT_COLUMNS,
-  type InvestmentRow,
+  INVESTMENT_ROWS,
 } from "@/constants/carbon-leader-application-form"
 import { navBarHeight } from "@/lib/const"
 import { cn } from "@/lib/utils"
@@ -410,19 +410,8 @@ const UnitField = ({
 )
 
 const ApplicationForm = () => {
-  // (4) 표에 세울 줄. 빈 줄 하나로 시작해 사용자가 직접 채우고 줄도 늘린다.
-  const [investRows, setInvestRows] = useState<InvestmentRow[]>(() => [
-    {
-      code: "IPN1",
-      tech: "",
-      facility: "",
-      period: "",
-      amount: "",
-      reduction: "",
-    },
-  ])
-  const nextInvestKey = useRef(2)
-  const rows = investRows
+  // (4) 표에 세울 줄. 1차 신청서에서 넘어오는 목록이라 화면에서 늘리거나 줄이지 않는다.
+  const rows = INVESTMENT_ROWS
 
   // (5) 감축기술 도입현황. 사용자가 줄을 늘린다.
   const [techRows, setTechRows] = useState<number[]>(() =>
@@ -439,66 +428,36 @@ const ApplicationForm = () => {
    * 그리기 전에 옮겨야 화면이 두 번 튀지 않아 useLayoutEffect 를 쓴다.
    */
   const addRowButtonRef = useRef<HTMLButtonElement>(null)
-  const investAddButtonRef = useRef<HTMLButtonElement>(null)
-  /** 이번 변화의 기준으로 삼을 [행 추가하기] 버튼(투자계획 · 도입현황) */
-  const activeAddButton = useRef(addRowButtonRef)
   const buttonTopBefore = useRef<number | null>(null)
   /** 방금 늘린 줄. 헤더에 가리지 않게 윗선을 확인할 때 쓴다 */
-  const followRowKey = useRef<string | number | null>(null)
+  const followRowKey = useRef<number | null>(null)
   const [rowsTick, setRowsTick] = useState(0)
 
-  const markRowsChange = (button: typeof addRowButtonRef) => {
-    activeAddButton.current = button
+  const markRowsChange = () => {
     buttonTopBefore.current =
-      button.current?.getBoundingClientRect().top ?? null
+      addRowButtonRef.current?.getBoundingClientRect().top ?? null
     setRowsTick((tick) => tick + 1)
   }
 
   const addTechRow = () => {
     const key = nextTechKey.current++
     followRowKey.current = key
-    markRowsChange(addRowButtonRef)
+    markRowsChange()
     setTechRows((prev) => [...prev, key])
   }
 
   /** 줄은 항상 하나는 남는다. 마지막 한 줄이면 새 키로 갈아 끼워 값만 비운다 */
   const removeTechRow = (key: number) => {
     const fresh = nextTechKey.current++
-    markRowsChange(addRowButtonRef)
+    markRowsChange()
     setTechRows((prev) =>
       prev.length > 1 ? prev.filter((row) => row !== key) : [fresh],
     )
   }
 
-  /** 새 줄의 칸 이름에 쓸 코드. 이름이 investment-<code>-tech 꼴이라 하이픈을 넣지 않는다 */
-  const blankInvestRow = (): InvestmentRow => ({
-    code: `IPN${nextInvestKey.current++}`,
-    tech: "",
-    facility: "",
-    period: "",
-    amount: "",
-    reduction: "",
-  })
-
-  const addInvestRow = () => {
-    const row = blankInvestRow()
-    followRowKey.current = row.code
-    markRowsChange(investAddButtonRef)
-    setInvestRows((prev) => [...prev, row])
-  }
-
-  const removeInvestRow = (code: string) => {
-    markRowsChange(investAddButtonRef)
-    setInvestRows((prev) =>
-      prev.length > 1
-        ? prev.filter((row) => row.code !== code)
-        : [blankInvestRow()],
-    )
-  }
-
   useLayoutEffect(() => {
     if (!rowsTick) return
-    const button = activeAddButton.current.current
+    const button = addRowButtonRef.current
     const before = buttonTopBefore.current
     const rowKey = followRowKey.current
     buttonTopBefore.current = null
@@ -546,22 +505,6 @@ const ApplicationForm = () => {
           ? ADDRESS_FIELDS.every((field) => valueOf(field))
           : valueOf(name)
       if (!filled) next[name] = requiredMessage(label)
-    })
-
-    // (4) 탄소중립 투자계획: 모든 칸을 사용자가 채운다
-    rows.forEach((row) => {
-      INVESTMENT_COLUMNS.forEach((column) => {
-        const name = `investment-${row.code}-${column.key}`
-        if (!valueOf(name)) {
-          next[name] = requiredMessage(column.label.replace(/\s*\(.*$/, ""))
-        }
-      })
-      const filled = ["start", "end"].every((edge) =>
-        valueOf(`investment-${row.code}-${edge}`),
-      )
-      if (!filled) {
-        next[`investment-${row.code}-period`] = requiredMessage("사업기간")
-      }
     })
 
     // (5) 감축기술 도입현황: 도입시기까지 한 줄로 묶어 본다
@@ -880,7 +823,7 @@ const ApplicationForm = () => {
           <Card
             id="investment-plan"
             title="탄소중립 투자계획"
-            description="탄소중립 투자계획을 입력합니다. 행 추가 버튼으로 항목을 자유롭게 추가할 수 있습니다."
+            description="1차 신청 시 작성한 탄소중립 투자계획과 동일한 정보가 노출됩니다. 이 항목은 수정할 수 없습니다."
           >
             <div className={cn("flex flex-col", TABLE_BOX)}>
               {/* 표 헤더는 PC 시안에만 있다 */}
@@ -897,8 +840,6 @@ const ApplicationForm = () => {
                   <span className="flex-1 py-2.5 text-center font-medium">
                     온실가스감축량 <span className="font-normal">(tCO₂eq)</span>
                   </span>
-                  {/* 삭제 버튼 자리 */}
-                  <span className="w-21 shrink-0" />
                 </div>
               </div>
 
@@ -906,8 +847,6 @@ const ApplicationForm = () => {
                 {rows.map((row, index) => (
                   <div
                     key={row.code}
-                    // 줄을 늘린 뒤 창을 따라 옮길 때 이 줄을 찾는다
-                    data-row-key={row.code}
                     // 오류 문구가 붙어도 칸 윗선이 흔들리지 않도록 위 기준으로 세운다
                     className="flex flex-col gap-4 py-6 first:pt-0 last:pb-0 xl:flex-row xl:items-start xl:gap-8 xl:py-0"
                   >
@@ -924,15 +863,20 @@ const ApplicationForm = () => {
                           htmlFor={`investment-${row.code}-${column.key}`}
                           className="xl:min-w-0 xl:flex-1 xl:[&>label]:sr-only"
                         >
+                          {/* 감축잠재량 산정에서 넘어오는 값이라 읽기 전용이다 */}
                           <input
                             id={`investment-${row.code}-${column.key}`}
                             name={`investment-${row.code}-${column.key}`}
+                            readOnly
                             autoComplete="off"
                             placeholder={column.placeholder}
+                            value={
+                              column.key === "tech" ? row.tech : row.facility
+                            }
+                            // 읽기 전용 칸은 시안이 값을 회색으로 흐려 둔다
                             className={cn(
                               FIELD,
-                              errors[`investment-${row.code}-${column.key}`] &&
-                                "ring-destructive ring-2",
+                              "bg-surface-disabled text-ash-500",
                             )}
                           />
                         </Field>
@@ -946,27 +890,18 @@ const ApplicationForm = () => {
                         >
                           사업기간
                         </label>
-                        {/* 768 시안은 시작일·종료일이 한 줄에 반씩, 360 만 위아래로 쌓인다 */}
-                        <div className="flex flex-col gap-2.5 md:flex-row">
-                          {(["start", "end"] as const).map((edge) => (
-                            <div key={edge} className="min-w-0 flex-1">
-                              <DateField
-                                id={`investment-${row.code}-${edge}`}
-                                placeholder={
-                                  edge === "start" ? "시작일" : "종료일"
-                                }
-                                invalid={
-                                  !!errors[`investment-${row.code}-period`]
-                                }
-                              />
-                            </div>
-                          ))}
-                        </div>
-                        {errors[`investment-${row.code}-period`] ? (
-                          <p className="text-ink-error text-xs font-medium lg:text-sm">
-                            {errors[`investment-${row.code}-period`]}
-                          </p>
-                        ) : null}
+                        {/* 1차에 적어 둔 기간을 그대로 되짚기만 한다 */}
+                        <input
+                          id={`investment-${row.code}-start`}
+                          name={`investment-${row.code}-period`}
+                          readOnly
+                          autoComplete="off"
+                          value={row.period}
+                          className={cn(
+                            FIELD,
+                            "bg-surface-disabled text-ash-500",
+                          )}
+                        />
                       </div>
 
                       {INVESTMENT_COLUMNS.slice(2).map((column) => (
@@ -980,37 +915,18 @@ const ApplicationForm = () => {
                             id={`investment-${row.code}-${column.key}`}
                             placeholder={column.placeholder}
                             suffix={column.suffix ?? ""}
-                            invalid={
-                              !!errors[`investment-${row.code}-${column.key}`]
+                            value={
+                              column.key === "amount"
+                                ? row.amount
+                                : row.reduction
                             }
+                            readOnly
                           />
                         </Field>
                       ))}
-
-                      <button
-                        type="button"
-                        aria-label={`${index + 1}번 행 삭제`}
-                        onClick={() => removeInvestRow(row.code)}
-                        className={cn(
-                          SIDE_BUTTON,
-                          "w-full md:col-span-2 xl:w-21",
-                        )}
-                      >
-                        삭제
-                      </button>
                     </div>
                   </div>
                 ))}
-
-                {/* 시안 PC_add_BTN 규격은 (5) 표의 [행 추가하기] 와 같다 */}
-                <button
-                  ref={investAddButtonRef}
-                  type="button"
-                  onClick={addInvestRow}
-                  className="bg-surface-action text-brand-primary hover:bg-surface-flow hover:border-brand-primary focus-visible:ring-ash-600 mt-6 flex h-14 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-transparent text-base font-bold transition-colors outline-hidden focus-visible:ring-2 md:h-16 [&_svg]:size-5"
-                >
-                  <CirclePlus aria-hidden="true" />행 추가하기
-                </button>
               </div>
             </div>
           </Card>
