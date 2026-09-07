@@ -20,11 +20,24 @@
 - 결과: 2·3차 신청서에서 투자계획을 직접 입력하고 항목을 늘리거나 지울 수 있다
 - 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/113bf49f9c1c500e39443a20b33e1dccc6ce2762)
 
+### 신청 금액 단위 천원 → 백만원 통일
+- 대상: constants/carbon-leader-application-form.ts
+  - constants/carbon-leader-final-confirm.ts
+  - app/(site)/(content)/carbon-leader/application-1/components/application-form.tsx
+  - app/(site)/(content)/carbon-leader/application-3/components/application-form.tsx
+  - app/(site)/(content)/carbon-leader/application-2/components/final-confirm.tsx
+  - app/(site)/(content)/carbon-leader/application-3/components/final-confirm.tsx
+- 변경: 항목 이름표와 표 헤더의 (천원) 을 (백만원) 으로 바꿨다 — 총매출액 · 탄소감축투자 계획금액 · 투자계획 투자금 · 감축기술 도입현황 투자금
+  - 화면에 놓여 있던 금액도 같은 기준으로 환산했다(투자계획 120,000 → 120, 총매출액 15,000,000 → 15,000, 계획금액 500,000 → 500 등)
+  - 입력 칸 오른쪽 단위는 시안대로 '원' 을 그대로 둔다
+- 결과: 1·2·3차 신청서 작성과 최종확인 여섯 화면의 금액 표기와 값이 백만원 기준으로 맞는다
+- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/665f4c168a2b014140aeead6b978c6a0a1cd8e8d)
+
 ## [덮어쓰기]
 
 ### 퍼블리싱 인덱스
 - 대상: app/page.tsx
-- 변경: 2·3차 신청서 작성 화면의 UIUX 상태를 '완료'에서 '개발 수정완료'로 변경
+- 변경: 1·2·3차 신청서 작성과 최종확인 여섯 화면의 UIUX 상태를 '개발 수정완료'로 변경
 - 적용: 지정한 파일만 교체
 
 릴리스 성공 후 내용은 자동으로 비워집니다.
