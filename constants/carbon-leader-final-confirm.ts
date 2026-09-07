@@ -67,8 +67,8 @@ export const BASE_YEAR_COLUMNS = ["2023년", "2024년", "2025년"]
 export const BASE_YEAR_ROWS: SummaryRow[] = [
   {
     label: "총매출액",
-    unit: "(천원)",
-    values: ["15,000,000", "15,000,000", "15,000,000"],
+    unit: "(백만원)",
+    values: ["15,000", "15,000", "15,000"],
   },
   {
     label: "온실가스배출량",
@@ -86,8 +86,8 @@ export const BASE_YEAR_ROWS: SummaryRow[] = [
 export const REDUCTION_PLAN_ROWS: SummaryRow[] = [
   {
     label: "탄소감축투자 계획금액",
-    unit: "(천원)",
-    values: ["500,000", "800,000", "1,200,000"],
+    unit: "(백만원)",
+    values: ["500", "800", "1,200"],
   },
   {
     label: "탄소중립 목표",
@@ -110,7 +110,7 @@ export const INVESTMENT_COLUMNS: { label: string; unit?: string }[] = [
   { label: "감축기술" },
   { label: "감축설비명" },
   { label: "사업기간" },
-  { label: "투자금", unit: "(천원)" },
+  { label: "투자금", unit: "(백만원)" },
   { label: "온실가스감축량", unit: "(tCO₂eq)" },
 ]
 
@@ -119,28 +119,28 @@ export const INVESTMENT_ROWS: InvestmentRow[] = [
     tech: "고효율 설비교체",
     facility: "고효율 LED 조명 교체",
     period: "2026.03~2026.09",
-    amount: "150,000",
+    amount: "150",
     reduction: "12.50",
   },
   {
     tech: "재생에너지 도입",
     facility: "태양광 발전 설비",
     period: "2026.06~2027.03",
-    amount: "300,000",
+    amount: "300",
     reduction: "45.20",
   },
   {
     tech: "공정 최적화",
     facility: "에너지 효율화 시스템",
     period: "2027.01~2027.12",
-    amount: "250,000",
+    amount: "250",
     reduction: "28.30",
   },
   {
     tech: "차량 전환",
     facility: "전기차 도입 (업무용)",
     period: "2027.06~2028.06",
-    amount: "200,000",
+    amount: "200",
     reduction: "8.40",
   },
 ]

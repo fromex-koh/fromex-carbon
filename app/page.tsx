@@ -272,7 +272,7 @@ const IA_ROWS = [
     status: "신규",
     revise: false,
     devCheck: false,
-    uiux: "개발 수정요청",
+    uiux: "개발 수정완료",
     desc: "Step 3, 기준연도 배출량 확인, 정보 입력 / 계산결과 도출",
     cells: [
       { level: 4, name: "감축잠재량 산정", rowSpan: 3, colSpan: 1 },
@@ -517,7 +517,7 @@ const IA_ROWS = [
     status: "신규",
     revise: false,
     devCheck: false,
-    uiux: "완료",
+    uiux: "개발 수정완료",
     desc: "Step 3, 최종확인 화면, 수정하기, 제출하기 버튼",
     cells: [
       { level: 4, name: "최종 확인", rowSpan: 2, colSpan: 1 },
@@ -585,7 +585,7 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     needDataDone: true,
-    uiux: "완료",
+    uiux: "개발 수정완료",
     desc: "Step 1, 정보 입력(회원정보 및 자가진단 정보 일부 연동) - 탄소중립 기준연도 현황 (자가진단 데이터 불러오기)",
     cells: [
       { level: 3, name: "선도기업 신청 2차", rowSpan: 8, colSpan: 1 },
@@ -626,7 +626,7 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     needDataDone: true,
-    uiux: "완료",
+    uiux: "개발 수정완료",
     desc: "Step 3, 최종확인 화면, 수정하기, 제출하기 버튼",
     cells: [
       { level: 4, name: "최종 확인", rowSpan: 2, colSpan: 1 },
@@ -694,7 +694,7 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     needDataDone: true,
-    uiux: "완료",
+    uiux: "개발 수정완료",
     desc: "Step 1, 정보 입력, 기업정보 - 내정보 불러오기, 탄소중립 기준연도현황 - 기존데이터 불러오기 기능",
     cells: [
       { level: 3, name: "선도기업 신청 3차", rowSpan: 17, colSpan: 1 },
@@ -858,7 +858,7 @@ const IA_ROWS = [
     revise: false,
     devCheck: false,
     needDataDone: true,
-    uiux: "완료",
+    uiux: "개발 수정완료",
     desc: "Step 5, 최종확인 화면, 수정하기, 제출하기 버튼",
     cells: [
       { level: 4, name: "최종 확인", rowSpan: 2, colSpan: 1 },

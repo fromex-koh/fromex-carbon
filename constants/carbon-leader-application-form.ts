@@ -37,7 +37,7 @@ export interface PlanRow {
 export const BASE_YEAR_COLUMNS = ["1년차도", "2년차도", "3년차도"]
 
 export const BASE_YEAR_ROWS: PlanRow[] = [
-  { label: "총매출액", unit: "(천원)", suffix: "원" },
+  { label: "총매출액", unit: "(백만원)", suffix: "원" },
   { label: "온실가스배출량", unit: "(tCO₂eq)", suffix: "tCO₂eq" },
 ]
 
@@ -45,7 +45,7 @@ export const BASE_YEAR_ROWS: PlanRow[] = [
 export const REDUCTION_PLAN_COLUMNS = ["2026년", "2027년", "2028년"]
 
 export const REDUCTION_PLAN_ROWS: PlanRow[] = [
-  { label: "탄소감축투자 계획금액", unit: "(천원)", suffix: "원" },
+  { label: "탄소감축투자 계획금액", unit: "(백만원)", suffix: "원" },
   // 시안은 이 줄만 칸 오른쪽 단위가 없다. 단위는 이름표 괄호에만 적힌다.
   { label: "탄소중립 목표", unit: "(기준연도 대비감축, %)", suffix: "" },
 ]
@@ -62,7 +62,12 @@ export interface InvestmentColumn {
 export const INVESTMENT_COLUMNS: InvestmentColumn[] = [
   { key: "tech", label: "감축기술", placeholder: "감축기술명" },
   { key: "facility", label: "감축설비명", placeholder: "설비명 입력" },
-  { key: "amount", label: "투자금 (천원)", placeholder: "0", suffix: "원" },
+  {
+    key: "amount",
+    label: "투자금 (백만원)",
+    placeholder: "0",
+    suffix: "원",
+  },
   {
     key: "reduction",
     // 칸 오른쪽 단위와 같이 tCO₂eq 다. PC 시안의 (천원) 은 위 줄에서 복사된 오기다
@@ -85,7 +90,7 @@ export interface InvestmentRow {
   code: string
   tech: string
   facility: string
-  /** 천원 단위 */
+  /** 백만원 단위 */
   amount: string
   /** tCO₂eq 단위 */
   reduction: string
@@ -106,7 +111,7 @@ export const INVESTMENT_ROWS: InvestmentRow[] = [
     period: "2026-03-01 ~ 2026-09-30",
     tech: "고효율 전동기 교체",
     facility: "송풍기 전동기 3호기",
-    amount: "120,000",
+    amount: "120",
     reduction: "48.20",
   },
   {
@@ -114,7 +119,7 @@ export const INVESTMENT_ROWS: InvestmentRow[] = [
     period: "2026-06-01 ~ 2027-03-31",
     tech: "폐열 회수 설비 도입",
     facility: "건조로 폐열회수기",
-    amount: "350,000",
+    amount: "350",
     reduction: "132.75",
   },
   {
@@ -122,7 +127,7 @@ export const INVESTMENT_ROWS: InvestmentRow[] = [
     period: "2027-01-01 ~ 2027-12-31",
     tech: "태양광 발전 설비 도입",
     facility: "공장동 옥상 태양광",
-    amount: "480,000",
+    amount: "480",
     reduction: "172.00",
   },
 ]
@@ -131,7 +136,12 @@ export const INVESTMENT_ROWS: InvestmentRow[] = [
 export const ADOPTION_COLUMNS: InvestmentColumn[] = [
   { key: "tech", label: "감축기술", placeholder: "예) 고효율 설비교체" },
   { key: "facility", label: "감축설비명", placeholder: "예) 고효율 LED 조명" },
-  { key: "amount", label: "투자금 (천원)", placeholder: "0", suffix: "원" },
+  {
+    key: "amount",
+    label: "투자금 (백만원)",
+    placeholder: "0",
+    suffix: "원",
+  },
 ]
 
 /** 처음에는 한 줄만 보여 준다. 행 추가하기로 늘어날 자리다. */

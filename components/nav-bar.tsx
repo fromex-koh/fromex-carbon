@@ -25,6 +25,10 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useSession } from "@/components/auth-provider"
 import LogoTaxonomy from "@/components/ui/logo-taxonomy"
 
+// 전체 메뉴 패널이 열린 동안 배경 스크롤을 잠그는 클래스.
+// 패널이 보이는 1080 이하에서만 걸리게 두어, 창을 넓히면 잠금도 함께 풀린다.
+const SCROLL_LOCK_CLASS = "max-[1080px]:overflow-hidden"
+
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [isDark, setIsDark] = useState(false)
@@ -129,8 +133,23 @@ const NavBar = () => {
 
   useEffect(() => {
     activeCurrentMenu()
-    document.body.style.overflow = isOpen ? "hidden" : ""
+    // 패널은 1080 이하에서만 보인다(아래 max-[1080px]:block).
+    // overflow 를 직접 넣으면 창을 넓혀 패널이 사라져도 잠금이 남아 스크롤이
+    // 막히므로, 같은 구간에서만 도는 클래스로 잠근다.
+    document.body.classList.toggle(SCROLL_LOCK_CLASS, isOpen)
   }, [isOpen])
+
+  // 잠금이 풀려도 열림 상태가 남으면 창을 다시 좁혔을 때 패널이 그대로 나온다.
+  // 1080 을 넘는 순간 상태도 함께 닫는다.
+  useEffect(() => {
+    const wide = window.matchMedia("(min-width: 1081px)")
+    const closeOnWide = () => {
+      if (wide.matches) setIsOpen(false)
+    }
+    closeOnWide()
+    wide.addEventListener("change", closeOnWide)
+    return () => wide.removeEventListener("change", closeOnWide)
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -405,11 +424,15 @@ const NavBar = () => {
         </div>
 
         <div className="flex">
-          <div className={"flex h-lvh flex-col gap-2 bg-active p-4"}>
+          <div
+            className={
+              "flex h-lvh w-2/5 max-w-60 shrink-0 flex-col gap-2 bg-active p-3 sm:p-4"
+            }
+          >
             {sideMenuList.map((menu, index) => (
               <Button
                 className={cn(
-                  "py-6 text-lg font-bold",
+                  "h-auto py-4 text-base font-bold break-keep whitespace-normal sm:py-6 sm:text-lg",
                   index === activeMenuIndex && "bg-accent",
                 )}
                 key={menu.title + "onSide"}
@@ -422,7 +445,9 @@ const NavBar = () => {
               </Button>
             ))}
           </div>
-          <div className={"flex h-lvh w-full flex-col gap-1 p-4"}>
+          <div
+            className={"flex h-lvh min-w-0 flex-1 flex-col gap-1 p-3 sm:p-4"}
+          >
             {activeMenuIndex !== -1 &&
               sideMenuList[activeMenuIndex].contents.map((content) => (
                 <div key={content.subTitle + "onSide"}>
@@ -440,7 +465,7 @@ const NavBar = () => {
                     <Button
                       variant={"ghost"}
                       className={cn(
-                        "w-full justify-start py-6 text-base font-medium",
+                        "h-auto w-full justify-start py-4 text-left text-sm font-medium break-keep whitespace-normal sm:py-6 sm:text-base",
                         pathname.includes(
                           sideMenuList[activeMenuIndex].link + content.link,
                         ) && "text-primary hover:text-primary",
