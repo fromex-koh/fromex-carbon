@@ -1,32 +1,36 @@
-"use client"
+"use client";
 
-import { type FormEvent, useEffect, useRef, useState } from "react"
+import { type FormEvent, useEffect, useRef, useState } from "react";
 
+import { BadgeCheck, Check, Download, Leaf, MoreHorizontal, Puzzle, X } from "lucide-react";
+
+import ConfirmDialog from "@/app/(site)/(content)/carbon-leader/self-check/components/confirm-dialog";
+import { SelfCheckReportDownloadButton } from "@/app/(site)/(content)/carbon-leader/self-check/components/result-certificate";
+import { CertificateDownloadButton } from "@/app/(site)/(content)/carbon-leader/application-1/components/result-certificate";
+import SupplementRequestDialog from "@/app/(site)/(content)/my-page/components/supplement-request-dialog";
 import {
-  BadgeCheck,
-  Check,
-  Download,
-  Leaf,
-  MoreHorizontal,
-  Puzzle,
-  X,
-} from "lucide-react"
-
-import ConfirmDialog from "@/app/(site)/(content)/carbon-leader/self-check/components/confirm-dialog"
-import SupplementRequestDialog from "@/app/(site)/(content)/my-page/components/supplement-request-dialog"
+  CERTIFICATE_SAMPLE,
+  CERTIFICATE_SECOND_SAMPLE,
+  CERTIFICATE_THIRD_SAMPLE,
+  type CertificateData,
+} from "@/constants/carbon-leader-certificate";
+import {
+  SELF_CHECK_REPORT_SAMPLE,
+  type SelfCheckReportData,
+} from "@/constants/carbon-leader-self-check-report";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import {
   STATUS_FILTER_ALL,
   STATUS_FILTERS,
@@ -35,9 +39,9 @@ import {
   STATUS_SORTS,
   type StatusItem,
   type StatusTone,
-} from "@/constants/my-page-status"
-import { cn } from "@/lib/utils"
-import { smoothScrollTo } from "@/util/smooth-scroll-to"
+} from "@/constants/my-page-status";
+import { cn } from "@/lib/utils";
+import { smoothScrollTo } from "@/util/smooth-scroll-to";
 
 // IA "현황조회". 로그인 회원의 평가·신청 내역을 한 화면에 모아 본다.
 // [퍼블리싱 노출용] 목록은 전부 시안에 그려진 값이다. 실데이터를 붙일 때 걷어낸다.
@@ -59,7 +63,7 @@ const GROUP_TONE = {
     card: "bg-brand-done-teal/8",
     Icon: Leaf,
   },
-} as const
+} as const;
 
 /** 줄 앞 상태 알약. 시안은 58x28 · r6 · 흰 면 · 13/700 이다 */
 const STATUS_TONE: Record<string, string> = {
@@ -69,40 +73,113 @@ const STATUS_TONE: Record<string, string> = {
   만료: "text-ink-hint",
   // 보완요청만 흰 면이 아니라 붉은 면에 흰 글자다
   보완요청: "bg-destructive text-white",
-}
+};
 
 /**
  * 결과 줄 오른쪽 필터. 시안은 활성만 진한 글자에 체크 아이콘이 붙는다.
  * "전체" 를 뺀 나머지는 아래 묶음 이름과 같아서 그대로 걸러 쓴다.
  */
-const ALL = STATUS_FILTER_ALL
-const FILTERS = STATUS_FILTERS
+const ALL = STATUS_FILTER_ALL;
+const FILTERS = STATUS_FILTERS;
 
 /** 정렬 셀렉트. 시안 패널은 120x92(46 두 줄)이다 */
-const SORTS = STATUS_SORTS
+const SORTS = STATUS_SORTS;
+
+/**
+ * [프론트 개발자: 현황조회 PDF 데이터 연결 지점]
+ * 목록 API의 각 항목에는 downloadKind를 넣고, 실제 출력 데이터는 이 객체로 넘긴다.
+ * 같은 차수의 여러 신청 건을 구분해야 할 때는 StatusItem에 식별자를 추가한 뒤
+ * 해당 식별자로 조회한 데이터를 StatusCard에 전달하면 버튼/템플릿 코드는 그대로 쓸 수 있다.
+ */
+export interface StatusDownloadData {
+  certificates: Partial<Record<1 | 2 | 3, CertificateData>>;
+  selfCheckReport?: SelfCheckReportData;
+}
+
+const DEFAULT_STATUS_DOWNLOAD_DATA: StatusDownloadData = {
+  certificates: {
+    1: CERTIFICATE_SAMPLE,
+    2: CERTIFICATE_SECOND_SAMPLE,
+    3: CERTIFICATE_THIRD_SAMPLE,
+  },
+  selfCheckReport: SELF_CHECK_REPORT_SAMPLE,
+};
+
+const StatusDownloadAction = ({
+  item,
+  expired,
+  downloadData,
+  mobile = false,
+}: {
+  item: StatusItem;
+  expired: boolean;
+  downloadData: StatusDownloadData;
+  mobile?: boolean;
+}) => {
+  const label = item.download;
+  if (!label) return null;
+
+  const className = mobile
+    ? "bg-surface-action text-primary hover:bg-surface-flow disabled:bg-fill-disabled disabled:text-ink-on-fill-muted mt-2.5 inline-flex h-10 w-full cursor-pointer items-center justify-center gap-1.5 rounded-md text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-100 md:hidden [&_svg]:size-4"
+    : "bg-transparent text-primary hover:bg-surface-field dark:hover:bg-white/10 disabled:bg-fill-disabled disabled:text-ink-on-fill-muted disabled:hover:bg-fill-disabled dark:disabled:hover:bg-fill-disabled inline-flex h-7.5 cursor-pointer items-center gap-1.5 rounded-md px-2 text-sm font-bold whitespace-nowrap shadow-none transition-colors max-md:hidden disabled:cursor-not-allowed disabled:opacity-100 md:h-7.5 md:w-auto [&_svg]:size-4";
+  const content = (
+    <>
+      <Download aria-hidden="true" />
+      {label}
+    </>
+  );
+
+  if (item.downloadKind === "self-check-report" && downloadData.selfCheckReport) {
+    return (
+      <SelfCheckReportDownloadButton data={downloadData.selfCheckReport} className={className}>
+        {content}
+      </SelfCheckReportDownloadButton>
+    );
+  }
+
+  const certificateRound = item.downloadKind?.startsWith("certificate-")
+    ? Number(item.downloadKind.at(-1))
+    : undefined;
+  const certificate = certificateRound
+    ? downloadData.certificates[certificateRound as 1 | 2 | 3]
+    : undefined;
+  if (certificate) {
+    return (
+      <CertificateDownloadButton data={certificate} disabled={expired} className={className}>
+        {content}
+      </CertificateDownloadButton>
+    );
+  }
+
+  // 전문평가·K-택소노미처럼 아직 PDF 템플릿이 연결되지 않은 기존 항목은 모양만 유지한다.
+  return (
+    <button type="button" disabled={expired} className={className}>
+      {content}
+    </button>
+  );
+};
 
 const StatusCard = ({
   item,
   tone,
   onDelete,
+  downloadData,
 }: {
-  item: StatusItem
-  tone: StatusTone
-  onDelete: () => void
+  item: StatusItem;
+  tone: StatusTone;
+  onDelete: () => void;
+  downloadData: StatusDownloadData;
 }) => {
   /** 패널의 [삭제하기] 로 여는 확인 모달 */
-  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false);
   // 보완요청이 붙은 카드는 아직 받을 확인서가 없어 다운로드를 감춘다
-  const download = item.supplement ? undefined : item.download
+  const download = item.supplement ? undefined : item.download;
   // 유효기간이 지난 건은 확인서를 받을 수 없어 버튼을 잠근다
-  const expired = !!item.validity?.expired
+  const expired = !!item.validity?.expired;
 
   return (
     <li
-      className={cn(
-        "flex flex-col rounded-2xl px-5 py-5 md:px-8 md:py-7",
-        GROUP_TONE[tone].card,
-      )}
+      className={cn("flex flex-col rounded-2xl px-5 py-5 md:px-8 md:py-7", GROUP_TONE[tone].card)}
     >
       {/* 제목 줄. 오른쪽에 다운로드 링크와 더보기 점 세 개가 붙는다 */}
       <div className="flex items-start justify-between gap-3">
@@ -141,18 +218,7 @@ const StatusCard = ({
             </SupplementRequestDialog>
           ) : null}
           {download ? (
-            <button
-              type="button"
-              disabled={expired}
-              // 모바일은 아래 전체폭 버튼이 대신하므로 이 링크는 768 부터만 보인다.
-              // 평소에는 면색 없이 글자만 둔다. 카드 면이 옅은 색이라 회색 hover 는 묻힌다.
-              // 라이트는 흰 면으로 밝히고, 다크는 같은 방향(밝게)으로 흰색 10% 를 덮는다.
-              // 다크에서 어두운 면(#111)을 깔면 차이가 작아 잘 안 보인다.
-              className="text-primary hover:bg-surface-field dark:hover:bg-white/10 disabled:bg-fill-disabled disabled:text-ink-on-fill-muted disabled:hover:bg-fill-disabled dark:disabled:hover:bg-fill-disabled inline-flex h-7.5 cursor-pointer items-center gap-1.5 rounded-md px-2 text-sm font-bold whitespace-nowrap transition-colors max-md:hidden disabled:cursor-not-allowed [&_svg]:size-4"
-            >
-              <Download aria-hidden="true" />
-              {download}
-            </button>
+            <StatusDownloadAction item={item} expired={expired} downloadData={downloadData} />
           ) : null}
           {/* 시안 btn_기타 — 114x92 r8 흰 면 · 선 #d2d2d2, 항목 46 높이 15/500.
             수정하기 #666666 · 삭제하기 #ef4444 */}
@@ -220,17 +286,13 @@ const StatusCard = ({
             <span
               className={cn(
                 "text-xs md:text-sm",
-                item.validity.expired
-                  ? "text-ink-strong font-medium"
-                  : "text-ink-hint font-normal",
+                item.validity.expired ? "text-ink-strong font-medium" : "text-ink-hint font-normal",
               )}
             >
               {item.validity.value}
             </span>
             {item.validity.expired ? (
-              <span className="text-destructive text-xs font-bold md:text-sm">
-                만료
-              </span>
+              <span className="text-destructive text-xs font-bold md:text-sm">만료</span>
             ) : null}
           </div>
         ) : null}
@@ -249,14 +311,7 @@ const StatusCard = ({
 
       {/* 360 시안은 다운로드가 카드 맨 아래 전체폭 버튼이다. 768 부터는 제목 줄 오른쪽 링크만 남는다 */}
       {download ? (
-        <button
-          type="button"
-          disabled={expired}
-          className="bg-surface-action text-primary hover:bg-surface-flow disabled:bg-fill-disabled disabled:text-ink-on-fill-muted mt-2.5 inline-flex h-10 w-full cursor-pointer items-center justify-center gap-1.5 rounded-md text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-100 md:hidden [&_svg]:size-4"
-        >
-          <Download aria-hidden="true" />
-          {download}
-        </button>
+        <StatusDownloadAction item={item} expired={expired} downloadData={downloadData} mobile />
       ) : null}
 
       {/* 자가진단 삭제 확인과 같은 껍데기를 쓴다 */}
@@ -271,8 +326,8 @@ const StatusCard = ({
         onConfirm={onDelete}
       />
     </li>
-  )
-}
+  );
+};
 
 /**
  * [퍼블리싱 노출용] 검색어 일치 판정.
@@ -286,7 +341,7 @@ const StatusCard = ({
  * 훑는 범위는 제목·상태·설명·등록일시·유효기간이다.
  */
 const matchesKeyword = (item: StatusItem, keyword: string) => {
-  if (!keyword) return true
+  if (!keyword) return true;
 
   const haystack = [
     ...item.title,
@@ -294,14 +349,14 @@ const matchesKeyword = (item: StatusItem, keyword: string) => {
     ...item.rows.flatMap((row) => [row.status, row.text, row.date]),
   ]
     .join(" ")
-    .toLowerCase()
+    .toLowerCase();
 
   return keyword
     .toLowerCase()
     .split(/\s+/)
     .filter(Boolean)
-    .every((word) => haystack.includes(word))
-}
+    .every((word) => haystack.includes(word));
+};
 
 /** 지우고 다시 그릴 때 줄이 섞이지 않도록 항목마다 고정 키를 매겨 둔다 */
 const seedOf = (source: typeof STATUS_GROUPS) =>
@@ -311,26 +366,29 @@ const seedOf = (source: typeof STATUS_GROUPS) =>
       ...item,
       key: `${group.title}-${index}`,
     })),
-  }))
+  }));
 
 const Status = ({
   /** 빈 화면 전용 라우트에서 목록을 비워 넘긴다 */
   groups: seed = STATUS_GROUPS,
+  /** API에서 받은 1·2·3차 확인서와 자가진단 보고서 데이터 */
+  downloadData = DEFAULT_STATUS_DOWNLOAD_DATA,
 }: {
-  groups?: typeof STATUS_GROUPS
+  groups?: typeof STATUS_GROUPS;
+  downloadData?: StatusDownloadData;
 }) => {
-  const [filter, setFilter] = useState(ALL)
+  const [filter, setFilter] = useState(ALL);
   /** 입력칸에 적히는 값 */
-  const [keyword, setKeyword] = useState("")
-  const searchRef = useRef<HTMLInputElement>(null)
+  const [keyword, setKeyword] = useState("");
+  const searchRef = useRef<HTMLInputElement>(null);
   /** [검색] 을 눌러 목록에 실제로 적용된 값. 입력 도중에는 목록이 흔들리지 않는다 */
-  const [query, setQuery] = useState("")
+  const [query, setQuery] = useState("");
   /** 묶음별로 지금까지 펼친 건수. [더보기] 를 누르면 STATUS_PAGE_SIZE 만큼 늘어난다 */
-  const [shownCount, setShownCount] = useState<Record<string, number>>({})
+  const [shownCount, setShownCount] = useState<Record<string, number>>({});
   /** [더보기] 로 방금 펼친 묶음. 새로 나온 마지막 줄까지 화면을 옮기고 비운다 */
-  const [expanded, setExpanded] = useState<string | null>(null)
-  const [sort, setSort] = useState(SORTS[0])
-  const [groups, setGroups] = useState(() => seedOf(seed))
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [sort, setSort] = useState(SORTS[0]);
+  const [groups, setGroups] = useState(() => seedOf(seed));
 
   // 고른 묶음만 남기고, 그 안에서 등록일로 정렬한다.
   // 날짜가 같으면 원래 순서를 지킨다.
@@ -346,16 +404,14 @@ const Status = ({
       items: group.items
         .map((item, index) => ({ item, index }))
         .sort((a, b) => {
-          const gap = (a.item.rows[0]?.date ?? "").localeCompare(
-            b.item.rows[0]?.date ?? "",
-          )
-          const order = gap !== 0 ? gap : a.index - b.index
-          return sort === "최신순" ? -order : order
+          const gap = (a.item.rows[0]?.date ?? "").localeCompare(b.item.rows[0]?.date ?? "");
+          const order = gap !== 0 ? gap : a.index - b.index;
+          return sort === "최신순" ? -order : order;
         })
         .map(({ item }) => item),
     }))
     .map((group) => {
-      const limit = shownCount[group.title] ?? STATUS_PAGE_SIZE
+      const limit = shownCount[group.title] ?? STATUS_PAGE_SIZE;
       return {
         ...group,
         // 묶음 전체 건수는 안내 문구에 쓰고, 화면에는 limit 까지만 그린다
@@ -365,16 +421,16 @@ const Status = ({
         page: Math.ceil(limit / STATUS_PAGE_SIZE),
         pageTotal: Math.ceil(group.items.length / STATUS_PAGE_SIZE),
         items: group.items.slice(0, limit),
-      }
-    })
+      };
+    });
 
-  const total = shown.reduce((sum, group) => sum + group.totalCount, 0)
+  const total = shown.reduce((sum, group) => sum + group.totalCount, 0);
 
   /** 검색어를 비우면 목록도 전체로 되돌린다. × 단추와 입력 비우기가 함께 쓴다 */
   const resetSearch = () => {
-    setQuery("")
-    setShownCount({})
-  }
+    setQuery("");
+    setShownCount({});
+  };
 
   /**
    * [검색] 또는 엔터. 여기가 API 를 끼워 넣을 자리다 —
@@ -382,41 +438,38 @@ const Status = ({
    * setGroups(seedOf(응답)) 로 갈아 끼우면 된다.
    */
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    setQuery(keyword.trim())
+    event.preventDefault();
+    setQuery(keyword.trim());
     // 검색 결과는 늘 첫 쪽부터 본다
-    setShownCount({})
-  }
+    setShownCount({});
+  };
 
   const showMore = (title: string) => {
     setShownCount((prev) => ({
       ...prev,
       [title]: (prev[title] ?? STATUS_PAGE_SIZE) + STATUS_PAGE_SIZE,
-    }))
-    setExpanded(title)
-  }
+    }));
+    setExpanded(title);
+  };
 
   // 늘어난 줄이 그려진 뒤 마지막 카드를 화면 가운데로 올린다
   useEffect(() => {
-    if (!expanded) return
+    if (!expanded) return;
 
     const timer = window.setTimeout(() => {
-      const section = document.querySelector(
-        `[data-group="${CSS.escape(expanded)}"]`,
-      )
-      const last = section?.querySelector("li:last-of-type")
+      const section = document.querySelector(`[data-group="${CSS.escape(expanded)}"]`);
+      const last = section?.querySelector("li:last-of-type");
       if (last) {
-        const rect = last.getBoundingClientRect()
-        const center =
-          window.scrollY + rect.top - (window.innerHeight - rect.height) / 2
-        const max = document.documentElement.scrollHeight - window.innerHeight
-        smoothScrollTo(Math.min(Math.max(center, 0), max))
+        const rect = last.getBoundingClientRect();
+        const center = window.scrollY + rect.top - (window.innerHeight - rect.height) / 2;
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        smoothScrollTo(Math.min(Math.max(center, 0), max));
       }
-      setExpanded(null)
-    }, 60)
+      setExpanded(null);
+    }, 60);
 
-    return () => window.clearTimeout(timer)
-  }, [expanded])
+    return () => window.clearTimeout(timer);
+  }, [expanded]);
 
   // [삭제하기] 를 누른 카드를 목록에서 뺀다
   const handleDelete = (groupTitle: string, key: string) =>
@@ -426,7 +479,7 @@ const Status = ({
           ? { ...group, items: group.items.filter((item) => item.key !== key) }
           : group,
       ),
-    )
+    );
 
   return (
     <div className="flex w-full max-w-316 flex-col px-5 pt-10 pb-24 md:px-7 md:pt-12 md:pb-28 lg:px-8 lg:pt-14 lg:pb-42">
@@ -446,10 +499,10 @@ const Status = ({
             placeholder="검색어를 입력해주세요"
             value={keyword}
             onChange={(event) => {
-              const next = event.target.value
-              setKeyword(next)
+              const next = event.target.value;
+              setKeyword(next);
               // 입력을 비우면(× 버튼 포함) 검색을 누르지 않아도 전체로 돌아온다
-              if (!next.trim()) resetSearch()
+              if (!next.trim()) resetSearch();
             }}
             // 브라우저가 그리는 기본 × 는 감추고 아래 단추로 대신한다
             className={cn(
@@ -464,9 +517,9 @@ const Status = ({
               type="button"
               aria-label="검색어 지우기"
               onClick={() => {
-                setKeyword("")
-                resetSearch()
-                searchRef.current?.focus()
+                setKeyword("");
+                resetSearch();
+                searchRef.current?.focus();
               }}
               className="bg-fill-disabled hover:bg-ink-hint absolute right-5 inline-flex size-6 cursor-pointer items-center justify-center rounded-full text-white transition-colors [&_svg]:size-3.5"
             >
@@ -487,8 +540,8 @@ const Status = ({
       <div className="mt-12 flex flex-wrap items-center justify-between gap-x-2 gap-y-2 md:mt-14 md:gap-4">
         {/* 시안은 "n건" 만 브랜드 파랑 굵은 글씨다 */}
         <p className="text-ink-muted text-base font-medium">
-          총 <span className="text-primary font-bold">{total}건</span>의 평가
-          결과<span className="max-md:hidden">가 있습니다.</span>
+          총 <span className="text-primary font-bold">{total}건</span>의 평가 결과
+          <span className="max-md:hidden">가 있습니다.</span>
         </p>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 md:gap-4">
           {/* 768 부터는 시안대로 고스트 버튼이 늘어선다 */}
@@ -501,18 +554,12 @@ const Status = ({
                 aria-pressed={filter === name}
                 className={cn(
                   "hover:bg-accent inline-flex cursor-pointer items-center gap-1 rounded-md px-2 py-1 text-sm font-bold whitespace-nowrap transition-colors",
-                  filter === name
-                    ? "text-ink-strong"
-                    : "text-ink-hint hover:text-ink-body",
+                  filter === name ? "text-ink-strong" : "text-ink-hint hover:text-ink-body",
                 )}
               >
                 {/* 시안은 켜진 항목 앞에만 20px 체크가 붙는다 */}
                 {filter === name ? (
-                  <Check
-                    aria-hidden="true"
-                    strokeWidth={2.5}
-                    className="size-4"
-                  />
+                  <Check aria-hidden="true" strokeWidth={2.5} className="size-4" />
                 ) : null}
                 {name}
               </button>
@@ -536,10 +583,7 @@ const Status = ({
               ))}
             </SelectContent>
           </Select>
-          <span
-            aria-hidden="true"
-            className="bg-line-field h-3.5 w-px shrink-0 max-md:hidden"
-          />
+          <span aria-hidden="true" className="bg-line-field h-3.5 w-px shrink-0 max-md:hidden" />
           {/* 시안은 테두리·면색 없는 셀렉트다. 달력 머리 셀렉트처럼 hover 에서만 배경이 뜬다 */}
           <Select value={sort} onValueChange={setSort}>
             <SelectTrigger
@@ -565,14 +609,10 @@ const Status = ({
       {/* 묶음 세 개 */}
       <div className="mt-6 flex flex-col gap-8 md:gap-10">
         {shown.map((group) => (
-          <section
-            key={group.title}
-            data-group={group.title}
-            className="flex flex-col"
-          >
+          <section key={group.title} data-group={group.title} className="flex flex-col">
             <div className="flex items-center gap-2.5 md:gap-3">
               {(() => {
-                const { Icon } = GROUP_TONE[group.tone]
+                const { Icon } = GROUP_TONE[group.tone];
                 return (
                   <span
                     aria-hidden="true"
@@ -583,7 +623,7 @@ const Status = ({
                   >
                     <Icon strokeWidth={2.25} />
                   </span>
-                )
+                );
               })()}
               <h3 className="text-ink-strong text-xl font-bold break-keep md:text-2xl lg:text-3xl">
                 {group.title}
@@ -596,9 +636,7 @@ const Status = ({
                  회색 면(surface-disabled) + 굵은 한 줄 + 흐린 보조 한 줄. */
               <div className="bg-surface-disabled mt-4 flex flex-col items-center gap-2 rounded-xl px-6 py-12 md:mt-6 md:rounded-2xl md:py-15">
                 <p className="text-ink-strong text-base font-bold break-keep md:text-lg">
-                  {query
-                    ? `검색 결과가 없습니다.`
-                    : `${group.title} 내역이 없습니다.`}
+                  {query ? `검색 결과가 없습니다.` : `${group.title} 내역이 없습니다.`}
                 </p>
                 <p className="text-ink-muted text-sm break-keep">
                   {query
@@ -614,6 +652,7 @@ const Status = ({
                   key={item.key}
                   item={item}
                   tone={group.tone}
+                  downloadData={downloadData}
                   onDelete={() => handleDelete(group.title, item.key)}
                 />
               ))}
@@ -641,7 +680,7 @@ const Status = ({
         ))}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Status
+export default Status;

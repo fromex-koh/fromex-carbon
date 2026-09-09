@@ -23,36 +23,38 @@ const TAXONOMY_DATES = [
   "2025-09-19 12:35:50",
   "2025-09-12 09:29:04",
   "2025-08-29 15:56:12",
-]
+];
 
 export interface StatusRow {
   /** 줄 앞 알약 */
-  status: string
+  status: string;
   /** 알약 오른쪽 설명 */
-  text: string
+  text: string;
   /** 줄 오른쪽 날짜 */
-  date: string
+  date: string;
 }
 
 export interface StatusItem {
   /** 카드 제목. 두 조각이면 가운데 점으로 잇는다 */
-  title: string[]
-  rows: StatusRow[]
+  title: string[];
+  rows: StatusRow[];
   /** 오른쪽 위 다운로드 링크 이름 */
-  download?: string
+  download?: string;
+  /** 탄소감축 PDF 템플릿 선택값. API 응답에서도 같은 값으로 내려준다. */
+  downloadKind?: "certificate-1" | "certificate-2" | "certificate-3" | "self-check-report";
   /** 탄소감축 카드에만 있는 유효기간 줄. expired 면 오른쪽에 붉은 "만료" 가 붙는다 */
-  validity?: { label: string; value: string; expired?: boolean }
+  validity?: { label: string; value: string; expired?: boolean };
   /** 보완요청이 있는 카드 */
-  supplement?: boolean
+  supplement?: boolean;
 }
 
 /** 묶음 색 구분. 화면(status.tsx)의 GROUP_TONE 키와 같다 */
-export type StatusTone = "info" | "violet" | "teal"
+export type StatusTone = "info" | "violet" | "teal";
 
 export interface StatusGroup {
-  title: string
-  tone: StatusTone
-  items: StatusItem[]
+  title: string;
+  tone: StatusTone;
+  items: StatusItem[];
 }
 
 export const STATUS_GROUPS: StatusGroup[] = [
@@ -219,6 +221,7 @@ export const STATUS_GROUPS: StatusGroup[] = [
       {
         title: ["선도기업 신청 1차"],
         download: "확인서 다운로드",
+        downloadKind: "certificate-1",
         validity: {
           label: "유효기간",
           value: "2025-08-26 ~ 2026-08-26",
@@ -236,6 +239,7 @@ export const STATUS_GROUPS: StatusGroup[] = [
       {
         title: ["선도기업 신청 3차"],
         download: "확인서 다운로드",
+        downloadKind: "certificate-3",
         validity: { label: "유효기간", value: "2026-07-30 ~ 2027-07-30" },
         rows: [
           {
@@ -250,6 +254,7 @@ export const STATUS_GROUPS: StatusGroup[] = [
       {
         title: ["선도기업 신청 2차"],
         download: "확인서 다운로드",
+        downloadKind: "certificate-2",
         validity: { label: "유효기간", value: "2026-05-21 ~ 2027-05-21" },
         rows: [
           {
@@ -263,6 +268,7 @@ export const STATUS_GROUPS: StatusGroup[] = [
       {
         title: ["선도기업 신청 1차"],
         download: "확인서 다운로드",
+        downloadKind: "certificate-1",
         validity: { label: "유효기간", value: "제출 후 부여" },
         rows: [
           {
@@ -276,6 +282,7 @@ export const STATUS_GROUPS: StatusGroup[] = [
       {
         title: ["탄소감축 자가진단"],
         download: "보고서 다운로드",
+        downloadKind: "self-check-report",
         rows: [
           {
             status: "완료",
@@ -286,30 +293,26 @@ export const STATUS_GROUPS: StatusGroup[] = [
       },
     ],
   },
-]
+];
 
 /**
  * 세 묶음이 모두 비었을 때를 보여 주는 목록.
  * 빈 화면 전용 라우트(/my-page/status/empty)가 쓴다. 묶음 이름·색은 그대로 두고 목록만 비운다.
  */
-export const STATUS_GROUPS_EMPTY: StatusGroup[] = STATUS_GROUPS.map(
-  (group) => ({ ...group, items: [] }),
-)
+export const STATUS_GROUPS_EMPTY: StatusGroup[] = STATUS_GROUPS.map((group) => ({
+  ...group,
+  items: [],
+}));
 
 /** 결과 줄 필터. "전체" 를 뺀 나머지는 STATUS_GROUPS 의 title 과 같아야 한다 */
-export const STATUS_FILTER_ALL = "전체"
-export const STATUS_FILTERS = [
-  STATUS_FILTER_ALL,
-  "전문평가",
-  "K-택소노미",
-  "탄소감축",
-]
+export const STATUS_FILTER_ALL = "전체";
+export const STATUS_FILTERS = [STATUS_FILTER_ALL, "전문평가", "K-택소노미", "탄소감축"];
 
 /**
  * 묶음마다 한 번에 보여 주는 건수. 이보다 많으면 아래 [더보기] 가 붙고,
  * 적으면 버튼이 아예 나오지 않는다.
  */
-export const STATUS_PAGE_SIZE = 4
+export const STATUS_PAGE_SIZE = 4;
 
 /** 정렬 셀렉트 값 */
-export const STATUS_SORTS = ["최신순", "오래된순"]
+export const STATUS_SORTS = ["최신순", "오래된순"];
