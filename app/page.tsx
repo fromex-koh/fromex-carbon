@@ -459,15 +459,13 @@ const IA_ROWS = [
     no: 28,
     path: "/carbon-leader/self-check/result/result-certificate",
     user: "비회원·회원",
-    type: "Link",
+    type: "Download",
     status: "신규",
     revise: false,
     devCheck: false,
     uiux: "완료",
     desc: "결과 보고서 다운로드",
-    cells: [
-      { level: 5, name: "결과 확인서 (다운로드)", rowSpan: 1, colSpan: 1 },
-    ],
+    cells: [{ level: 5, name: "결과보고서(template)", rowSpan: 1, colSpan: 1 }],
   },
   {
     no: 29,
@@ -555,26 +553,25 @@ const IA_ROWS = [
     no: 35,
     path: "/carbon-leader/application-1/result/application-download",
     user: "비회원·회원",
-    type: "Link",
-    status: "신규",
+    type: "Download",
+    status: "완료",
     revise: false,
     devCheck: false,
     uiux: "완료",
     desc: "신청서 다운로드",
-    cells: [{ level: 5, name: "신청서 (다운로드)", rowSpan: 1, colSpan: 1 }],
+    cells: [{ level: 5, name: "신청서(template)", rowSpan: 1, colSpan: 1 }],
   },
   {
     no: 36,
     path: "/carbon-leader/application-1/result/result-certificate",
     user: "비회원·회원",
-    type: "Link",
+    type: "Download",
     status: "신규",
     revise: false,
     devCheck: false,
-    undecided: true,
-    uiux: "대기중",
+    uiux: "완료",
     desc: "결과 보고서 다운로드 (콘텐츠 미수급), 제공 미정 * 공식 인증을 받는 절차 인하여 현재 개발에 제외될 수 있음",
-    cells: [{ level: 5, name: "결과 확인서", rowSpan: 1, colSpan: 1 }],
+    cells: [{ level: 5, name: "결과확인서(template)", rowSpan: 1, colSpan: 1 }],
   },
   {
     no: 37,
@@ -664,26 +661,25 @@ const IA_ROWS = [
     no: 43,
     path: "/carbon-leader/application-2/result/application-download",
     user: "비회원·회원",
-    type: "Link",
-    status: "신규",
+    type: "Download",
+    status: "완료",
     revise: false,
     devCheck: false,
     uiux: "완료",
     desc: "신청서 다운로드",
-    cells: [{ level: 5, name: "신청서 (다운로드)", rowSpan: 1, colSpan: 1 }],
+    cells: [{ level: 5, name: "신청서(template)", rowSpan: 1, colSpan: 1 }],
   },
   {
     no: 44,
     path: "/carbon-leader/application-2/result/result-certificate",
     user: "비회원·회원",
-    type: "Link",
+    type: "Download",
     status: "신규",
     revise: false,
     devCheck: false,
-    undecided: true,
-    uiux: "대기중",
+    uiux: "완료",
     desc: "결과 보고서 다운로드 (콘텐츠 미수급), 제공 미정 * 공식 인증을 받는 절차 인하여 현재 개발에 제외될 수 있음",
-    cells: [{ level: 5, name: "결과 확인서", rowSpan: 1, colSpan: 1 }],
+    cells: [{ level: 5, name: "결과확인서(template)", rowSpan: 1, colSpan: 1 }],
   },
   {
     no: 45,
@@ -896,26 +892,25 @@ const IA_ROWS = [
     no: 60,
     path: "/carbon-leader/application-3/result/application-download",
     user: "비회원·회원",
-    type: "Link",
-    status: "신규",
+    type: "Download",
+    status: "완료",
     revise: false,
     devCheck: false,
     uiux: "완료",
     desc: "신청서 다운로드",
-    cells: [{ level: 5, name: "신청서 (다운로드)", rowSpan: 1, colSpan: 1 }],
+    cells: [{ level: 5, name: "신청서(template)", rowSpan: 1, colSpan: 1 }],
   },
   {
     no: 61,
     path: "/carbon-leader/application-3/result/result-certificate",
     user: "비회원·회원",
-    type: "Link",
+    type: "Download",
     status: "신규",
     revise: false,
     devCheck: false,
-    undecided: true,
-    uiux: "대기중",
+    uiux: "완료",
     desc: "결과 보고서 다운로드 (콘텐츠 미수급), 제공 미정 * 공식 인증을 받는 절차 인하여 현재 개발에 제외될 수 있음",
-    cells: [{ level: 5, name: "결과 확인서", rowSpan: 1, colSpan: 1 }],
+    cells: [{ level: 5, name: "결과확인서(template)", rowSpan: 1, colSpan: 1 }],
   },
   {
     no: 62,
@@ -1134,13 +1129,6 @@ const REMARK_BADGES = {
     variant: "outline",
     className: "border-orange-500 text-orange-500",
     desc: "현업에서 요청한 자료 수급을 마친 행. '자료수급필요' 였던 행이 여기로 넘어온다.",
-  },
-  undecided: {
-    label: "미정",
-    // 다른 배지와 겹치지 않게 무채색으로 둔다. 라이트는 검정, 다크는 흰 알약이다
-    variant: "default",
-    className: "bg-ink-strong hover:bg-ink-strong text-surface-field",
-    desc: "제공 여부가 아직 정해지지 않은 행. 개발 범위에서 빠질 수 있다.",
   },
 } as const
 
@@ -1979,7 +1967,6 @@ const PublishingIndexPage = () => {
                     row.reviseDone ||
                     row.devCheck ||
                     row.needDataDone ||
-                    row.undecided ||
                     row.note ? (
                       <span className="flex flex-col items-start gap-1">
                         {row.revise && <RemarkBadge kind="revise" />}
@@ -1988,7 +1975,6 @@ const PublishingIndexPage = () => {
                         {row.needDataDone && (
                           <RemarkBadge kind="needDataDone" />
                         )}
-                        {row.undecided && <RemarkBadge kind="undecided" />}
                         {/* 배지로 나타내기 어려운 한 줄 메모. 화면이 없는 이동 링크 등에 쓴다 */}
                         {row.note && <RemarkNote note={row.note} />}
                       </span>
