@@ -11,7 +11,12 @@ import GradeBadge from "@/app/(site)/(content)/carbon-leader/self-check/componen
 import StepMobileNav from "@/app/(site)/(content)/carbon-leader/self-check/components/step-mobile-nav"
 import type { Grade } from "@/constants/carbon-leader-evaluation-index-items"
 import { SELF_CHECK_STEPS } from "@/constants/carbon-leader-self-check-steps"
+import {
+  SELF_CHECK_REPORT_SAMPLE,
+  type SelfCheckReportData,
+} from "@/constants/carbon-leader-self-check-report"
 import { cn } from "@/lib/utils"
+import { SelfCheckReportDownloadButton } from "@/app/(site)/(content)/carbon-leader/self-check/components/result-certificate"
 
 // 자가진단 STEP 6 결과 확인.
 // 시안이 셋이라 프롭 둘로 나눈다.
@@ -23,6 +28,19 @@ import { cn } from "@/lib/utils"
 // completed 는 그 첫 값일 뿐이라, /result/done 은 눌린 상태로 바로 들어간다.
 
 export type ResultVerdict = "fit" | "unfit"
+
+/**
+ * [프론트 개발 연계]
+ * API 응답을 SelfCheckReportData 모양으로 만든 뒤 reportData에 넘기면
+ * 결과 화면의 "출력물 받기"에서 해당 값으로 PDF가 만들어진다.
+ */
+export interface SelfCheckResultProps {
+  verdict?: ResultVerdict
+  /** 작성완료를 누른 뒤 상태의 첫 값. [선도기업 신청하기]가 열린다. */
+  completed?: boolean
+  /** PDF 템플릿에 주입할 API 데이터 */
+  reportData?: SelfCheckReportData
+}
 
 /**
  * 판정에 따라 달라지는 값. 색은 라이트·다크가 같다(시안 동일).
@@ -86,12 +104,19 @@ const VerdictRow = ({
 const SelfCheckResult = ({
   verdict = "fit",
   completed = false,
-}: {
-  verdict?: ResultVerdict
-  /** 작성완료를 누른 뒤 상태의 첫 값. [선도기업 신청하기] 가 열린다 */
-  completed?: boolean
-}) => {
+  reportData,
+}: SelfCheckResultProps) => {
   const view = VERDICT[verdict]
+  // 퍼블리싱 예시에서는 현재 화면의 판정과 PDF 내용이 서로 어긋나지 않게 맞춘다.
+  // 실제 연계에서는 API 응답을 reportData로 넘기므로 이 기본값은 사용되지 않는다.
+  const resolvedReportData: SelfCheckReportData = reportData ?? {
+    ...SELF_CHECK_REPORT_SAMPLE,
+    plan: {
+      ...SELF_CHECK_REPORT_SAMPLE.plan,
+      adequacy: view.label,
+    },
+    grade: `${view.grade}등급`,
+  }
   const [done, setDone] = useState(completed)
   // 작성완료는 진단 내용을 서버로 보내는 요청이다.
   // 응답을 기다리는 동안 버튼을 잠가 같은 요청이 여러 번 나가지 않게 한다.
@@ -233,18 +258,16 @@ const SelfCheckResult = ({
         {/* 다시 진단하기 왼쪽 · 나머지 둘 오른쪽 한 줄을 374 까지 지킨다.
             374~767 은 글자·여백을 줄이고 아이콘을 감춰 세 칸을 끼워 넣고,
             374 밑으로 더 좁아지면 줄이 깨지므로 세 칸을 한 줄씩 내려 쌓는다.
-            셋 다 다른 화면으로 넘어가는 링크라 Link 로 건다 */}
+            출력물은 현재 화면의 데이터를 PDF로 만들고, 나머지 둘만 링크로 이동한다. */}
         <div className="mt-5 flex flex-col gap-2 min-[374px]:flex-row min-[374px]:items-center min-[374px]:gap-1.5 md:gap-3">
-          {/* IA 26번 "결과 확인서 (다운로드)". 지금은 자리만 잡아 둔 경로이고,
-              실제로는 결과 보고서 PDF 를 내려주는 주소로 바뀐다 */}
-          <Link
-            href="/carbon-leader/self-check/result/result-certificate"
-            // 시안: 면 #ecf0f8 · 글 브랜드색 · 테두리 없음
+          {/* 세 결과 상태가 공유하는 PDF 버튼. API 데이터는 reportData 하나로 주입한다. */}
+          <SelfCheckReportDownloadButton
+            data={resolvedReportData}
             className="bg-surface-flow text-brand-primary hover:bg-surface-action focus-visible:ring-ash-600 flex h-10.5 cursor-pointer items-center justify-center gap-1 rounded-lg px-4 text-sm font-bold transition-colors outline-hidden focus-visible:ring-2 min-[374px]:order-2 min-[374px]:ml-auto min-[374px]:min-w-0 min-[374px]:px-3 min-[374px]:text-xs min-[374px]:max-md:[&_svg]:hidden md:h-13 md:w-42 md:px-4 md:text-sm lg:w-47 [&_svg]:size-5"
           >
             출력물 받기
             <Download aria-hidden="true" />
-          </Link>
+          </SelfCheckReportDownloadButton>
           {/* 자가진단을 처음(STEP 1 기업 정보 입력)부터 다시 한다 */}
           <Button
             asChild

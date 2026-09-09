@@ -1,12 +1,27 @@
-import Link from "next/link"
+import Link from "next/link";
 
-import { ArrowRight, Check, Download, House } from "lucide-react"
+import { ArrowRight, Check, Download, House } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Stepper } from "@/components/ui/stepper"
-import StepMobileNav from "@/app/(site)/(content)/carbon-leader/self-check/components/step-mobile-nav"
-import { APPLICATION_STEPS } from "@/constants/carbon-leader-application-form"
-import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button";
+import { Stepper } from "@/components/ui/stepper";
+import { ApplicationDownloadButton } from "@/app/(site)/(content)/carbon-leader/application-1/components/application-download";
+import { SecondApplicationDownloadButton } from "@/app/(site)/(content)/carbon-leader/application-2/components/application-download";
+import { ThirdApplicationDownloadButton } from "@/app/(site)/(content)/carbon-leader/application-3/components/application-download";
+import StepMobileNav from "@/app/(site)/(content)/carbon-leader/self-check/components/step-mobile-nav";
+import { APPLICATION_STEPS } from "@/constants/carbon-leader-application-form";
+import {
+  APPLICATION_DOWNLOAD_SAMPLE,
+  type ApplicationDownloadData,
+} from "@/constants/carbon-leader-application-download";
+import {
+  APPLICATION_SECOND_DOWNLOAD_SAMPLE,
+  type ApplicationSecondDownloadData,
+} from "@/constants/carbon-leader-application-2-download";
+import {
+  APPLICATION_THIRD_DOWNLOAD_SAMPLE,
+  type ApplicationThirdDownloadData,
+} from "@/constants/carbon-leader-application-3-download";
+import { cn } from "@/lib/utils";
 
 // 선도기업 신청 1차 STEP 4 "제출 완료".
 // 접수 결과만 보여 주는 화면이라 입력 컨트롤이 없다.
@@ -17,7 +32,14 @@ const RECEIPT_NUMBERS: Record<number, string> = {
   1: "2026-512",
   2: "2026-2ND-001",
   3: "2026-3RD-001",
-}
+};
+
+/** 구현된 차수별 결과 확인서 경로 */
+const RESULT_CERTIFICATE_HREFS: Record<number, string> = {
+  1: "/carbon-leader/application-1/result/result-certificate",
+  2: "/carbon-leader/application-2/result/result-certificate",
+  3: "/carbon-leader/application-3/result/result-certificate",
+};
 
 const RECEIPT = {
   items: [
@@ -25,7 +47,7 @@ const RECEIPT = {
     "처리 예상기간 : 2~3주",
     "신청기업 : 주식회사 그린에너지텍",
   ],
-}
+};
 
 /** 접수 후 처리 절차 세 단계. period 는 오른쪽 초록 알약이다. */
 const STEPS = [
@@ -44,34 +66,39 @@ const STEPS = [
     desc: "심사 결과는 등록하신 이메일 및 문자로 안내드립니다. 인증 적합 시 인증서가 발급됩니다.",
     period: "접수일로부터 2~3주 이내",
   },
-]
+];
 
 const NOTICES = [
   "제출된 신청서는 수정이 불가합니다. 수정이 필요한 경우 담당자(1544-1120)에게 문의하세요.",
   "신청번호는 진행상황 조회 및 문의 시 필요하니 반드시 저장해두세요.",
   "추가 서류 제출이 요청될 경우 등록된 이메일로 안내드립니다.",
-]
+];
 
 /** 안내 문구 앞 점 */
 const Dot = () => (
-  <span
-    aria-hidden="true"
-    className="flex h-5.5 w-2.5 shrink-0 items-center justify-center"
-  >
+  <span aria-hidden="true" className="flex h-5.5 w-2.5 shrink-0 items-center justify-center">
     <span className="bg-ink-bullet size-1 rounded-full" />
   </span>
-)
+);
 
 const SubmitDone = ({
   /** 신청 차수. 스테퍼 첫 단계 이름과 안내 문구·접수번호가 이 값을 탄다 */
   round = 1,
+  /** 1차 출력물 PDF에 넣을 API 데이터. 생략하면 퍼블리싱 예시 값을 쓴다. */
+  applicationData = APPLICATION_DOWNLOAD_SAMPLE,
+  /** 2차 출력물 PDF에 넣을 API 데이터. 생략하면 퍼블리싱 예시 값을 쓴다. */
+  secondApplicationData = APPLICATION_SECOND_DOWNLOAD_SAMPLE,
+  /** 3차 출력물 PDF에 넣을 API 데이터. evaluation.criterion 값으로 평가기준이 분기된다. */
+  thirdApplicationData = APPLICATION_THIRD_DOWNLOAD_SAMPLE,
 }: {
-  round?: number
+  round?: number;
+  applicationData?: ApplicationDownloadData;
+  secondApplicationData?: ApplicationSecondDownloadData;
+  thirdApplicationData?: ApplicationThirdDownloadData;
 }) => {
-  const steps = APPLICATION_STEPS.map((step, index) =>
-    index === 0 ? `${round}차신청` : step,
-  )
-  const receiptNumber = RECEIPT_NUMBERS[round] ?? RECEIPT_NUMBERS[1]
+  const steps = APPLICATION_STEPS.map((step, index) => (index === 0 ? `${round}차신청` : step));
+  const receiptNumber = RECEIPT_NUMBERS[round] ?? RECEIPT_NUMBERS[1];
+  const resultCertificateHref = RESULT_CERTIFICATE_HREFS[round] ?? RESULT_CERTIFICATE_HREFS[1];
 
   return (
     <div className="flex w-full max-w-316 flex-col md:gap-10 md:px-7 md:py-10 lg:px-8">
@@ -107,8 +134,7 @@ const SubmitDone = ({
           </p>
           <p className="text-ink-bullet mt-2 text-center text-sm leading-normal font-normal break-keep md:text-base">
             {/* 1차 시안만 차수를 빼고 적는다. 2차부터는 "2차 신청서가" 로 들어간다 */}
-            탄소중립 선도기업 {round > 1 ? `${round}차 ` : ""}신청서가
-            성공적으로 접수되었습니다.
+            탄소중립 선도기업 {round > 1 ? `${round}차 ` : ""}신청서가 성공적으로 접수되었습니다.
             <br />
             신청번호를 통해 진행상황을 확인하실 수 있습니다.
           </p>
@@ -179,10 +205,7 @@ const SubmitDone = ({
           {/* 시안은 제목에는 점이 없다. 점은 아래 항목들만 붙는다 */}
           <p className="text-ink-body text-sm font-bold break-keep">유의사항</p>
           {NOTICES.map((notice) => (
-            <p
-              key={notice}
-              className="text-ink-body flex gap-1 text-sm font-medium break-keep"
-            >
+            <p key={notice} className="text-ink-body flex gap-1 text-sm font-medium break-keep">
               <Dot />
               <span>{notice}</span>
             </p>
@@ -193,14 +216,41 @@ const SubmitDone = ({
             374~767 은 글자·여백을 줄이고 아이콘을 감춰 세 칸을 끼워 넣고,
             374 밑으로 더 좁아지면 줄이 깨지므로 세 칸을 한 줄씩 내려 쌓는다 */}
         <div className="mt-4 flex flex-col gap-2 min-[374px]:flex-row min-[374px]:items-center min-[374px]:gap-1.5 md:gap-3 lg:mt-0">
-          <Link
-            href="/carbon-leader/self-check/result/result-certificate"
-            // 시안: 면 #ecf0f8 · 글 브랜드색 · 테두리 없음
-            className="bg-surface-flow text-brand-primary hover:bg-surface-action focus-visible:ring-ash-600 flex h-10.5 cursor-pointer items-center justify-center gap-1 rounded-lg px-4 text-sm font-bold transition-colors outline-hidden focus-visible:ring-2 min-[374px]:order-2 min-[374px]:ml-auto min-[374px]:min-w-0 min-[374px]:px-3 min-[374px]:text-xs min-[374px]:max-md:[&_svg]:hidden md:h-13 md:w-42 md:px-4 md:text-sm lg:w-47 [&_svg]:size-5"
-          >
-            출력물 받기
-            <Download aria-hidden="true" />
-          </Link>
+          {round === 1 ? (
+            <ApplicationDownloadButton
+              data={applicationData}
+              // 기존 결과 화면의 버튼 모양·반응형 배치는 그대로 유지한다.
+              className="bg-surface-flow text-brand-primary hover:bg-surface-action focus-visible:ring-ash-600 flex h-10.5 cursor-pointer items-center justify-center gap-1 rounded-lg px-4 text-sm font-bold transition-colors outline-hidden focus-visible:ring-2 min-[374px]:order-2 min-[374px]:ml-auto min-[374px]:min-w-0 min-[374px]:px-3 min-[374px]:text-xs min-[374px]:max-md:[&_svg]:hidden md:h-13 md:w-42 md:px-4 md:text-sm lg:w-47 [&_svg]:size-5"
+            >
+              출력물 받기
+              <Download aria-hidden="true" />
+            </ApplicationDownloadButton>
+          ) : round === 2 ? (
+            <SecondApplicationDownloadButton
+              data={secondApplicationData}
+              className="bg-surface-flow text-brand-primary hover:bg-surface-action focus-visible:ring-ash-600 flex h-10.5 cursor-pointer items-center justify-center gap-1 rounded-lg px-4 text-sm font-bold transition-colors outline-hidden focus-visible:ring-2 min-[374px]:order-2 min-[374px]:ml-auto min-[374px]:min-w-0 min-[374px]:px-3 min-[374px]:text-xs min-[374px]:max-md:[&_svg]:hidden md:h-13 md:w-42 md:px-4 md:text-sm lg:w-47 [&_svg]:size-5"
+            >
+              출력물 받기
+              <Download aria-hidden="true" />
+            </SecondApplicationDownloadButton>
+          ) : round === 3 ? (
+            <ThirdApplicationDownloadButton
+              // 3차 결과 API를 thirdApplicationData에 넣으면 평가기준 분기까지 그대로 PDF에 반영된다.
+              data={thirdApplicationData}
+              className="bg-surface-flow text-brand-primary hover:bg-surface-action focus-visible:ring-ash-600 flex h-10.5 cursor-pointer items-center justify-center gap-1 rounded-lg px-4 text-sm font-bold transition-colors outline-hidden focus-visible:ring-2 min-[374px]:order-2 min-[374px]:ml-auto min-[374px]:min-w-0 min-[374px]:px-3 min-[374px]:text-xs min-[374px]:max-md:[&_svg]:hidden md:h-13 md:w-42 md:px-4 md:text-sm lg:w-47 [&_svg]:size-5"
+            >
+              출력물 받기
+              <Download aria-hidden="true" />
+            </ThirdApplicationDownloadButton>
+          ) : (
+            <Link
+              href={resultCertificateHref}
+              className="bg-surface-flow text-brand-primary hover:bg-surface-action focus-visible:ring-ash-600 flex h-10.5 cursor-pointer items-center justify-center gap-1 rounded-lg px-4 text-sm font-bold transition-colors outline-hidden focus-visible:ring-2 min-[374px]:order-2 min-[374px]:ml-auto min-[374px]:min-w-0 min-[374px]:px-3 min-[374px]:text-xs min-[374px]:max-md:[&_svg]:hidden md:h-13 md:w-42 md:px-4 md:text-sm lg:w-47 [&_svg]:size-5"
+            >
+              출력물 받기
+              <Download aria-hidden="true" />
+            </Link>
+          )}
           <Button
             asChild
             variant="outline"
@@ -223,7 +273,7 @@ const SubmitDone = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default SubmitDone
+export default SubmitDone;

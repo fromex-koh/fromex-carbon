@@ -1,12 +1,17 @@
-import { Fragment } from "react"
-import Link from "next/link"
+import { Fragment } from "react";
+import Link from "next/link";
 
-import { ArrowLeft, Check, Download, Files } from "lucide-react"
+import { ArrowLeft, Check, Download, Files } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Stepper } from "@/components/ui/stepper"
-import StepMobileNav from "@/app/(site)/(content)/carbon-leader/self-check/components/step-mobile-nav"
-import { APPLICATION_THIRD_STEPS } from "@/constants/carbon-leader-application-form"
+import { Button } from "@/components/ui/button";
+import { Stepper } from "@/components/ui/stepper";
+import { ThirdApplicationDownloadButton } from "@/app/(site)/(content)/carbon-leader/application-3/components/application-download";
+import StepMobileNav from "@/app/(site)/(content)/carbon-leader/self-check/components/step-mobile-nav";
+import { APPLICATION_THIRD_STEPS } from "@/constants/carbon-leader-application-form";
+import {
+  APPLICATION_THIRD_DOWNLOAD_SAMPLE,
+  type ApplicationThirdDownloadData,
+} from "@/constants/carbon-leader-application-3-download";
 import {
   COMPANY_FIELDS,
   INVESTMENT_COLUMNS,
@@ -15,8 +20,8 @@ import {
   STATUS_FIELDS,
   type SummaryField,
   type SummaryRow,
-} from "@/constants/carbon-leader-final-confirm"
-import { cn } from "@/lib/utils"
+} from "@/constants/carbon-leader-final-confirm";
+import { cn } from "@/lib/utils";
 
 // 선도기업 신청 3차 STEP 5 "신청서 최종 확인".
 // 앞 단계 입력을 읽기 전용으로 훑어보는 화면이라 입력 컨트롤이 없다.
@@ -32,7 +37,7 @@ import { cn } from "@/lib/utils"
 const COMPANY_FIELDS_THIRD: SummaryField[] = [
   ...COMPANY_FIELDS,
   { label: "신청차수", value: "3차 신청" },
-]
+];
 
 /** 감축기술 도입현황 표의 열. 투자계획 표와 같은 격자를 쓰고 열만 다르다 */
 const ADOPTION_COLUMNS: { label: string; unit?: string }[] = [
@@ -40,14 +45,14 @@ const ADOPTION_COLUMNS: { label: string; unit?: string }[] = [
   { label: "감축설비명" },
   { label: "도입시기" },
   { label: "투자금", unit: "(백만원)" },
-]
+];
 
 /** [퍼블리싱 노출용] 3차 신청서에서 입력한 도입현황 */
 const ADOPTION_ROWS: string[][] = [
   ["고효율 설비교체", "고효율 인버터 컴프레서", "2025-08-15", "120"],
   ["재생에너지 도입", "태양광 자가발전 설비(50kW)", "2026-01-20", "280"],
   ["공정 최적화", "폐열 회수 시스템", "2026-07-10", "190"],
-]
+];
 
 /** 투자계획 표는 상수의 줄을 격자표가 쓰는 칸 배열로 편다 */
 const INVESTMENT_CELLS: string[][] = INVESTMENT_ROWS.map((row) => [
@@ -56,31 +61,30 @@ const INVESTMENT_CELLS: string[][] = INVESTMENT_ROWS.map((row) => [
   row.period,
   row.amount,
   row.reduction,
-])
+]);
 
 /** 인벤토리 배출량 신청에서 넘어온 1~3차년도 실적 */
-const INVENTORY_COLUMNS = ["1차년도 (2021)", "2차년도 (2022)", "3차년도 (2023)"]
+const INVENTORY_COLUMNS = ["1차년도 (2021)", "2차년도 (2022)", "3차년도 (2023)"];
 const INVENTORY_ROWS: SummaryRow[] = [
   {
     label: "온실가스 배출량",
     unit: "(Scope 1&2, tCO₂eq)",
     values: ["430", "400", "370"],
   },
-]
+];
 
 /**
  * 목표달성 평가 요약 한 칸. 시안은 회색 상자 안에 흰 알약 이름표와 큰 값이 선다.
  * 목표달성 평가 화면(절대배출량 기준)과 같은 항목·값이다.
  */
-const ACHIEVEMENT_STATS: { label: string; value: string; result?: boolean }[] =
-  [
-    { label: "평가 기준", value: "절대배출량 기준" },
-    { label: "기준연도 평균 배출량", value: "480 tCO₂eq" },
-    { label: "최종년도(3차) 실적 배출량", value: "370 tCO₂eq" },
-    { label: "절대배출량 감축률", value: "22.9%" },
-    { label: "목표감축률", value: "6%" },
-    { label: "평가 결과", value: "달성", result: true },
-  ]
+const ACHIEVEMENT_STATS: { label: string; value: string; result?: boolean }[] = [
+  { label: "평가 기준", value: "절대배출량 기준" },
+  { label: "기준연도 평균 배출량", value: "480 tCO₂eq" },
+  { label: "최종년도(3차) 실적 배출량", value: "370 tCO₂eq" },
+  { label: "절대배출량 감축률", value: "22.9%" },
+  { label: "목표감축률", value: "6%" },
+  { label: "평가 결과", value: "달성", result: true },
+];
 
 /**
  * 평가 결과 칸의 값 색.
@@ -88,12 +92,12 @@ const ACHIEVEMENT_STATS: { label: string; value: string; result?: boolean }[] =
  * 그 화면에는 미달성 케이스가 여럿 있어, 값만 갈아 끼우면 색도 따라간다.
  */
 const resultColorOf = (value: string) =>
-  value === "미달성" ? "text-ink-fail" : "text-brand-primary"
+  value === "미달성" ? "text-ink-fail" : "text-brand-primary";
 
 /** 최종점검 제출서류 묶음. 번호가 붙고 묶음마다 첨부 건수를 센다 */
 interface DocumentGroup {
-  title: string
-  documents: { title: string; files: { name: string; size: string }[] }[]
+  title: string;
+  documents: { title: string; files: { name: string; size: string }[] }[];
 }
 
 /** [퍼블리싱 노출용] 서류 제출 화면에서 첨부한 파일 */
@@ -112,15 +116,11 @@ const DOCUMENT_GROUPS: DocumentGroup[] = [
       },
       {
         title: "중소기업확인서",
-        files: [
-          { name: "중소기업확인서_그린에너지텍_2026.pdf", size: "0.9 MB" },
-        ],
+        files: [{ name: "중소기업확인서_그린에너지텍_2026.pdf", size: "0.9 MB" }],
       },
       {
         title: "탄소중립 기업활동 자료",
-        files: [
-          { name: "탄소중립_기업활동_자료_그린에너지텍.pdf", size: "2.4 MB" },
-        ],
+        files: [{ name: "탄소중립_기업활동_자료_그린에너지텍.pdf", size: "2.4 MB" }],
       },
     ],
   },
@@ -133,9 +133,7 @@ const DOCUMENT_GROUPS: DocumentGroup[] = [
       },
       {
         title: "1~3차년도 이동연소 증빙서류",
-        files: [
-          { name: "법인차량_유류구매내역_1-3차년도.pdf", size: "1.4 MB" },
-        ],
+        files: [{ name: "법인차량_유류구매내역_1-3차년도.pdf", size: "1.4 MB" }],
       },
       {
         title: "1~3차년도 간접배출 증빙서류",
@@ -148,13 +146,11 @@ const DOCUMENT_GROUPS: DocumentGroup[] = [
     documents: [
       {
         title: "도입설비 견적서 및 계약서",
-        files: [
-          { name: "도입설비_견적서_계약서_그린에너지텍.pdf", size: "1.6 MB" },
-        ],
+        files: [{ name: "도입설비_견적서_계약서_그린에너지텍.pdf", size: "1.6 MB" }],
       },
     ],
   },
-]
+];
 
 /**
  * 상단 안내. 두 번째 줄은 앞머리만 굵게 둔다(시안 동일).
@@ -168,18 +164,14 @@ const NOTICES: { lead?: string; text: string }[] = [
     lead: "아래 내용이 모두 정확한지 확인해주세요.",
     text: " 제출 후에는 담당자 검토가 진행되며, 신청번호가 발급됩니다. 수정이 필요한 경우 [수정하기] 버튼을 이용하세요.",
   },
-]
+];
 
 /** 카드 머리의 총 건수 안내에 쓴다 */
 const TOTAL_FILE_COUNT = DOCUMENT_GROUPS.reduce(
   (total, group) =>
-    total +
-    group.documents.reduce(
-      (count, document) => count + document.files.length,
-      0,
-    ),
+    total + group.documents.reduce((count, document) => count + document.files.length, 0),
   0,
-)
+);
 
 /**
  * 화면 상단 안내 박스.
@@ -189,10 +181,7 @@ const ConfirmNotice = () => (
   <section className="bg-surface-notice flex flex-col gap-3 px-6 py-6 max-md:rounded-none md:rounded-2xl lg:px-10">
     <ul className="flex flex-col gap-3">
       {NOTICES.map((notice) => (
-        <li
-          key={notice.text}
-          className="text-ink-body flex gap-1 text-base break-keep"
-        >
+        <li key={notice.text} className="text-ink-body flex gap-1 text-base break-keep">
           <span
             aria-hidden="true"
             className="flex h-6.5 w-2.5 shrink-0 items-center justify-center"
@@ -201,9 +190,7 @@ const ConfirmNotice = () => (
           </span>
           <span>
             {notice.lead ? (
-              <strong className="text-ink-strong font-bold">
-                {notice.lead}
-              </strong>
+              <strong className="text-ink-strong font-bold">{notice.lead}</strong>
             ) : null}
             {notice.text}
           </span>
@@ -211,7 +198,7 @@ const ConfirmNotice = () => (
       ))}
     </ul>
   </section>
-)
+);
 
 /** 카드 한 장. 머리에 분류 칩과 제목, 오른쪽에 [수정] 이 붙는다. */
 const SummaryCard = ({
@@ -222,12 +209,12 @@ const SummaryCard = ({
   lock,
   children,
 }: {
-  chip: string
-  title: string
+  chip: string;
+  title: string;
   /** 제목 줄 아래, 구분선 위에 놓이는 안내 문구 */
-  note?: string
+  note?: string;
   /** [수정] 자리에 대신 놓는 문구. 1차에서 받아 고칠 수 없는 카드가 쓴다 */
-  lock?: string
+  lock?: string;
   /**
    * [수정] 이 여는 입력 화면 주소.
    *
@@ -237,8 +224,8 @@ const SummaryCard = ({
    *  manager-info · investment-plan · adoption-status,
    *  document-submit 의 documents)
    */
-  href?: string
-  children: React.ReactNode
+  href?: string;
+  children: React.ReactNode;
 }) => (
   <section className="border-line-card flex flex-col rounded-2xl border px-5 py-6 md:p-7.5 lg:p-8 dark:border-line-divider/40">
     <header className="border-line-card flex flex-col gap-2 border-b pb-6 dark:border-line-divider/40">
@@ -252,9 +239,7 @@ const SummaryCard = ({
           </h3>
           {/* 옆에 붙는 안내(총 N건 첨부 등). 780 밑에서는 제목이 줄 전체를 먹어 title 다음 줄로 내려간다 */}
           {note ? (
-            <span className="text-ink-hint text-sm font-medium whitespace-nowrap">
-              {note}
-            </span>
+            <span className="text-ink-hint text-sm font-medium whitespace-nowrap">{note}</span>
           ) : null}
         </div>
         {href ? (
@@ -273,7 +258,7 @@ const SummaryCard = ({
     </header>
     {children}
   </section>
-)
+);
 
 /** 이름표 + 값 묶음. 시안은 PC 3열 · 768 2열 · 360 1열이다. */
 const FieldGrid = ({ fields }: { fields: SummaryField[] }) => (
@@ -281,15 +266,10 @@ const FieldGrid = ({ fields }: { fields: SummaryField[] }) => (
     {fields.map((field) => (
       <Fragment key={field.label}>
         <div
-          className={cn(
-            "flex flex-col gap-3 px-2.5 py-3 md:px-6",
-            field.wide && "md:col-span-2",
-          )}
+          className={cn("flex flex-col gap-3 px-2.5 py-3 md:px-6", field.wide && "md:col-span-2")}
         >
           <dt className="text-ink-hint text-sm font-medium">{field.label}</dt>
-          <dd className="text-ink-strong text-base font-bold break-all">
-            {field.value}
-          </dd>
+          <dd className="text-ink-strong text-base font-bold break-all">{field.value}</dd>
         </div>
         {/* 시안은 묶음 사이에 구분선을 한 줄 넣는다 */}
         {field.groupEnd ? (
@@ -301,20 +281,14 @@ const FieldGrid = ({ fields }: { fields: SummaryField[] }) => (
       </Fragment>
     ))}
   </dl>
-)
+);
 
 /**
  * 연도별 표.
  * 768 부터는 구분 열 + 연도 열의 표, 360 은 줄마다 연도 머리글이 붙는 묶음이 된다.
  * 값이 하나뿐인 줄은 값 자리 가운데에 한 번만 찍는다(시안 동일).
  */
-const SummaryTable = ({
-  columns,
-  rows,
-}: {
-  columns: string[]
-  rows: SummaryRow[]
-}) => (
+const SummaryTable = ({ columns, rows }: { columns: string[]; rows: SummaryRow[] }) => (
   <div className="md:border-line-card md:bg-surface-field mt-4 flex flex-col md:mt-6 md:overflow-hidden md:rounded-md md:border lg:mt-8 dark:border-line-divider/40">
     {/* 표 머리글. 여백·이름 열·간격을 본문 줄과 같은 값으로 맞춰 칸이 어긋나지 않게 한다 */}
     <div className="bg-surface-disabled text-ink-muted hidden text-xs font-bold md:flex md:px-6">
@@ -336,9 +310,7 @@ const SummaryTable = ({
         >
           {/* 360 은 이름 왼쪽 · 단위 오른쪽 끝, 768 부터는 단위가 이름 아래 줄이다 */}
           <div className="flex items-baseline justify-between gap-2 md:w-48 md:shrink-0 md:flex-col md:items-start md:gap-0">
-            <span className="text-ink-strong text-base font-bold break-keep">
-              {row.label}
-            </span>
+            <span className="text-ink-strong text-base font-bold break-keep">{row.label}</span>
             {row.unit ? (
               <span className="text-ink-hint text-xs font-normal whitespace-nowrap">
                 {row.unit}
@@ -376,7 +348,7 @@ const SummaryTable = ({
       ))}
     </div>
   </div>
-)
+);
 
 /**
  * 칸마다 선이 있는 격자표. 투자계획·감축기술 도입현황이 같은 규격을 쓴다.
@@ -387,8 +359,8 @@ const GridTable = ({
   columns,
   rows,
 }: {
-  columns: { label: string; unit?: string }[]
-  rows: string[][]
+  columns: { label: string; unit?: string }[];
+  rows: string[][];
 }) => (
   <div className="mt-4 md:mt-6 lg:mt-8">
     {/* 768 부터: 격자표 */}
@@ -412,9 +384,7 @@ const GridTable = ({
             {column.unit ? (
               // 시안: 단위는 이름과 같은 #333333, 크기만 작고 굵기는 400
               // 768 은 단위가 반드시 아랫줄이라 basis-full 로 줄을 끊는다(PC 는 한 줄)
-              <span className="text-xs font-normal max-lg:basis-full">
-                {column.unit}
-              </span>
+              <span className="text-xs font-normal max-lg:basis-full">{column.unit}</span>
             ) : null}
           </span>
         ))}
@@ -453,12 +423,8 @@ const GridTable = ({
       {rows.map((row, index) => (
         <div key={`${row[0]}-m-${index}`} className="flex flex-col gap-3">
           <div className="flex flex-col gap-1">
-            <span className="text-ink-strong text-base font-bold break-keep">
-              {row[0]}
-            </span>
-            <span className="text-ink-hint text-sm font-bold break-keep">
-              {row[1]}
-            </span>
+            <span className="text-ink-strong text-base font-bold break-keep">{row[0]}</span>
+            <span className="text-ink-hint text-sm font-bold break-keep">{row[1]}</span>
           </div>
           <div className="flex flex-col">
             <div className="bg-surface-disabled flex">
@@ -470,9 +436,7 @@ const GridTable = ({
                   {column.label}
                   {/* 시안의 단위는 이름보다 연한 회색에 굵기 400 이다 */}
                   {column.unit ? (
-                    <span className="text-ink-hint font-normal">
-                      {column.unit}
-                    </span>
+                    <span className="text-ink-hint font-normal">{column.unit}</span>
                   ) : null}
                 </span>
               ))}
@@ -493,7 +457,7 @@ const GridTable = ({
       ))}
     </div>
   </div>
-)
+);
 
 /**
  * 목표달성 평가 요약.
@@ -521,18 +485,10 @@ const AchievementStats = () => (
       </div>
     ))}
   </dl>
-)
+);
 
 /** 제출한 파일 한 줄 */
-const SubmittedFileRow = ({
-  name,
-  size,
-  done,
-}: {
-  name: string
-  size: string
-  done?: boolean
-}) => (
+const SubmittedFileRow = ({ name, size, done }: { name: string; size: string; done?: boolean }) => (
   <li
     className={cn(
       "flex items-center gap-2.5",
@@ -545,10 +501,7 @@ const SubmittedFileRow = ({
       {/* 시안 아이콘은 뒷장이 비치는 문서 모양이라 Files 가 가장 가깝다 */}
       <Files
         aria-hidden="true"
-        className={cn(
-          "size-6 shrink-0",
-          done ? "text-ink-hint" : "text-ink-muted",
-        )}
+        className={cn("size-6 shrink-0", done ? "text-ink-hint" : "text-ink-muted")}
       />
       <span
         className={cn(
@@ -573,18 +526,34 @@ const SubmittedFileRow = ({
       ) : null}
     </div>
   </li>
-)
+);
 
-const FORM = "/carbon-leader/application-3/application-form"
+const FORM = "/carbon-leader/application-3/application-form";
 
-const FinalConfirm = () => {
+/**
+ * [프론트 개발자: API 및 평가기준 분기 연결 지점]
+ * 최종확인 API 응답을 ApplicationThirdDownloadData로 변환한 뒤 이 컴포넌트의
+ * applicationData prop에 넣는다. 아래 `출력물 받기` 버튼이 이 객체를 그대로 PDF에 사용한다.
+ *
+ * evaluation.criterion 값과 필요한 필드:
+ * - "absolute": baselineAverage, finalEmission, reductionRate, targetRate, achieved
+ * - "intensity": baselineIntensity, finalIntensity, reductionRate, targetRate, achieved
+ * - "reduction": baselineAverage, averageReduction, evaluationRate, targetRate, achieved
+ * - "target-management": allowance, actualEmission, achieved
+ *
+ * 타입이 판별 유니온이므로 criterion을 먼저 정하면 필요한 필드가 자동완성되고,
+ * 잘못된 기준/필드 조합은 TypeScript가 막는다. 전체 샘플은
+ * constants/carbon-leader-application-3-download.ts를 참고한다.
+ */
+const FinalConfirm = ({
+  applicationData = APPLICATION_THIRD_DOWNLOAD_SAMPLE,
+}: {
+  /** 3차 출력물에 넣을 API 데이터. 생략하면 퍼블리싱 예시 값을 사용한다. */
+  applicationData?: ApplicationThirdDownloadData;
+}) => {
   return (
     <div className="flex w-full max-w-316 flex-col md:gap-8 md:px-7 md:pt-12 md:pb-28 lg:gap-10 lg:px-8 lg:pt-14 lg:pb-42">
-      <StepMobileNav
-        title="최종 확인"
-        step={5}
-        total={APPLICATION_THIRD_STEPS.length}
-      />
+      <StepMobileNav title="최종 확인" step={5} total={APPLICATION_THIRD_STEPS.length} />
 
       <div className="flex flex-col gap-8 max-md:hidden lg:flex-row lg:items-start lg:justify-between lg:gap-8">
         <h2 className="text-ink-strong text-lg font-bold whitespace-nowrap md:text-3xl lg:text-4xl">
@@ -600,44 +569,24 @@ const FinalConfirm = () => {
       <ConfirmNotice />
 
       <div className="flex flex-col gap-6 max-md:px-5 max-md:pt-12 max-md:pb-24 lg:gap-10">
-        <SummaryCard
-          chip="기업정보"
-          title="기업정보"
-          href={`${FORM}#company-info`}
-        >
+        <SummaryCard chip="기업정보" title="기업정보" href={`${FORM}#company-info`}>
           <FieldGrid fields={COMPANY_FIELDS_THIRD} />
         </SummaryCard>
 
-        <SummaryCard
-          chip="기업현황"
-          title="기업현황"
-          href={`${FORM}#company-status`}
-        >
+        <SummaryCard chip="기업현황" title="기업현황" href={`${FORM}#company-status`}>
           <FieldGrid fields={STATUS_FIELDS} />
         </SummaryCard>
 
-        <SummaryCard
-          chip="담당자"
-          title="담당자정보"
-          href={`${FORM}#manager-info`}
-        >
+        <SummaryCard chip="담당자" title="담당자정보" href={`${FORM}#manager-info`}>
           <FieldGrid fields={MANAGER_FIELDS} />
         </SummaryCard>
 
         {/* 1차 신청 때 받은 값이라 이 화면에서도 고칠 수 없다 */}
-        <SummaryCard
-          chip="투자계획"
-          title="탄소중립 투자계획"
-          lock="1차 신청 정보 · 수정불가"
-        >
+        <SummaryCard chip="투자계획" title="탄소중립 투자계획" lock="1차 신청 정보 · 수정불가">
           <GridTable columns={INVESTMENT_COLUMNS} rows={INVESTMENT_CELLS} />
         </SummaryCard>
 
-        <SummaryCard
-          chip="도입현황"
-          title="감축기술 도입현황"
-          href={`${FORM}#adoption-status`}
-        >
+        <SummaryCard chip="도입현황" title="감축기술 도입현황" href={`${FORM}#adoption-status`}>
           <GridTable columns={ADOPTION_COLUMNS} rows={ADOPTION_ROWS} />
         </SummaryCard>
 
@@ -668,7 +617,7 @@ const FinalConfirm = () => {
               const count = group.documents.reduce(
                 (total, document) => total + document.files.length,
                 0,
-              )
+              );
               return (
                 <li
                   key={group.title}
@@ -705,7 +654,7 @@ const FinalConfirm = () => {
                     ))}
                   </ul>
                 </li>
-              )
+              );
             })}
           </ul>
         </SummaryCard>
@@ -714,14 +663,15 @@ const FinalConfirm = () => {
             374~767 은 글자·여백을 줄이고 아이콘을 감춰 세 칸을 끼워 넣고,
             374 밑으로 더 좁아지면 줄이 깨지므로 세 칸을 한 줄씩 내려 쌓는다 */}
         <div className="flex flex-col gap-2 min-[374px]:flex-row min-[374px]:items-center min-[374px]:gap-1.5 md:gap-3">
-          <button
-            type="button"
+          <ThirdApplicationDownloadButton
+            // 위 applicationData.evaluation.criterion에 따라 PDF 평가 카드가 자동 분기된다.
+            data={applicationData}
             // 시안: 면 #ecf0f8 · 글 브랜드색 · 테두리 없음 · 201x56 · radius 8 · 아이콘 24
             className="bg-surface-flow text-brand-primary hover:bg-surface-action focus-visible:ring-ash-600 flex h-10.5 cursor-pointer items-center justify-center gap-1 rounded-lg px-4 text-sm font-bold transition-colors outline-hidden focus-visible:ring-2 min-[374px]:order-2 min-[374px]:ml-auto min-[374px]:min-w-0 min-[374px]:px-3 min-[374px]:text-xs min-[374px]:max-md:[&_svg]:hidden md:h-13 md:w-42 md:px-4 md:text-sm lg:w-47 [&_svg]:size-6"
           >
             출력물 받기
             <Download aria-hidden="true" />
-          </button>
+          </ThirdApplicationDownloadButton>
           <Button
             type="button"
             variant="outline"
@@ -740,7 +690,7 @@ const FinalConfirm = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default FinalConfirm
+export default FinalConfirm;

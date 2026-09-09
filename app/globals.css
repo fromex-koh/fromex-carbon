@@ -710,3 +710,110 @@
     }
   }
 }
+
+/*
+ * 확인서 PDF 다운로드 버튼이 인쇄 직전에 body 아래에 생성하는 전용 영역이다.
+ * 평상시 화면에는 확인서 복사본이 보이지 않도록 숨기고, 아래 @media print에서만 표시한다.
+ */
+.certificate-print-root {
+  display: none;
+}
+
+/*
+ * 자가진단 결과보고서를 이미지로 캡처해 PDF 파일로 만드는 임시 영역이다.
+ * display:none이면 캡처할 수 없어 화면 밖에만 배치하며, 다운로드가 끝나면 DOM에서 제거된다.
+ */
+.self-check-report-export-root {
+  position: fixed;
+  top: 0;
+  left: -100000px;
+  z-index: -1;
+  width: max-content;
+  pointer-events: none;
+  color-scheme: light;
+}
+
+/*
+ * 선도기업 1차 신청서를 이미지로 캡처해 PDF로 만드는 전용 임시 영역이다.
+ * 기존 화면 레이아웃에는 참여하지 않도록 화면 밖에만 두고, 생성이 끝나면 제거한다.
+ */
+.application-download-export-root {
+  position: absolute;
+  top: 0;
+  left: -100000px;
+  z-index: -1;
+  display: flex;
+  align-items: flex-start;
+  width: max-content;
+  pointer-events: none;
+  color-scheme: light;
+}
+
+/*
+ * 다중 A4 캡처 중에는 한 장씩 이 영역에 복제한다.
+ * 모든 장을 같은 원점에서 렌더해 두 번째 장 이후의 상단 헤더가 잘리는 것을 막는다.
+ */
+.application-download-single-sheet-export-root {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -2147483647;
+  width: max-content;
+  pointer-events: none;
+  color-scheme: light;
+}
+
+@media print {
+  /* 확인서는 A4 한 장이라 종이 여백을 브라우저가 아니라 시안이 정한다 */
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  /* 확인서 화면을 인쇄하면 사이트 껍데기(헤더·푸터·버튼)를 빼고 종이만 남긴다 */
+  body:has(.certificate-sheet) main > * {
+    display: none;
+  }
+
+  body:has(.certificate-sheet) main > *:has(.certificate-sheet) {
+    display: block;
+  }
+
+  .certificate-page {
+    padding: 0;
+    gap: 0;
+  }
+
+  .certificate-page [data-print-hide] {
+    display: none;
+  }
+
+  .certificate-sheet {
+    box-shadow: none;
+  }
+
+  /*
+   * 다운로드 버튼이 만든 인쇄 전용 영역이 있을 때만 실행된다.
+   * 버튼이 어느 페이지에 배치되어도 헤더·배너·푸터 등 기존 화면은 제외하고
+   * body 바로 아래에 임시로 렌더링된 확인서 한 장만 인쇄한다.
+   */
+  body:has(> .certificate-print-root) > *:not(.certificate-print-root) {
+    display: none !important;
+  }
+
+  /* 브라우저의 PDF 저장 용지와 동일한 A4 크기로 인쇄 영역을 고정한다. */
+  .certificate-print-root {
+    display: block;
+    width: 210mm;
+    height: 297mm;
+  }
+
+  /*
+   * 화면 시안의 842pt는 실제 A4 높이보다 약 0.11pt 커서 빈 두 번째 페이지가
+   * 생길 수 있으므로, 인쇄 전용 복사본에만 정확한 A4 크기를 적용한다.
+   */
+  .certificate-print-root .certificate-sheet {
+    width: 210mm;
+    height: 297mm;
+  }
+}
