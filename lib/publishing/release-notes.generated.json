@@ -1,6 +1,97 @@
 {
   "releases": [
     {
+      "version": "v0.1.2",
+      "releasedAt": "2026-09-28",
+      "changes": [
+        {
+          "type": "handoff",
+          "mode": "diff",
+          "title": "전역 색상 토큰 추가",
+          "details": [
+            { "label": "대상", "value": "app/globals.css" },
+            {
+              "label": "변경",
+              "value": "시맨틱 토큰 7개 추가\nprimitive 1개 추가 (gray-95-3-c)\n네 블록(@theme · :root · .light · .dark) 끝에 신규 구간 주석 표시"
+            },
+            {
+              "label": "결과",
+              "value": "기존 토큰 값 변경·삭제 없음\n기존 화면 색상 영향 없음"
+            },
+            {
+              "label": "커밋",
+              "value": "[변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/d8ff13ce12cce114872b6656bd9f43624f7f8897)\n[주석 보강 보기](https://github.com/fromex-koh/fromex-carbon/commit/32fdaecbef2c6926bab672933e119c1e7817b9d3)"
+            }
+          ]
+        },
+        {
+          "type": "handoff",
+          "mode": "new",
+          "title": "로그인 화면",
+          "details": [
+            {
+              "label": "대상",
+              "value": "app/(site)/login/page.tsx\napp/(site)/login/components/login-card.tsx"
+            },
+            {
+              "label": "화면",
+              "value": "기업회원 · 기관회원 탭 로그인 카드\n기업회원: [기보 ONE 로그인] 으로 기보 ONE 플랫폼 이동, 복귀 안내 2줄\n기관회원: 아이디 · 비밀번호 폼, 두 칸 필수\n오류 표시는 기존 규칙 (ring-destructive · text-ink-error)"
+            },
+            {
+              "label": "주의",
+              "value": "로그인 API 연동 자리는 TODO 주석으로 비워 둠\n배너 없는 화면이라 (content) 아닌 (site) 바로 아래 배치"
+            },
+            { "label": "적용", "value": "신규 파일 추가" }
+          ]
+        },
+        {
+          "type": "handoff",
+          "mode": "new",
+          "title": "기관회원 가입 안내 팝업",
+          "details": [
+            {
+              "label": "대상",
+              "value": "app/(site)/login/components/agency-signup-guide-dialog.tsx\napp/(site)/login/agency-signup-guide/page.tsx"
+            },
+            {
+              "label": "화면",
+              "value": "기관회원 탭 [회원가입] 으로 여는 안내 팝업\n대상 기관 표 + 계정 발급 5단계\n제목 고정, 본문만 스크롤"
+            },
+            { "label": "적용", "value": "신규 파일 추가" }
+          ]
+        },
+        {
+          "type": "handoff",
+          "mode": "new",
+          "title": "아이디 · 비밀번호 찾기 팝업",
+          "details": [
+            {
+              "label": "대상",
+              "value": "app/(site)/login/components/find-account-dialog.tsx\napp/(site)/login/find-account/page.tsx"
+            },
+            {
+              "label": "화면",
+              "value": "기관회원 탭 [아이디 · 비밀번호 찾기] 로 여는 연락처 안내\n담당자 번호 안내 + [닫기] 버튼 하나"
+            },
+            { "label": "적용", "value": "신규 파일 추가" }
+          ]
+        },
+        {
+          "type": "handoff",
+          "mode": "overwrite",
+          "title": "퍼블리싱 인덱스",
+          "details": [
+            { "label": "대상", "value": "app/page.tsx" },
+            {
+              "label": "변경",
+              "value": "로그인 UIUX 완료 전환, 하위 모달 2행 추가 (3뎁스)\n화면 파일 존재 검사 범위를 (site) 바로 아래까지 확대\n릴리스 카드 본문·주의를 점 목록으로 표시\n총 화면 75 → 77"
+            },
+            { "label": "적용", "value": "지정한 파일만 교체" }
+          ]
+        }
+      ]
+    },
+    {
       "version": "v0.1.1",
       "releasedAt": "2026-09-09",
       "changes": [

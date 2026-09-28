@@ -172,6 +172,17 @@
   --color-line-selected: hsl(var(--line-selected));
   --color-surface-info: hsl(var(--surface-info));
   --color-surface-error: hsl(var(--surface-error));
+  /* ── 여기부터 신규 · 로그인 화면 ── */
+  --color-surface-page: hsl(var(--surface-page));
+  --color-line-card-strong: hsl(var(--line-card-strong));
+  --color-line-panel: hsla(var(--line-panel));
+  --color-ink-on-brand-muted: hsl(var(--ink-on-brand-muted));
+  --color-ink-faint: hsl(var(--ink-faint));
+  --color-surface-check: hsl(var(--surface-check));
+  /* ── 여기까지 신규 · 로그인 화면 ── */
+  /* ── 여기부터 신규 · 기관회원 가입 안내 팝업 ── */
+  --color-surface-step-badge: hsla(var(--surface-step-badge));
+  /* ── 여기까지 신규 · 기관회원 가입 안내 팝업 ── */
 }
 
 /*
@@ -312,6 +323,9 @@
     --red-50-s100: 0 100% 50%;
     --gray-97-25-c: 0, 0%, 97.25%, 1;
     --blue-95-c: 220, 46%, 95%, 1;
+    /* ── 여기부터 신규 · 기관회원 가입 안내 팝업 ── */
+    --gray-95-3-c: 0, 0%, 95.3%, 1;
+    /* ── 여기까지 신규 · 기관회원 가입 안내 팝업 ── */
   }
 }
 
@@ -430,6 +444,17 @@
     --line-selected: var(--blue-69);
     --surface-info: var(--blue-92-4);
     --surface-error: var(--red-92-2);
+    /* ── 여기부터 신규 · 로그인 화면 ── */
+    --surface-page: var(--gray-95-3);
+    --line-card-strong: var(--gray-82-35);
+    --line-panel: var(--gray-93-3-c);
+    --ink-on-brand-muted: var(--gray-93-3);
+    --ink-faint: var(--gray-60);
+    --surface-check: var(--gray-100);
+    /* ── 여기까지 신규 · 로그인 화면 ── */
+    /* ── 여기부터 신규 · 기관회원 가입 안내 팝업 ── */
+    --surface-step-badge: var(--gray-95-3-c);
+    /* ── 여기까지 신규 · 기관회원 가입 안내 팝업 ── */
   }
 
   :root .light {
@@ -546,6 +571,17 @@
     --line-selected: var(--blue-69);
     --surface-info: var(--blue-92-4);
     --surface-error: var(--red-92-2);
+    /* ── 여기부터 신규 · 로그인 화면 ── */
+    --surface-page: var(--gray-95-3);
+    --line-card-strong: var(--gray-82-35);
+    --line-panel: var(--gray-93-3-c);
+    --ink-on-brand-muted: var(--gray-93-3);
+    --ink-faint: var(--gray-60);
+    --surface-check: var(--gray-100);
+    /* ── 여기까지 신규 · 로그인 화면 ── */
+    /* ── 여기부터 신규 · 기관회원 가입 안내 팝업 ── */
+    --surface-step-badge: var(--gray-95-3-c);
+    /* ── 여기까지 신규 · 기관회원 가입 안내 팝업 ── */
   }
 
   .dark {
@@ -660,6 +696,17 @@
     --line-selected: var(--blue-89-8);
     --surface-info: var(--blue-92-4);
     --surface-error: var(--red-92-2);
+    /* ── 여기부터 신규 · 로그인 화면 ── */
+    --surface-page: var(--gray-6-7);
+    --line-card-strong: var(--gray-53-3);
+    --line-panel: var(--gray-93-3-a40);
+    --ink-on-brand-muted: var(--gray-93-3);
+    --ink-faint: var(--gray-60);
+    --surface-check: var(--gray-100);
+    /* ── 여기까지 신규 · 로그인 화면 ── */
+    /* ── 여기부터 신규 · 기관회원 가입 안내 팝업 ── */
+    --surface-step-badge: var(--gray-93-3-a40);
+    /* ── 여기까지 신규 · 기관회원 가입 안내 팝업 ── */
   }
 }
 
