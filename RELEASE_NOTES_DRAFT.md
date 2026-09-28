@@ -41,6 +41,7 @@
 - 결과: 기존 토큰 값 변경·삭제 없음
   - 기존 화면 색상 영향 없음
 - 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/d8ff13ce12cce114872b6656bd9f43624f7f8897)
+  - [주석 보강 보기](https://github.com/fromex-koh/fromex-carbon/commit/32fdaecbef2c6926bab672933e119c1e7817b9d3)
 
 ## [신규 추가]
 
