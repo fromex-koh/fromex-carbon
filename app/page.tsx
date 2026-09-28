@@ -1455,13 +1455,23 @@ const ReleaseNoteHandoffCard = ({
             // 한 라벨에 여러 줄이면 점 목록으로 편다. 이어 붙이면 한 문단으로 읽혀
             // 받아 보는 쪽에서 변경 건수를 한눈에 세기 어렵다.
             const lines = group.values.flatMap((value) => value.split("\n"))
+            // 커밋 링크는 줄마다 버튼이 되므로 점을 붙이지 않는다.
+            // 값을 통째로 넘기면 링크 여러 개를 버튼으로 쌓아 준다.
+            const isCommitLabel = COMMIT_LINK_LABELS.includes(group.label)
 
             return (
               <div key={group.label} className="flex flex-col gap-1">
                 <dt className="text-muted-foreground text-xs font-medium">
                   {group.label}
                 </dt>
-                {lines.length > 1 ? (
+                {isCommitLabel ? (
+                  <dd>
+                    <ReleaseNoteDetailValue
+                      label={group.label}
+                      value={lines.join("\n")}
+                    />
+                  </dd>
+                ) : lines.length > 1 ? (
                   <dd>
                     <ul className="flex flex-col gap-1">
                       {lines.map((line) => (
