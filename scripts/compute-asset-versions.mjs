@@ -15,7 +15,11 @@ import { format, resolveConfig } from "prettier"
 import { resolvePathVersion } from "./git-info.mjs"
 
 const SOURCE = "lib/publishing/handoff-assets.json"
-const CONTENT_ROOT = "app/(site)/(content)"
+// 화면이 (content) 아래에만 있지는 않다. 서브비주얼 배너가 없는 화면(로그인 등)은
+// (site) 바로 아래에 둔다. 퍼블리싱 인덱스(app/page.tsx)의 SCREEN_ROOTS 와 같은 범위다.
+const SITE_ROOT = "app/(site)"
+// 헤더 상태 확인용 화면이라 IA 화면이 아니다. 화면 개수 집계에서 뺀다.
+const PREVIEW_ROOT = "app/(site)/preview"
 const ASSET_VERSIONS_OUTPUT = "lib/publishing/asset-versions.generated.json"
 const SCREEN_VERSIONS_OUTPUT = "lib/publishing/screen-versions.generated.json"
 const RELEASE_NOTES_OUTPUT = "lib/publishing/release-notes.generated.json"
@@ -85,7 +89,7 @@ writeFileSync(
   await formatJson({ version: releaseVersion, assets }, ASSET_VERSIONS_OUTPUT),
 )
 
-// 화면 목록은 따로 적지 않는다. (content) 아래에서 page.tsx 가 있는 폴더가 곧 한 화면이며,
+// 화면 목록은 따로 적지 않는다. (site) 아래에서 page.tsx 가 있는 폴더가 곧 한 화면이며,
 // 퍼블리싱 인덱스의 라우트 경로와 같은 규칙이다.
 const collectScreenDirs = (dir) => {
   const entries = readdirSync(dir, { withFileTypes: true })
@@ -104,7 +108,7 @@ const collectScreenDirs = (dir) => {
 // 라우트 그룹 폴더는 URL 에 나타나지 않는다.
 const toRoutePath = (screenDir) =>
   screenDir
-    .slice(CONTENT_ROOT.length)
+    .slice(SITE_ROOT.length)
     .split("/")
     .filter((segment) => segment !== "" && !segment.startsWith("("))
     .reduce((path, segment) => `${path}/${segment}`, "")
@@ -114,7 +118,7 @@ const collectAncestorLayouts = (screenDir) => {
   const layouts = []
 
   let cursor = screenDir
-  while (cursor !== CONTENT_ROOT && cursor.startsWith(CONTENT_ROOT)) {
+  while (cursor !== SITE_ROOT && cursor.startsWith(SITE_ROOT)) {
     cursor = dirname(cursor)
     const layout = join(cursor, "layout.tsx")
     if (existsSync(layout)) layouts.push(layout)
@@ -129,7 +133,7 @@ const collectFolderPaths = (screenDir) => {
   const tracked = [screenDir]
 
   let cursor = screenDir
-  while (cursor !== CONTENT_ROOT && cursor.startsWith(CONTENT_ROOT)) {
+  while (cursor !== SITE_ROOT && cursor.startsWith(SITE_ROOT)) {
     cursor = dirname(cursor)
     const components = join(cursor, "components")
     if (existsSync(components)) tracked.push(components)
@@ -193,7 +197,8 @@ const collectTrackedPaths = (screenDir) => {
   return imported.concat(collectAncestorLayouts(screenDir))
 }
 
-const screens = collectScreenDirs(CONTENT_ROOT)
+const screens = collectScreenDirs(SITE_ROOT)
+  .filter((screenDir) => !screenDir.startsWith(PREVIEW_ROOT))
   .map((screenDir) => {
     const resolvedVersion = resolvePathVersion(collectTrackedPaths(screenDir))
     const version =
