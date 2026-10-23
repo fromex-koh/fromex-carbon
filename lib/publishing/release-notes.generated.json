@@ -1,6 +1,49 @@
 {
   "releases": [
     {
+      "version": "v0.1.3",
+      "releasedAt": "2026-10-23",
+      "changes": [
+        {
+          "type": "handoff",
+          "mode": "new",
+          "title": "선도기업 신청 보완요청 팝업",
+          "details": [
+            {
+              "label": "대상",
+              "value": "app/(site)/login/components/leader-supplement-notice-dialog.tsx\napp/(site)/login/leader-supplement-notice/page.tsx"
+            },
+            {
+              "label": "화면",
+              "value": "선도기업 신청 건의 보완요청을 알리는 안내\n[현황조회 이동하기] 로 /my-page/status 이동"
+            },
+            { "label": "적용", "value": "신규 파일 추가" },
+            {
+              "label": "커밋",
+              "value": "[변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/3552f628cdd88634ae9a085d7973001f5772af2f)"
+            }
+          ]
+        },
+        {
+          "type": "handoff",
+          "mode": "overwrite",
+          "title": "퍼블리싱 인덱스",
+          "details": [
+            { "label": "대상", "value": "app/page.tsx" },
+            {
+              "label": "변경",
+              "value": "로그인 아래 선도기업 신청 보완요청 팝업 1행 추가 (3뎁스)\n총 화면 77 → 78"
+            },
+            { "label": "적용", "value": "지정한 파일만 교체" },
+            {
+              "label": "커밋",
+              "value": "[변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/a72815aed53a6a10349f3556fc4671478fc2e64a)"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "version": "v0.1.2",
       "releasedAt": "2026-09-28",
       "changes": [
