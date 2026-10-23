@@ -88,8 +88,8 @@ const IA_ROWS = [
     uiux: "완료",
     desc: "GNB 의 [로그인] 을 눌렀을 때 여는 화면",
     cells: [
-      { level: 1, name: "메인 홈", rowSpan: 77, colSpan: 1 },
-      { level: 2, name: "로그인", rowSpan: 3, colSpan: 1 },
+      { level: 1, name: "메인 홈", rowSpan: 78, colSpan: 1 },
+      { level: 2, name: "로그인", rowSpan: 4, colSpan: 1 },
       { level: 0, name: "", rowSpan: 1, colSpan: 3 },
     ],
   },
@@ -125,6 +125,21 @@ const IA_ROWS = [
   },
   {
     no: 4,
+    path: "/login/leader-supplement-notice",
+    user: "회원",
+    type: "Modal Popup",
+    status: "신규",
+    revise: false,
+    devCheck: false,
+    uiux: "완료",
+    desc: "로그인 후 신청 건에 보완요청이 있을 때 알리고 현황조회로 보냄",
+    cells: [
+      { level: 3, name: "선도기업 신청 보완요청 팝업", rowSpan: 1, colSpan: 1 },
+      { level: 0, name: "", rowSpan: 1, colSpan: 2 },
+    ],
+  },
+  {
+    no: 5,
     path: "/carbon-leader/application/initial",
     user: "비회원·회원",
     type: "Page",
@@ -141,7 +156,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 5,
+    no: 6,
     path: "/carbon-leader/application/initial/not-eligible",
     user: "회원",
     type: "Modal Popup",
@@ -160,7 +175,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 6,
+    no: 7,
     path: "/carbon-leader/application/self-check-done",
     user: "비회원·회원",
     type: "Page",
@@ -172,7 +187,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "자가진단 완료", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 7,
+    no: 8,
     path: "/carbon-leader/application/first-done",
     user: "비회원·회원",
     type: "Page",
@@ -184,7 +199,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "1차 신청 완료", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 8,
+    no: 9,
     path: "/carbon-leader/application/middle-review",
     user: "비회원·회원",
     type: "Page",
@@ -196,7 +211,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "중간점검 접수", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 9,
+    no: 10,
     path: "/carbon-leader/application/middle-done",
     user: "비회원·회원",
     type: "Page",
@@ -208,7 +223,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "중간점검 완료", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 10,
+    no: 11,
     path: "/carbon-leader/application/final-done",
     user: "비회원·회원",
     type: "Page",
@@ -220,7 +235,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "최종점검 완료", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 11,
+    no: 12,
     path: "/carbon-leader/self-check/company-info",
     user: "비회원·회원",
     type: "Page",
@@ -236,7 +251,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 12,
+    no: 13,
     path: "/carbon-leader/self-check/company-info/resume",
     user: "회원",
     type: "Modal Popup",
@@ -248,7 +263,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "이어서 작성하기 팝업", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 13,
+    no: 14,
     path: "/carbon-leader/self-check/company-info/industry-code-search",
     user: "비회원·회원",
     type: "Modal Popup",
@@ -260,7 +275,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "업종코드 조회", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 14,
+    no: 15,
     path: "/carbon-leader/self-check/inventory-emission",
     user: "비회원·회원",
     type: "Page",
@@ -275,7 +290,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 15,
+    no: 16,
     path: "/carbon-leader/self-check/inventory-emission/item-select",
     user: "비회원·회원",
     type: "Modal Popup",
@@ -287,7 +302,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "항목 선택", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 16,
+    no: 17,
     path: "/carbon-leader/self-check/inventory-emission/scope-guide",
     user: "비회원·회원",
     type: "Dialog",
@@ -299,7 +314,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "Scope설명", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 17,
+    no: 18,
     path: "/carbon-leader/self-check/inventory-emission/detail-input",
     user: "비회원·회원",
     type: "Modal Popup",
@@ -311,7 +326,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "상세 입력", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 18,
+    no: 19,
     path: "/carbon-leader/self-check/reduction-potential",
     user: "비회원·회원",
     type: "Page",
@@ -326,7 +341,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 19,
+    no: 20,
     path: "/carbon-leader/self-check/reduction-potential/delete-confirm",
     user: "비회원·회원",
     type: "Dialog",
@@ -338,7 +353,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "삭제 확인 팝업", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 20,
+    no: 21,
     path: "/carbon-leader/self-check/reduction-potential/change-confirm",
     user: "비회원·회원",
     type: "Modal Popup",
@@ -352,7 +367,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 21,
+    no: 22,
     path: "/carbon-leader/self-check/reduction-target",
     user: "비회원·회원",
     type: "Page",
@@ -367,7 +382,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 22,
+    no: 23,
     path: "/carbon-leader/self-check/reduction-target/fit",
     user: "비회원·회원",
     type: "Page",
@@ -379,7 +394,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "이행계획 적정", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 23,
+    no: 24,
     path: "/carbon-leader/self-check/reduction-target/unfit",
     user: "비회원·회원",
     type: "Page",
@@ -391,7 +406,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "이행계획 부적정", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 24,
+    no: 25,
     path: "/carbon-leader/self-check/evaluation-index",
     user: "비회원·회원",
     type: "Page",
@@ -406,7 +421,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 25,
+    no: 26,
     path: "/carbon-leader/self-check/evaluation-index/mandatory-training",
     user: "비회원·회원",
     type: "Dialog",
@@ -425,7 +440,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 26,
+    no: 27,
     path: "/carbon-leader/self-check/evaluation-index/emission-source-example",
     user: "비회원·회원",
     type: "Dialog",
@@ -444,7 +459,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 27,
+    no: 28,
     path: "/carbon-leader/self-check/evaluation-index/certification-type",
     user: "비회원·회원",
     type: "Dialog",
@@ -463,7 +478,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 28,
+    no: 29,
     path: "/carbon-leader/self-check/result",
     user: "비회원·회원",
     type: "Page",
@@ -478,7 +493,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 29,
+    no: 30,
     path: "/carbon-leader/self-check/result/done",
     user: "비회원·회원",
     type: "Page",
@@ -490,7 +505,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "적정 · 신청하기 활성", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 30,
+    no: 31,
     path: "/carbon-leader/self-check/result/unfit",
     user: "비회원·회원",
     type: "Page",
@@ -502,7 +517,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "부적정", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 31,
+    no: 32,
     path: "/carbon-leader/self-check/result/result-certificate",
     user: "비회원·회원",
     type: "Download",
@@ -514,7 +529,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "결과보고서(template)", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 32,
+    no: 33,
     path: "/carbon-leader/application-1/application-form",
     user: "회원",
     type: "Page",
@@ -530,7 +545,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 33,
+    no: 34,
     path: "/carbon-leader/application-1/application-form/address-search",
     user: "회원",
     type: "Modal Popup",
@@ -542,7 +557,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "주소 검색", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 34,
+    no: 35,
     path: "/carbon-leader/application-1/document-submit",
     user: "회원",
     type: "Page",
@@ -554,7 +569,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "서류 제출", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 35,
+    no: 36,
     path: "/carbon-leader/application-1/final-confirm",
     user: "회원",
     type: "Page",
@@ -569,7 +584,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 36,
+    no: 37,
     path: "/carbon-leader/application-1/final-confirm/submit-confirm",
     user: "회원",
     type: "Modal Popup",
@@ -581,7 +596,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "제출 확인 팝업", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 37,
+    no: 38,
     path: "/carbon-leader/application-1/result",
     user: "회원",
     type: "Page",
@@ -596,7 +611,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 38,
+    no: 39,
     path: "/carbon-leader/application-1/result/application-download",
     user: "비회원·회원",
     type: "Download",
@@ -608,7 +623,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "신청서(template)", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 39,
+    no: 40,
     path: "/carbon-leader/application-1/result/result-certificate",
     user: "비회원·회원",
     type: "Download",
@@ -620,7 +635,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "결과확인서(template)", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 40,
+    no: 41,
     path: "/carbon-leader/application-2/application-form",
     user: "회원",
     type: "Page",
@@ -637,7 +652,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 41,
+    no: 42,
     path: "/carbon-leader/application-2/application-form/address-search",
     user: "회원",
     type: "Modal Popup",
@@ -649,7 +664,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "주소 검색", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 42,
+    no: 43,
     path: "/carbon-leader/application-2/document-submit",
     user: "회원",
     type: "Page",
@@ -661,7 +676,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "서류 제출", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 43,
+    no: 44,
     path: "/carbon-leader/application-2/final-confirm",
     user: "회원",
     type: "Page",
@@ -677,7 +692,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 44,
+    no: 45,
     path: "/carbon-leader/application-2/final-confirm/submit-confirm",
     user: "회원",
     type: "Modal Popup",
@@ -689,7 +704,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "제출 확인 팝업", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 45,
+    no: 46,
     path: "/carbon-leader/application-2/result",
     user: "회원",
     type: "Page",
@@ -704,7 +719,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 46,
+    no: 47,
     path: "/carbon-leader/application-2/result/application-download",
     user: "비회원·회원",
     type: "Download",
@@ -716,7 +731,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "신청서(template)", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 47,
+    no: 48,
     path: "/carbon-leader/application-2/result/result-certificate",
     user: "비회원·회원",
     type: "Download",
@@ -728,7 +743,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "결과확인서(template)", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 48,
+    no: 49,
     path: "/carbon-leader/application-3/application-form",
     user: "회원",
     type: "Page",
@@ -745,7 +760,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 49,
+    no: 50,
     path: "/carbon-leader/application-3/application-form/address-search",
     user: "회원",
     type: "Modal Popup",
@@ -757,7 +772,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "주소 검색", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 50,
+    no: 51,
     path: "/carbon-leader/application-3/inventory-emission",
     user: "회원",
     type: "Page",
@@ -772,7 +787,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 51,
+    no: 52,
     path: "/carbon-leader/application-3/inventory-emission/item-select",
     user: "회원",
     type: "Modal Popup",
@@ -784,7 +799,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "항목 선택", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 52,
+    no: 53,
     path: "/carbon-leader/application-3/inventory-emission/scope-guide",
     user: "회원",
     type: "Dialog",
@@ -796,7 +811,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "Scope설명", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 53,
+    no: 54,
     path: "/carbon-leader/application-3/inventory-emission/detail-input",
     user: "회원",
     type: "Modal Popup",
@@ -808,7 +823,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "상세 입력", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 54,
+    no: 55,
     path: "/carbon-leader/application-3/target-achievement",
     user: "회원",
     type: "Page",
@@ -823,7 +838,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 55,
+    no: 56,
     path: "/carbon-leader/application-3/target-achievement/general-unmet",
     user: "회원",
     type: "Page",
@@ -835,7 +850,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "일반기업 · 미달성", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 56,
+    no: 57,
     path: "/carbon-leader/application-3/target-achievement/target-management",
     user: "회원",
     type: "Page",
@@ -847,7 +862,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "목표관리업체 · 달성", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 57,
+    no: 58,
     path: "/carbon-leader/application-3/target-achievement/target-management-unmet",
     user: "회원",
     type: "Page",
@@ -866,7 +881,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 58,
+    no: 59,
     path: "/carbon-leader/application-3/target-achievement/target-management-all-unmet",
     user: "회원",
     type: "Page",
@@ -880,7 +895,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 59,
+    no: 60,
     path: "/carbon-leader/application-3/document-submit",
     user: "회원",
     type: "Page",
@@ -892,7 +907,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "서류 제출", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 60,
+    no: 61,
     path: "/carbon-leader/application-3/final-confirm",
     user: "회원",
     type: "Page",
@@ -908,7 +923,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 61,
+    no: 62,
     path: "/carbon-leader/application-3/final-confirm/submit-confirm",
     user: "회원",
     type: "Modal Popup",
@@ -920,7 +935,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "제출 확인 팝업", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 62,
+    no: 63,
     path: "/carbon-leader/application-3/result",
     user: "회원",
     type: "Page",
@@ -935,7 +950,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 63,
+    no: 64,
     path: "/carbon-leader/application-3/result/application-download",
     user: "비회원·회원",
     type: "Download",
@@ -947,7 +962,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "신청서(template)", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 64,
+    no: 65,
     path: "/carbon-leader/application-3/result/result-certificate",
     user: "비회원·회원",
     type: "Download",
@@ -959,7 +974,7 @@ const IA_ROWS = [
     cells: [{ level: 5, name: "결과확인서(template)", rowSpan: 1, colSpan: 1 }],
   },
   {
-    no: 65,
+    no: 66,
     path: "/carbon-leader/application-history",
     user: "회원",
     type: "Link",
@@ -979,7 +994,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 66,
+    no: 67,
     path: "/my-page",
     user: "회원",
     type: "Button",
@@ -995,7 +1010,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 67,
+    no: 68,
     path: "/my-page/sub-account",
     user: "회원",
     type: "Page",
@@ -1010,7 +1025,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 68,
+    no: 69,
     path: "/my-page/sub-account/register",
     user: "회원",
     type: "Modal Popup",
@@ -1022,7 +1037,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "하위계정 등록", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 69,
+    no: 70,
     path: "/my-page/profile-edit",
     user: "회원",
     type: "Page",
@@ -1037,7 +1052,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 70,
+    no: 71,
     path: "/my-page/profile-edit/company",
     user: "회원",
     type: "Page",
@@ -1049,7 +1064,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "기업회원", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 71,
+    no: 72,
     path: "/my-page/profile-edit/cancel-confirm",
     user: "회원",
     type: "Modal Popup",
@@ -1061,7 +1076,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "수정 취소 확인", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 72,
+    no: 73,
     path: "/my-page/profile-edit/save-confirm",
     user: "회원",
     type: "Modal Popup",
@@ -1073,7 +1088,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "저장 확인", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 73,
+    no: 74,
     path: "/my-page/profile-edit/address-search",
     user: "회원",
     type: "Modal Popup",
@@ -1085,7 +1100,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "주소검색", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 74,
+    no: 75,
     path: "/my-page/status",
     user: "회원",
     type: "Page",
@@ -1100,7 +1115,7 @@ const IA_ROWS = [
     ],
   },
   {
-    no: 75,
+    no: 76,
     path: "/my-page/status/supplement-request",
     user: "회원",
     type: "Modal Popup",
@@ -1112,7 +1127,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "보완요청", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 76,
+    no: 77,
     path: "/my-page/status/empty",
     user: "회원",
     type: "Page",
@@ -1124,7 +1139,7 @@ const IA_ROWS = [
     cells: [{ level: 4, name: "내역 없음", rowSpan: 1, colSpan: 2 }],
   },
   {
-    no: 77,
+    no: 78,
     path: "/my-page/status/delete-confirm",
     user: "회원",
     type: "Modal Popup",
