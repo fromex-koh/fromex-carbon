@@ -29,3 +29,24 @@
 
 릴리스 성공 후 내용은 자동으로 비워집니다.
 -->
+
+## [신규 추가]
+
+### 선도기업 신청 보완요청 팝업
+
+- 대상: app/(site)/login/components/leader-supplement-notice-dialog.tsx
+  - app/(site)/login/leader-supplement-notice/page.tsx
+- 화면: 선도기업 신청 건의 보완요청을 알리는 안내
+  - [현황조회 이동하기] 로 /my-page/status 이동
+- 적용: 신규 파일 추가
+- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/3552f628cdd88634ae9a085d7973001f5772af2f)
+
+## [덮어쓰기]
+
+### 퍼블리싱 인덱스
+
+- 대상: app/page.tsx
+- 변경: 로그인 아래 선도기업 신청 보완요청 팝업 1행 추가 (3뎁스)
+  - 총 화면 77 → 78
+- 적용: 지정한 파일만 교체
+- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/a72815aed53a6a10349f3556fc4671478fc2e64a)
