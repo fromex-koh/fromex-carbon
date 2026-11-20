@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { ArrowUpRight, Eye, EyeOff } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -14,21 +15,16 @@ import { cn } from "@/lib/utils"
 type MemberType = "company" | "agency"
 
 const TABS = [
-  {
-    key: "company" as const,
-    title: "기업회원",
-    caption: "기보 ONE 플랫폼 통합 로그인",
-  },
-  {
-    key: "agency" as const,
-    title: "기관회원",
-    caption: "아이디 · 비밀번호 로그인",
-  },
+  { key: "company" as const, title: "기업회원" },
+  { key: "agency" as const, title: "기관회원" },
 ]
 
-// 시안은 두 줄로 끊어 놓았다. 한 줄씩 <p> 로 떨어뜨려 줄바꿈 자리를 고정한다.
+/** 좁은 화면에서 주소 중간(/ · .)이 끊기면 읽기 어려워 한 덩어리로 묶는다 */
+const PORTAL = "(https://www.kibo.or.kr/portal)"
+
+/** 한 줄이 <p> 하나다. 줄바꿈 자리를 고정하려고 배열로 나눠 둔다 */
 const NOTES = [
-  "기보 ONE 플랫폼(https://www.kibo.or.kr/portal) 로그인 후,",
+  `기보 ONE 플랫폼${PORTAL} 로그인 후,`,
   "탄소중립 플랫폼으로 이동하셔야 로그인이 완료됩니다.",
 ]
 
@@ -51,6 +47,7 @@ const LoginCard = () => {
   const [password, setPassword] = useState("")
   const [errors, setErrors] = useState<FieldErrors>({})
   const [submitted, setSubmitted] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const footer = FOOTERS[tab]
 
   const footerLink = (
@@ -68,9 +65,24 @@ const LoginCard = () => {
     setErrors(validate(next.id ?? id, next.password ?? password))
   }
 
+  // 다크는 페이지 배경과 카드가 같은 색이라, 카드만 한 단계 밝은 면으로 띄운다
   return (
-    <div className="border-line-card-strong bg-surface-field flex flex-col overflow-hidden rounded-xl border md:rounded-2xl">
-      <div role="tablist" aria-label="회원 유형" className="grid grid-cols-2">
+    <div className="border-line-card bg-surface-field dark:bg-surface-card flex flex-col gap-6 rounded-2xl border p-5 md:gap-7.5 md:p-7.5">
+      {/* 회원 유형 세그먼트. 면색은 버튼이 아니라 아래 표시자 한 장이 맡는다 */}
+      <div
+        role="tablist"
+        aria-label="회원 유형"
+        className="bg-surface-disabled dark:bg-surface-field grid grid-cols-2 rounded-full p-1"
+      >
+        {/* 칸 하나 크기로 1번 칸에 겹쳐 두고, 2번이 선택되면 제 너비만큼 옮긴다.
+            칸 너비가 같아 translate-x-full 이 정확히 옆 칸에 맞는다. */}
+        <span
+          aria-hidden="true"
+          className={cn(
+            "bg-brand-primary pointer-events-none col-start-1 row-start-1 rounded-full transition-transform duration-300 ease-out motion-reduce:transition-none",
+            tab === "agency" && "translate-x-full",
+          )}
+        />
         {TABS.map((item, index) => {
           const active = item.key === tab
 
@@ -84,31 +96,14 @@ const LoginCard = () => {
               id={`login-tab-${item.key}`}
               onClick={() => setTab(item.key)}
               className={cn(
-                "flex cursor-pointer flex-col items-center gap-1 px-2 py-4 text-center md:px-4 md:py-8",
+                "relative row-start-1 cursor-pointer rounded-full px-2 py-3.5 text-center text-sm transition-colors",
+                index === 0 ? "col-start-1" : "col-start-2",
                 active
-                  ? "bg-brand-primary"
-                  : cn(
-                      "bg-surface-disabled border-line-card-strong",
-                      index === 0 ? "border-r" : "border-l",
-                    ),
+                  ? "text-ink-on-brand font-bold"
+                  : "text-ink-muted font-semibold",
               )}
             >
-              <span
-                className={cn(
-                  "text-xl font-bold break-keep md:text-2xl",
-                  active ? "text-ink-on-brand" : "text-ink-bullet",
-                )}
-              >
-                {item.title}
-              </span>
-              <span
-                className={cn(
-                  "text-xs font-normal whitespace-nowrap md:text-sm md:font-medium",
-                  active ? "text-ink-on-brand-muted" : "text-ink-faint",
-                )}
-              >
-                {item.caption}
-              </span>
+              {item.title}
             </button>
           )
         })}
@@ -118,11 +113,11 @@ const LoginCard = () => {
         role="tabpanel"
         id={`login-panel-${tab}`}
         aria-labelledby={`login-tab-${tab}`}
-        className="border-line-card-strong flex flex-col gap-4 border-t p-5 md:gap-6 md:p-8"
+        className="flex flex-col gap-6"
       >
         {tab === "company" ? (
-          <>
-            <div className="border-line-panel bg-surface-panel flex flex-col gap-4 rounded-lg border p-5 md:rounded-2xl md:p-8">
+          <div className="flex flex-col gap-4">
+            <div className="bg-surface-panel flex flex-col gap-4 rounded-2xl p-5">
               <div className="flex flex-col">
                 <p className="text-ink-strong text-base font-bold break-keep">
                   기보 ONE 플랫폼 통합 로그인
@@ -137,29 +132,35 @@ const LoginCard = () => {
                   기업회원은 기보 ONE 플랫폼 통합 계정으로 탄소중립 플랫폼을
                   로그인합니다.
                 </p>
-                <p>
-                  아래 버튼을 클릭하면 기보 ONE 플랫폼 로그인 페이지로
-                  이동합니다.
-                </p>
               </div>
             </div>
 
-            <div className="flex flex-col gap-4 md:gap-6">
-              <Button
-                type="button"
-                size="lg"
-                className="bg-brand-primary hover:bg-brand-primary-hover text-ink-on-brand h-11 w-full px-4 text-sm font-bold md:h-13"
-              >
-                기보 ONE 로그인
-              </Button>
+            {/* 외부 사이트로 나가는 동선이라 대각선 화살표를 붙인다 */}
+            <Button
+              type="button"
+              size="lg"
+              className="bg-brand-primary hover:bg-brand-primary-hover text-ink-on-brand h-13 w-full gap-1.5 rounded-lg px-4 text-sm font-bold"
+            >
+              기보 ONE 로그인
+              <ArrowUpRight aria-hidden="true" className="size-5" />
+            </Button>
 
-              <div className="text-ink-faint flex flex-col items-center gap-1 text-xs break-keep">
-                {NOTES.map((note) => (
-                  <p key={note}>{note}</p>
-                ))}
-              </div>
+            <div className="text-ink-faint flex flex-col items-center gap-1 text-center text-xs break-keep">
+              {NOTES.map((note) => {
+                const [head, tail] = note.split(PORTAL)
+
+                return (
+                  <p key={note}>
+                    {head}
+                    {tail === undefined ? null : (
+                      <span className="whitespace-nowrap">{PORTAL}</span>
+                    )}
+                    {tail}
+                  </p>
+                )
+              })}
             </div>
-          </>
+          </div>
         ) : (
           <form
             onSubmit={(event) => {
@@ -194,7 +195,7 @@ const LoginCard = () => {
                     revalidate({ id: event.target.value })
                   }}
                   className={cn(
-                    "border-line-field bg-surface-field text-ink-strong placeholder:text-ink-placeholder h-12 rounded-md text-sm font-medium placeholder:font-medium",
+                    "border-line-field bg-surface-field text-ink-strong placeholder:text-ink-placeholder h-12.25 rounded-md text-base font-medium placeholder:font-medium",
                     errors.id &&
                       "hover:ring-destructive focus-visible:ring-destructive",
                   )}
@@ -217,25 +218,43 @@ const LoginCard = () => {
                 >
                   비밀번호
                 </Label>
-                <Input
-                  id="login-password"
-                  name="login-password"
-                  type="password"
-                  autoComplete="current-password"
-                  placeholder="비밀번호를 입력하세요"
-                  value={password}
-                  isValid={!errors.password}
-                  aria-describedby="login-password-message"
-                  onChange={(event) => {
-                    setPassword(event.target.value)
-                    revalidate({ password: event.target.value })
-                  }}
-                  className={cn(
-                    "border-line-field bg-surface-field text-ink-strong placeholder:text-ink-placeholder h-12 rounded-md text-sm font-medium placeholder:font-medium",
-                    errors.password &&
-                      "hover:ring-destructive focus-visible:ring-destructive",
-                  )}
-                />
+                {/* 눈 버튼이 글자 위에 겹치지 않게 입력 칸 오른쪽을 비워 둔다 */}
+                <div className="relative">
+                  <Input
+                    id="login-password"
+                    name="login-password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="current-password"
+                    placeholder="비밀번호를 입력하세요"
+                    value={password}
+                    isValid={!errors.password}
+                    aria-describedby="login-password-message"
+                    onChange={(event) => {
+                      setPassword(event.target.value)
+                      revalidate({ password: event.target.value })
+                    }}
+                    className={cn(
+                      "border-line-field bg-surface-field text-ink-strong placeholder:text-ink-placeholder h-12.25 rounded-md pr-11 text-base font-medium placeholder:font-medium",
+                      errors.password &&
+                        "hover:ring-destructive focus-visible:ring-destructive",
+                    )}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    aria-label={
+                      showPassword ? "비밀번호 숨기기" : "비밀번호 표시"
+                    }
+                    aria-pressed={showPassword}
+                    className="text-ink-muted hover:text-ink-strong absolute top-1/2 right-4 -translate-y-1/2 cursor-pointer"
+                  >
+                    {showPassword ? (
+                      <EyeOff aria-hidden="true" className="size-5" />
+                    ) : (
+                      <Eye aria-hidden="true" className="size-5" />
+                    )}
+                  </button>
+                </div>
                 {errors.password && (
                   <p
                     id="login-password-message"
@@ -278,7 +297,7 @@ const LoginCard = () => {
             <Button
               type="submit"
               size="lg"
-              className="bg-brand-primary hover:bg-brand-primary-hover text-ink-on-brand h-11 w-full px-4 text-sm font-bold md:h-13"
+              className="bg-brand-primary hover:bg-brand-primary-hover text-ink-on-brand h-13 w-full rounded-lg px-4 text-sm font-bold"
             >
               로그인
             </Button>
@@ -286,7 +305,7 @@ const LoginCard = () => {
         )}
       </div>
 
-      <div className="border-line-card-strong bg-surface-panel flex flex-col items-center justify-center gap-1 border-t px-5 py-6 sm:flex-row sm:gap-4">
+      <div className="border-line-card flex flex-col items-center justify-center gap-2 border-t pt-5 sm:flex-row sm:gap-4">
         <span className="text-ink-bullet text-sm font-medium break-keep">
           {footer.text}
         </span>
