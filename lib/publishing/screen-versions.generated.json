@@ -1,5 +1,5 @@
 {
-  "version": "v0.1.3",
+  "version": "v0.1.4",
   "screens": [
     {
       "path": "/carbon-leader/application-1/application-form",
@@ -307,7 +307,7 @@
       "isCurrent": false
     },
     { "path": "/home", "version": "v0.0.2", "isCurrent": false },
-    { "path": "/login", "version": "v0.1.2", "isCurrent": false },
+    { "path": "/login", "version": "v0.1.4", "isCurrent": true },
     {
       "path": "/login/agency-signup-guide",
       "version": "v0.1.2",
@@ -317,7 +317,7 @@
     {
       "path": "/login/leader-supplement-notice",
       "version": "v0.1.3",
-      "isCurrent": true
+      "isCurrent": false
     },
     {
       "path": "/my-page/profile-edit",
