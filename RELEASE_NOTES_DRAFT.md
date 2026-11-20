@@ -29,3 +29,16 @@
 
 릴리스 성공 후 내용은 자동으로 비워집니다.
 -->
+
+## [Diff 확인]
+
+### 로그인 화면 UI 개선
+
+- 대상: app/(site)/login/components/login-card.tsx
+  - app/(site)/login/page.tsx
+- 변경: 회원 유형 탭이 세그먼트 구조로 바뀜 — 표시자 1장과 버튼 2개를 grid 로 겹쳐 둔다
+  - 비밀번호 보기 토글 추가 (showPassword 상태)
+  - 탭 설명줄 · 안내 상자 두 번째 문단 · 브레드크럼 제거
+- 결과: globals.css 무수정, 기존 시맨틱 토큰만 써서 다른 화면 영향 없음
+  - 모달 연결과 유효성 검사 규칙은 그대로
+- 커밋: [변경사항 보기](https://github.com/fromex-koh/fromex-carbon/commit/7ba050c4ad2d7541a4b86aa5748dd7458700e13e)
